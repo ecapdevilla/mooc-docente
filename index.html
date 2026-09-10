@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MéritoDocente | Plataforma de preparación para concursos docentes</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="api-client.js" defer></script>
+  <script src="auth.js" defer></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo" onclick="app.showView('landing'); return false;">
+        <span class="logo-mark"><i class="fas fa-graduation-cap"></i></span>
+        <span class="logo-text">MéritoDocente</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#" onclick="app.showView('landing'); return false;">Inicio</a></li>
+        <li><a href="#modulos" onclick="app.showView('dashboard'); return false;">Cursos</a></li>
+        <li><a href="#mi-aprendizaje" onclick="app.showView('dashboard'); return false;">Mi aprendizaje</a></li>
+      </ul>
+
+      <div class="nav-user">
+        <div class="user-chip" id="userChip" style="display:none;">
+          <div class="user-avatar" id="userAvatar">?</div>
+          <div class="user-info">
+            <strong id="userName">Invitado</strong>
+            <span id="userRole">Preparándose</span>
+          </div>
+        </div>
+        <button class="icon-btn" id="logoutBtn" title="Cerrar sesión" style="display:none;" onclick="auth.logout();">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- VISTA 1: LANDING + REGISTRO -->
+  <div id="view-landing">
+    <header class="hero" id="inicio">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-content">
+            <div class="badge">
+              <i class="fas fa-star"></i> Convocatoria 2026 · Cupos limitados
+            </div>
+            <h1>Tu plaza docente <span class="accent">empieza aquí</span></h1>
+            <p class="hero-lead">Prepárate para el examen del concurso de méritos con cursos estructurados por área, evaluaciones tipo prueba y seguimiento de tu progreso. Todo en un solo lugar.</p>
+            <div class="cta-group">
+              <a href="#registro" class="btn btn-primary" onclick="app.showView('landing'); document.getElementById('registro').scrollIntoView({behavior: 'smooth'}); return false;">
+                <i class="fas fa-rocket"></i> Quiero matricularme
+              </a>
+              <a href="#modulos" class="btn btn-outline" onclick="app.showView('dashboard'); return false;">
+                <i class="fas fa-compass"></i> Explorar cursos
+              </a>
+            </div>
+            <div class="hero-stats">
+              <div class="stat"><div class="stat-num">8</div><div class="stat-label">Áreas del examen</div></div>
+              <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Lecciones</div></div>
+              <div class="stat"><div class="stat-num">100%</div><div class="stat-label">En línea</div></div>
+              <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Disponible</div></div>
+            </div>
+          </div>
+
+          <div class="hero-visual" id="registro">
+            <div class="register-card">
+              <div class="card-head">
+                <h3>Inscripción gratuita</h3>
+                <p>Empieza en menos de 1 minuto</p>
+              </div>
+
+              <form id="registroForm" onsubmit="auth.handleRegister(event)">
+                <div class="form-field">
+                  <i class="fas fa-user"></i>
+                  <input type="text" id="nombre" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="form-field">
+                  <i class="fas fa-envelope"></i>
+                  <input type="email" id="email" placeholder="Correo electrónico" required>
+                </div>
+
+                <div class="form-field">
+                  <i class="fas fa-phone-alt"></i>
+                  <input type="tel" id="celular" placeholder="Celular (WhatsApp)" required>
+                </div>
+
+                <div class="form-field">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <select id="departamento" required>
+                    <option value="" disabled selected>Selecciona tu departamento</option>
+                    <option>Antioquia</option><option>Atlántico</option><option>Bogotá D.C.</option>
+                    <option>Bolívar</option><option>Boyacá</option><option>Caldas</option>
+                    <option>Caquetá</option><option>Cauca</option><option>Cesar</option>
+                    <option>Córdoba</option><option>Cundinamarca</option><option>Chocó</option>
+                    <option>Huila</option><option>La Guajira</option><option>Magdalena</option>
+                    <option>Meta</option><option>Nariño</option><option>Norte de Santander</option>
+                    <option>Quindío</option><option>Risaralda</option><option>Santander</option>
+                    <option>Sucre</option><option>Tolima</option><option>Valle del Cauca</option>
+                    <option>Vaupés</option><option>Vichada</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-secondary btn-block" style="margin-top:0.5rem;">
+                  <i class="fas fa-check-circle"></i> Matricularme gratis
+                </button>
+
+                <div class="privacy-note">
+                  <i class="fas fa-lock"></i> Tus datos están seguros. Sin spam.
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- FEATURES -->
+    <section class="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">¿Por qué elegirnos?</span>
+          <h2>Todo lo que necesitas para aprobar</h2>
+          <p>Una plataforma diseñada específicamente para docentes que aspiran a una plaza en el concurso de méritos.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+            <h4>Contenido estructurado</h4>
+            <p>Módulos organizados por áreas del examen con teoría, ejemplos y casos prácticos.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon"><i class="fas fa-clipboard-check"></i></div>
+            <h4>Evaluación enfocada</h4>
+            <p>Cada lección incluye autoevaluaciones que replican el formato del concurso.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+            <h4>Seguimiento de progreso</h4>
+            <p>Visualiza tu avance por curso e identifica las áreas que necesitas reforzar.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+            <h4>Insignias de logro</h4>
+            <p>Al completar cada módulo obtienes una insignia que respalda tu preparación.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÁREAS -->
+    <section class="section areas">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Áreas evaluadas</span>
+          <h2>Cubrimos todas las áreas del examen</h2>
+          <p>Estudia por área y enfócate en lo que más necesitas reforzar.</p>
+        </div>
+        <div class="areas-grid">
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">01</div><div class="area-body"><h4>Pedagogía y Didáctica</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">02</div><div class="area-body"><h4>Legislación Educativa</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">03</div><div class="area-body"><h4>Evaluación Educativa</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">04</div><div class="area-body"><h4>Psicología del Aprendizaje</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">05</div><div class="area-body"><h4>TIC en Educación</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">06</div><div class="area-body"><h4>Currículo y Desarrollo</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">07</div><div class="area-body"><h4>Ética Docente</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" onclick="app.showView('dashboard'); return false;"><div class="area-num">08</div><div class="area-body"><h4>Práctica Pedagógica</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="final-cta">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Tu momento es ahora<br><span class="accent">Da el primer paso hacia tu plaza docente</span></h2>
+          <p>Únete a los docentes que se están preparando con la mejor plataforma de estudio para el concurso de méritos.</p>
+          <a href="#registro" class="btn"><i class="fas fa-play-circle"></i> Continuar estudiando</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- VISTA 2: DASHBOARD -->
+  <div id="view-dashboard" class="hidden">
+    <section class="dashboard">
+      <div class="container">
+        <div class="welcome-banner">
+          <div>
+            <h2 id="welcomeTitle">¡Hola de nuevo!</h2>
+            <p>Continúa tu preparación para el concurso de méritos. Cada lección te acerca a tu plaza.</p>
+          </div>
+          <div class="welcome-progress">
+            <div class="label">Progreso total</div>
+            <div class="value" id="globalProgress">0%</div>
+          </div>
+        </div>
+
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <div class="dash-stat-icon blue"><i class="fas fa-book-open"></i></div>
+            <div class="dash-stat-info">
+              <strong id="statModules">0/2</strong>
+              <span>Módulos completados</span>
+            </div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-icon green"><i class="fas fa-check-circle"></i></div>
+            <div class="dash-stat-info">
+              <strong id="statLessons">0/5</strong>
+              <span>Lecciones completadas</span>
+            </div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-icon yellow"><i class="fas fa-medal"></i></div>
+            <div class="dash-stat-info">
+              <strong id="statBadges">0/2</strong>
+              <span>Insignias obtenidas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header" style="text-align:left; margin: 0 0 1.5rem;">
+          <span class="eyebrow">Módulos disponibles</span>
+          <h2 style="font-size:1.6rem;">Continúa tu aprendizaje</h2>
+        </div>
+
+        <div class="modules-grid" id="modulesGrid"></div>
+
+        <div class="badges-section">
+          <h3><i class="fas fa-award"></i> Mis insignias</h3>
+          <div class="badges-grid" id="badgesGrid"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- VISTA 3: LECCIÓN -->
+  <div id="view-lesson" class="hidden">
+    <section class="section">
+      <div class="container">
+        <div class="lesson-view" id="lessonView"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL DE INSIGNIA -->
+  <div class="modal-overlay" id="badgeModal">
+    <div class="badge-modal">
+      <div class="badge-icon-wrapper">
+        <div class="badge-icon"><i class="fas fa-award" id="badgeModalIcon"></i></div>
+      </div>
+      <h3>¡Insignia desbloqueada!</h3>
+      <p>Has completado satisfactoriamente el módulo</p>
+      <div class="badge-name" id="badgeModalName">Nombre de insignia</div>
+      <button class="btn btn-primary" onclick="closeBadgeModal()">
+        <i class="fas fa-check"></i> ¡Genial!
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo" onclick="app.showView('landing'); return false;">
+            <span class="logo-mark"><i class="fas fa-graduation-cap"></i></span>
+            <span class="logo-text">MéritoDocente</span>
+          </a>
+          <p>La plataforma de preparación para el concurso de méritos docentes. Aprende a tu ritmo, evalúa tus conocimientos y alcanza tu plaza.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Plataforma</h5>
+          <ul>
+            <li><a href="#" onclick="app.showView('dashboard'); return false;">Cursos</a></li>
+            <li><a href="#" onclick="app.showView('landing'); return false;">Crear cuenta</a></li>
+            <li><a href="#">Iniciar sesión</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Contacto</h5>
+          <ul>
+            <li><a href="mailto:soporte@meritodocente.com"><i class="fas fa-envelope"></i> soporte@meritodocente.com</a></li>
+            <li><a href="#"><i class="fas fa-map-marker-alt"></i> Colombia</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 MéritoDocente. Todos los derechos reservados.</span>
+        <span>Hecho con <i class="fas fa-heart heart"></i> para docentes</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
