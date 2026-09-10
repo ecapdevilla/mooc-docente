@@ -53,6 +53,7 @@ Resolver estos puntos antes de usar datos reales o desplegar:
 9. `app.js` envía un módulo a una ruta que espera `lessonId` y no establece de forma consistente `currentLessonId`.
 10. `tests/` está vacío; `npm test` termina con `No tests found`.
 11. `docs/swagger.yaml` no existe, por lo que `/api-docs` no se monta.
+12. `index.html` carga `api-client.js` y `auth.js` desde la raíz, pero esos archivos están en `public/`; el frontend API necesita corregir esas rutas o su estructura de servido.
 
 ## Plan de conexión a Supabase
 
