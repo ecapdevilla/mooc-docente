@@ -32,6 +32,12 @@ El flujo actual es:
 - `app.js` es la lógica que intenta consumir la API.
 - `indexInicial.html` es la SPA documentada, pero actualmente usa principalmente módulos y progreso locales; existe una segunda integración en `app.js`.
 
+### Decisión de producto
+
+`indexInicial.html` es la fuente principal de diseño, contenido y flujo de usuario: no es un archivo descartable, sino el prototipo más completo del producto. Los módulos, lecciones, quizzes, badges y pantallas que hoy funcionan con `localStorage` deben migrarse progresivamente a persistencia real.
+
+`index.html` y `app.js` son una integración API provisional. No crear una tercera interfaz ni duplicar módulos. La dirección es conservar la experiencia de `indexInicial.html`, conectar sus acciones con la API y dejar una sola entrada frontend antes del despliegue.
+
 ### API registrada
 
 - Pública: `GET /health`, `GET /api/v1/ping/health`, registro, login, listado y detalle de cursos.
@@ -73,9 +79,9 @@ Evaluar Supabase Auth, Storage y Row Level Security únicamente después de esta
 
 ## Punto actual y siguiente acción
 
-Estado: arquitectura inventariada y documentada; GitHub sincronizado; no hay conexión a Supabase todavía; no se han corregido los bloqueos funcionales listados arriba.
+Estado: arquitectura inventariada y documentada; `indexInicial.html` definido como fuente de producto; GitHub sincronizado; no hay conexión a Supabase todavía; no se han corregido los bloqueos funcionales listados arriba.
 
-Siguiente acción concreta: corregir esquema/seed y contratos de autenticación, progreso y perfil; ejecutar validaciones locales; después crear el proyecto Supabase y probar la conexión con una `DATABASE_URL` de desarrollo.
+Siguiente acción concreta: corregir esquema/seed y contratos de autenticación, progreso y perfil; ejecutar validaciones locales; después crear el proyecto Supabase y probar la conexión con una `DATABASE_URL` de desarrollo. Luego migrar una vertical completa (login -> cursos -> una lección -> progreso) antes de convertir el resto de módulos.
 
 ## Comandos
 
