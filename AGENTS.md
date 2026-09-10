@@ -19,6 +19,8 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 
 ## Auditoría de arquitectura (2026-09-10)
 
+La hoja de ruta funcional completa, incluido el simulacro gratuito y la importación de 50 preguntas desde Word, está en `docs/roadmap.md`.
+
 ### Arquitectura real
 
 El flujo actual es:
@@ -146,8 +148,10 @@ El agente siguiente debe comenzar por `Siguiente acción concreta` y solo amplia
 
 ## Prioridades pendientes
 
-1. Añadir pruebas mínimas para salud, autenticación, cursos y progreso.
-2. Decidir si `app.js` y los HTML de la raíz seguirán siendo el frontend oficial o si se consolidarán en una sola entrada.
-3. Añadir `docs/swagger.yaml` o corregir la referencia si la documentación OpenAPI no forma parte del alcance.
-4. Inicializar Git y documentar una estrategia de ramas antes de trabajo colaborativo. (Git ya está inicializado; falta definir la estrategia.)
-5. Revisar respuestas y nombres de campos del frontend contra las rutas reales.
+1. Corregir esquema, seed y contratos de autenticación, progreso y perfil.
+2. Añadir pruebas mínimas para salud, autenticación, cursos y progreso.
+3. Crear Supabase y conectar PostgreSQL mediante `DATABASE_URL`.
+4. Implementar el simulacro gratuito sin registro y su calificación en backend.
+5. Crear editor, importar y publicar las primeras 50 preguntas desde Word.
+6. Consolidar `indexInicial.html` como única SPA y migrar el progreso a la API.
+7. Definir estrategia de ramas; Git ya está inicializado y sincronizado.
