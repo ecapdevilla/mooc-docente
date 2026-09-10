@@ -14,8 +14,67 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 - Esquema de datos: `database/schema.sql`.
 - Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`.
 - Pruebas: la carpeta `tests/` está vacía actualmente. `npm test` termina con `No tests found`.
-- Git: esta carpeta no tiene `.git` en el momento de documentar este estado.
+- Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
 - Swagger es opcional: el servidor solo monta `/api-docs` si existe `docs/swagger.yaml`.
+
+## Auditoría de arquitectura (2026-09-10)
+
+### Arquitectura real
+
+El flujo actual es:
+
+`Frontend -> Express -> rutas con SQL directo -> PostgreSQL`
+
+- `src/server.js` configura Express, seguridad, rate limiting, rutas, `/health` y el arranque condicionado a una conexión válida.
+- `src/config/database.js` usa `pg.Pool` y exige `DATABASE_URL`.
+- Las consultas están directamente en `src/routes/`; `src/controllers/` y `src/models/` están vacíos.
+- `public/api-client.js` y `public/auth.js` son el cliente de API y la gestión de sesión con `localStorage`.
+- `app.js` es la lógica que intenta consumir la API.
+- `indexInicial.html` es la SPA documentada, pero actualmente usa principalmente módulos y progreso locales; existe una segunda integración en `app.js`.
+
+### API registrada
+
+- Pública: `GET /health`, `GET /api/v1/ping/health`, registro, login, listado y detalle de cursos.
+- Autenticada: usuario actual, progreso, completar lección, perfil, actualización de perfil e inscripciones.
+- Administrativa: listado de usuarios y actualización de usuarios bajo `/api/v1/admin`.
+
+### Bloqueos verificados antes de conectar Supabase
+
+Resolver estos puntos antes de usar datos reales o desplegar:
+
+1. `npm run seed` apunta a `src/seed/seed.js`, pero ese archivo intenta importar `./src/seed/seed` desde su propia carpeta.
+2. `src/seed/data.sql` inserta `lessons.descripcion`, columna que no existe en `database/schema.sql`.
+3. El seed crea inscripciones y progreso inicial que pueden repetirse y violar las restricciones `UNIQUE`.
+4. `src/routes/users.js` actualiza `users.actualizado_en`, columna que no existe en el esquema.
+5. `src/routes/progress.js` lee `req.user.usuarioId`; `src/middleware/auth.js` entrega `req.user.id`.
+6. La lógica de badges trata `existingBadge` como si fuera el resultado completo de `pool.query`, aunque ya desestructuró `rows`.
+7. `validateProgress` está importado pero no se aplica a la ruta.
+8. `GET /courses` y `GET /courses/:id` no exponen la misma forma de datos que espera `app.js`.
+9. `app.js` envía un módulo a una ruta que espera `lessonId` y no establece de forma consistente `currentLessonId`.
+10. `tests/` está vacío; `npm test` termina con `No tests found`.
+11. `docs/swagger.yaml` no existe, por lo que `/api-docs` no se monta.
+
+## Plan de conexión a Supabase
+
+### Fase 1: Supabase como PostgreSQL administrado (recomendada)
+
+Conservar Express, `pg`, JWT y bcryptjs. Crear el proyecto Supabase, ejecutar el esquema corregido en el SQL Editor, cargar un seed idempotente y poner la cadena PostgreSQL de Supabase en `DATABASE_URL`. Configurar SSL para producción y probar primero `/health`, registro, login, cursos y progreso.
+
+Esta fase no requiere `@supabase/supabase-js`, Supabase Auth ni una reescritura de las consultas. El pooler de Supabase debe usarse según la cadena recomendada por el proyecto y las credenciales deben permanecer solo en `.env`.
+
+### Fase 2: consolidación de aplicación
+
+Elegir un único frontend oficial, alinear sus respuestas con la API y separar rutas, controladores y modelos solo cuando exista una necesidad concreta. Añadir pruebas mínimas para salud, autenticación, cursos y progreso.
+
+### Fase 3: servicios nativos de Supabase (opcional)
+
+Evaluar Supabase Auth, Storage y Row Level Security únicamente después de estabilizar la API actual. Es una migración mayor porque cambia identidad, autorización y acceso a datos.
+
+## Punto actual y siguiente acción
+
+Estado: arquitectura inventariada y documentada; GitHub sincronizado; no hay conexión a Supabase todavía; no se han corregido los bloqueos funcionales listados arriba.
+
+Siguiente acción concreta: corregir esquema/seed y contratos de autenticación, progreso y perfil; ejecutar validaciones locales; después crear el proyecto Supabase y probar la conexión con una `DATABASE_URL` de desarrollo.
 
 ## Comandos
 
@@ -83,5 +142,5 @@ El agente siguiente debe comenzar por `Siguiente acción concreta` y solo amplia
 1. Añadir pruebas mínimas para salud, autenticación, cursos y progreso.
 2. Decidir si `app.js` y los HTML de la raíz seguirán siendo el frontend oficial o si se consolidarán en una sola entrada.
 3. Añadir `docs/swagger.yaml` o corregir la referencia si la documentación OpenAPI no forma parte del alcance.
-4. Inicializar Git y documentar una estrategia de ramas antes de trabajo colaborativo.
-5. Revisar respuestas y nombres de campos del frontend contra los controladores reales.
+4. Inicializar Git y documentar una estrategia de ramas antes de trabajo colaborativo. (Git ya está inicializado; falta definir la estrategia.)
+5. Revisar respuestas y nombres de campos del frontend contra las rutas reales.
