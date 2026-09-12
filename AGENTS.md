@@ -14,7 +14,7 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 - Esquema de datos: `database/schema.sql`.
 - Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`, idempotentes. Las opciones de quiz se reconcilian al reejecutar el seed.
 - Base de datos de desarrollo: Supabase (pooler) mediante `DATABASE_URL` en `.env`.
-- Pruebas: `tests/` tiene 4 suites (salud, autenticación, cursos, progreso). `npm test` pasa 19/19 (2026-09-12).
+- Pruebas: `tests/` tiene 5 suites (salud, autenticación, cursos, progreso y la interfaz del SPA con jsdom). `npm test` pasa 26/26 (2026-09-12).
 - Servido local: `GET /` entrega `indexInicial.html`; `public/` expone `/api-client.js` y `/auth.js` en la raíz.
 - Despliegue: `vercel.json` y `api/index.js` preparan frontend estático + API serverless. Aún no desplegado ni verificado en Vercel.
 - Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
@@ -98,7 +98,7 @@ npm install
 npm run dev       # nodemon src/server.js
 npm start         # node src/server.js
 npm run seed      # idempotente; requiere PostgreSQL y variables de entorno
-npm test          # 4 suites / 19 pruebas contra la base configurada en .env
+npm test          # 5 suites / 26 pruebas contra la base configurada en .env
 ```
 
 Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en `.env.example`. El servidor verifica la conexión a la base de datos antes de escuchar en el puerto. Con `npm run dev`, el SPA está en `http://localhost:3000/` y la API en `http://localhost:3000/api/v1`. Para reproducir el enrutado de Vercel en local: `npx vercel dev`.

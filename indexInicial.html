@@ -2193,6 +2193,12 @@
        HELPERS
     ============================================================ */
     function showView(view) {
+      // Un usuario con sesión no necesita volver a la landing de matrícula:
+      // se le mantiene en su área de aprendizaje.
+      if (view === 'landing' && state.user) {
+        view = 'dashboard';
+      }
+
       document.getElementById('view-landing').classList.add('hidden');
       document.getElementById('view-dashboard').classList.add('hidden');
       document.getElementById('view-lesson').classList.add('hidden');
@@ -2498,7 +2504,7 @@
           document.getElementById('registroForm').reset();
           updateNavbar();
 
-          alert(`¡Felicidades ${nombre.split(' ')[0]}! 🎉\n\nNo pudimos conectar con el servidor. Tu progreso se guardará solo en este dispositivo.`);
+          alert(`¡Felicidades ${nombre.split(' ')[0]}! 🎉\n\nNo pudimos conectar con el servidor (${API_BASE}). Tu progreso se guardará solo en este dispositivo.`);
 
           showView('dashboard');
         }
@@ -2551,7 +2557,7 @@
       } catch (err) {
         errorBox.textContent = err.status
           ? err.message
-          : 'No pudimos conectar con el servidor. Verifica tu conexión.';
+          : `No pudimos conectar con el servidor (${API_BASE}). Verifica tu conexión.`;
         errorBox.style.display = 'block';
       } finally {
         submitBtn.disabled = false;

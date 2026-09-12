@@ -150,7 +150,7 @@ Criterio de salida: frontend y API desplegados, con simulacro anónimo y cuenta 
 
 ## Estado de avance (2026-09-12)
 
-- Fase 0 (saneamiento): completada. Esquema, seed y contratos corregidos; `npm test` pasa 4 suites y 19 pruebas.
+- Fase 0 (saneamiento): completada. Esquema, seed y contratos corregidos; `npm test` pasa 5 suites y 26 pruebas (incluye la interfaz del SPA con jsdom).
 - Fase 1 (Supabase): completada. La API opera contra Supabase con `pg`, JWT y bcryptjs.
 - Fase 2 (simulacro gratuito): pendiente.
 - Fase 3 (banco y editor de preguntas): pendiente. El seed ya carga 4 lecciones y 4 quizzes con 4 opciones y 1 respuesta correcta cada uno.
