@@ -58,10 +58,16 @@ router.get('/:id', async (req, res) => {
       const lessonsWithQuiz = [];
       for (const lesson of lessons) {
         const { rows: quizzes } = await pool.query(
-          `SELECT q.*, 
-           (SELECT json_agg(json_build_object('id', qo.id, 'opcion', qo.opcion, 'es_correcta', qo.es_correcta, 'orden', qo.orden))
-            FROM quiz_options qo WHERE qo.quiz_id = q.id ORDER BY qo.orden) as opciones
-           FROM quizzes q WHERE q.leccion_id = $1`,
+          `SELECT q.*,
+           (SELECT json_agg(
+                     json_build_object('id', qo.id, 'opcion', qo.opcion, 'es_correcta', qo.es_correcta, 'orden', qo.orden)
+                     ORDER BY qo.orden
+                   )
+            FROM quiz_options qo
+            WHERE qo.quiz_id = q.id) as opciones
+           FROM quizzes q
+           WHERE q.leccion_id = $1
+           ORDER BY q.id`,
           [lesson.id]
         );
         lessonsWithQuiz.push({ ...lesson, quizzes });

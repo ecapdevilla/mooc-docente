@@ -3,7 +3,10 @@
  * Handles all HTTP requests to the backend API
  */
 
-const API_BASE_URL = 'http://localhost:3000/api/v1';
+const API_BASE_URL =
+  typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')
+    ? `${window.location.origin}/api/v1`
+    : 'http://localhost:3000/api/v1';
 
 class ApiClient {
   constructor() {
@@ -74,4 +77,13 @@ class ApiClient {
 
 // Export singleton instance
 const api = new ApiClient();
-module.exports = api;
+
+// Disponible para la SPA en el navegador (script clásico)
+if (typeof window !== 'undefined') {
+  window.api = api;
+}
+
+// Disponible para pruebas y scripts de Node
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = api;
+}

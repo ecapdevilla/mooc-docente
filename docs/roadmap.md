@@ -148,6 +148,15 @@ Criterio de salida: frontend y API desplegados, con simulacro anónimo y cuenta 
 7. Migrar cursos/progreso y consolidar la SPA.
 8. Desplegar en Vercel.
 
+## Estado de avance (2026-09-12)
+
+- Fase 0 (saneamiento): completada. Esquema, seed y contratos corregidos; `npm test` pasa 4 suites y 19 pruebas.
+- Fase 1 (Supabase): completada. La API opera contra Supabase con `pg`, JWT y bcryptjs.
+- Fase 2 (simulacro gratuito): pendiente.
+- Fase 3 (banco y editor de preguntas): pendiente. El seed ya carga 4 lecciones y 4 quizzes con 4 opciones y 1 respuesta correcta cada uno.
+- Fase 4 (cuenta y aprendizaje): en progreso. `indexInicial.html` registra, inicia sesión y persiste progreso e insignias en la API. Falta reconciliar el contenido de lecciones entre el SPA y la base de datos y retirar `index.html`/`app.js`.
+- Fase 5 (despliegue): preparada y no ejecutada. `vercel.json` + `api/index.js` definen frontend estático y API serverless; en Vercel deben configurarse `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production` y `CORS_ORIGIN`.
+
 ## Criterios permanentes para agentes
 
 - Antes de editar, leer `AGENTS.md` y solo el archivo dueño del comportamiento.

@@ -9,9 +9,17 @@
     "test": "jest --verbose",
     "seed": "node src/seed/seed.js"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": ["<rootDir>/tests/setup.js"],
+    "testTimeout": 30000
+  },
   "keywords": ["mooc", "educación", "concursos", "docentes"],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

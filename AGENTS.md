@@ -8,14 +8,17 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 
 - Plataforma MOOC para preparación de concursos de méritos docentes.
 - Backend: Node.js 18+, Express 4, PostgreSQL, JWT y bcryptjs.
-- Frontend: HTML, CSS y JavaScript vanilla; la SPA principal está en `indexInicial.html` y usa `public/api-client.js` y `public/auth.js`.
-- Punto de entrada backend: `src/server.js`.
+- Frontend: HTML, CSS y JavaScript vanilla; la SPA principal es `indexInicial.html` (autocontenida) y consume la API directamente.
+- Punto de entrada backend: `src/server.js`. Escucha solo si se ejecuta directamente y exporta la app para uso serverless.
 - API base: `/api/v1`.
 - Esquema de datos: `database/schema.sql`.
-- Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`.
-- Pruebas: la carpeta `tests/` está vacía actualmente. `npm test` termina con `No tests found`.
+- Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`, idempotentes. Las opciones de quiz se reconcilian al reejecutar el seed.
+- Base de datos de desarrollo: Supabase (pooler) mediante `DATABASE_URL` en `.env`.
+- Pruebas: `tests/` tiene 4 suites (salud, autenticación, cursos, progreso). `npm test` pasa 19/19 (2026-09-12).
+- Servido local: `GET /` entrega `indexInicial.html`; `public/` expone `/api-client.js` y `/auth.js` en la raíz.
+- Despliegue: `vercel.json` y `api/index.js` preparan frontend estático + API serverless. Aún no desplegado ni verificado en Vercel.
 - Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
-- Swagger es opcional: el servidor solo monta `/api-docs` si existe `docs/swagger.yaml`.
+- Deuda menor: el archivo `nulul` en la raíz es un artefacto de shell versionado por error.
 
 ## Auditoría de arquitectura (2026-09-10)
 
@@ -46,22 +49,23 @@ El flujo actual es:
 - Autenticada: usuario actual, progreso, completar lección, perfil, actualización de perfil e inscripciones.
 - Administrativa: listado de usuarios y actualización de usuarios bajo `/api/v1/admin`.
 
-### Bloqueos verificados antes de conectar Supabase
+### Bloqueos funcionales: estado
 
-Resolver estos puntos antes de usar datos reales o desplegar:
+Todos los bloqueos del inventario anterior (1-12) están corregidos: el seed es idempotente y canónico, el progreso usa `req.user.id`, los badges gestionan `rows`, `validateProgress` se aplica a la ruta, el perfil no toca columnas inexistentes, `tests/` tiene suites reales y `public/` se sirve desde Express.
 
-1. `npm run seed` apunta a `src/seed/seed.js`, pero ese archivo intenta importar `./src/seed/seed` desde su propia carpeta.
-2. `src/seed/data.sql` inserta `lessons.descripcion`, columna que no existe en `database/schema.sql`.
-3. El seed crea inscripciones y progreso inicial que pueden repetirse y violar las restricciones `UNIQUE`.
-4. `src/routes/users.js` actualiza `users.actualizado_en`, columna que no existe en el esquema.
-5. `src/routes/progress.js` lee `req.user.usuarioId`; `src/middleware/auth.js` entrega `req.user.id`.
-6. La lógica de badges trata `existingBadge` como si fuera el resultado completo de `pool.query`, aunque ya desestructuró `rows`.
-7. `validateProgress` está importado pero no se aplica a la ruta.
-8. `GET /courses` y `GET /courses/:id` no exponen la misma forma de datos que espera `app.js`.
-9. `app.js` envía un módulo a una ruta que espera `lessonId` y no establece de forma consistente `currentLessonId`.
-10. `tests/` está vacío; `npm test` termina con `No tests found`.
-11. `docs/swagger.yaml` no existe, por lo que `/api-docs` no se monta.
-12. `index.html` carga `api-client.js` y `auth.js` desde la raíz, pero esos archivos están en `public/`; el frontend API necesita corregir esas rutas o su estructura de servido.
+Corregidos además en la sesión del 2026-09-12:
+
+1. `GET /api/v1/courses/:id` fallaba con 500 (`column "qo.orden" must appear in the GROUP BY clause`, código 42803). El `ORDER BY` debe ir dentro de `json_agg(... ORDER BY ...)`.
+2. Al reejecutar el seed quedaban opciones de quiz obsoletas y aparecían quizzes con dos respuestas correctas. Ahora el seed reconcilia las opciones de los quizzes sembrados (4 opciones y 1 correcta por quiz).
+3. `public/api-client.js` terminaba con `module.exports`, que lanza `ReferenceError` en el navegador; ahora expone `window.api` y mantiene compatibilidad con Node.
+4. `GET /api/v1/progress` no exponía el detalle por lección; ahora cada módulo incluye `lessons` con `completada`.
+
+Pendientes reconocidos (no bloquean el desarrollo actual):
+
+- `docs/swagger.yaml` no existe, por lo que `/api-docs` no se monta.
+- `index.html` y `app.js` siguen siendo la integración provisional; su retiro está planificado.
+- El contenido del SPA y el del seed no coinciden lección por lección. El mapeo actual es por orden (módulo del prototipo ↔ curso de la API) y la reconciliación de contenido corresponde a la Fase 3.
+- El despliegue en Vercel está configurado pero no ejecutado ni verificado.
 
 ## Plan de conexión a Supabase
 
@@ -70,6 +74,8 @@ Resolver estos puntos antes de usar datos reales o desplegar:
 Conservar Express, `pg`, JWT y bcryptjs. Crear el proyecto Supabase, ejecutar el esquema corregido en el SQL Editor, cargar un seed idempotente y poner la cadena PostgreSQL de Supabase en `DATABASE_URL`. Configurar SSL para producción y probar primero `/health`, registro, login, cursos y progreso.
 
 Esta fase no requiere `@supabase/supabase-js`, Supabase Auth ni una reescritura de las consultas. El pooler de Supabase debe usarse según la cadena recomendada por el proyecto y las credenciales deben permanecer solo en `.env`.
+
+Estado (2026-09-12): completada. La API opera contra Supabase con `pg`, JWT y bcryptjs; registro, login, cursos, progreso, perfil e inscripciones responden correctamente y están cubiertos por pruebas.
 
 ### Fase 2: consolidación de aplicación
 
@@ -81,9 +87,9 @@ Evaluar Supabase Auth, Storage y Row Level Security únicamente después de esta
 
 ## Punto actual y siguiente acción
 
-Estado: arquitectura inventariada y documentada; `indexInicial.html` definido como fuente de producto; GitHub sincronizado; no hay conexión a Supabase todavía; no se han corregido los bloqueos funcionales listados arriba.
+Estado (2026-09-12): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 19 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar.
 
-Siguiente acción concreta: corregir esquema/seed y contratos de autenticación, progreso y perfil; ejecutar validaciones locales; después crear el proyecto Supabase y probar la conexión con una `DATABASE_URL` de desarrollo. Luego migrar una vertical completa (login -> cursos -> una lección -> progreso) antes de convertir el resto de módulos.
+Siguiente acción concreta: implementar el simulacro gratuito sin registro (Fase 2 del roadmap) y, en paralelo, reconciliar el contenido del SPA con el del seed para que cada lección del prototipo tenga su fila real (Fase 3). Después desplegar en Vercel y verificar rutas públicas, autenticadas y administrativas en producción.
 
 ## Comandos
 
@@ -91,11 +97,11 @@ Siguiente acción concreta: corregir esquema/seed y contratos de autenticación,
 npm install
 npm run dev       # nodemon src/server.js
 npm start         # node src/server.js
-npm run seed      # requiere PostgreSQL y variables de entorno
-npm test          # actualmente no hay tests; fallará por ausencia de archivos
+npm run seed      # idempotente; requiere PostgreSQL y variables de entorno
+npm test          # 4 suites / 19 pruebas contra la base configurada en .env
 ```
 
-Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en `.env.example`. El servidor verifica la conexión a la base de datos antes de escuchar en el puerto.
+Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en `.env.example`. El servidor verifica la conexión a la base de datos antes de escuchar en el puerto. Con `npm run dev`, el SPA está en `http://localhost:3000/` y la API en `http://localhost:3000/api/v1`. Para reproducir el enrutado de Vercel en local: `npx vercel dev`.
 
 ## Mapa rápido
 
@@ -105,7 +111,10 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en 
 - `src/services/`: lógica de negocio reutilizable.
 - `src/middleware/auth.js`: autenticación y autorización.
 - `src/utils/validators.js`: validación de entradas.
-- `public/`: cliente HTTP y autenticación del frontend.
+- `indexInicial.html`: SPA principal (diseño, contenido y flujo del producto).
+- `public/`: cliente HTTP y autenticación usados por la integración provisional.
+- `api/index.js`: entrada serverless de la API para Vercel.
+- `vercel.json`: builds y rutas del despliegue (frontend estático + API).
 - `database/schema.sql`: tablas, relaciones e índices.
 - `docs/architecture.md`: descripción general de arquitectura.
 
@@ -117,6 +126,9 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en 
 - No exponer secretos de `.env`, tokens ni contraseñas en código, logs o documentación.
 - Los cambios de esquema deben incluir la actualización de `database/schema.sql` y del seed cuando aplique.
 - Mantener compatibilidad con las respuestas que consume `indexInicial.html` y `public/api-client.js`.
+- Mapeo SPA ↔ API: `indexInicial.html` empareja cada módulo del prototipo con un curso por título, resuelve las lecciones por orden (`modulos[].lecciones[]`) y guarda cada lección completada con `POST /api/v1/progress/lesson/:id`. `GET /api/v1/progress` entrega, por módulo, `lessons` con `completada`.
+- Origen de la API en el SPA: `window.MERITO_API_BASE` si está definido; si no, `origen actual + /api/v1`; si no, `http://localhost:3000/api/v1` (apertura con `file://`). Si la API no responde, el SPA degrada a modo local y avisa al usuario.
+- Claves de `localStorage` compartidas: `auth_token` y `user`.
 - Antes de cambiar un endpoint, revisar su ruta, controlador/modelo y llamada del frontend inmediata; no explorar todo el repositorio sin necesidad.
 
 ## Protocolo de trabajo para agentes
@@ -148,10 +160,10 @@ El agente siguiente debe comenzar por `Siguiente acción concreta` y solo amplia
 
 ## Prioridades pendientes
 
-1. Corregir esquema, seed y contratos de autenticación, progreso y perfil.
-2. Añadir pruebas mínimas para salud, autenticación, cursos y progreso.
-3. Crear Supabase y conectar PostgreSQL mediante `DATABASE_URL`.
+1. ~~Corregir esquema, seed y contratos de autenticación, progreso y perfil.~~ Hecho (2026-09-12).
+2. ~~Añadir pruebas mínimas para salud, autenticación, cursos y progreso.~~ Hecho: 4 suites, 19 pruebas.
+3. ~~Crear Supabase y conectar PostgreSQL mediante `DATABASE_URL`.~~ Hecho.
 4. Implementar el simulacro gratuito sin registro y su calificación en backend.
 5. Crear editor, importar y publicar las primeras 50 preguntas desde Word.
-6. Consolidar `indexInicial.html` como única SPA y migrar el progreso a la API.
-7. Definir estrategia de ramas; Git ya está inicializado y sincronizado.
+6. Consolidar `indexInicial.html` como única SPA: progreso migrado a la API; falta reconciliar el contenido de lecciones y retirar `index.html`/`app.js`.
+7. Verificar el despliegue en Vercel (`vercel.json` y `api/index.js` ya preparados) y definir la estrategia de ramas.

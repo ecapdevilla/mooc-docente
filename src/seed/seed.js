@@ -1,20 +1,48 @@
 #!/usr/bin/env node
-// Seed script to initialize database with test data
-const { seedDatabase } = require('./src/seed/seed');
 
-const runSeed = async () => {
+const fs = require('fs');
+const path = require('path');
+const { pool } = require('../config/database');
+
+async function seedDatabase() {
+  const client = await pool.connect();
+
+  try {
+    const sqlPath = path.join(__dirname, 'data.sql');
+    const sql = fs.readFileSync(sqlPath, 'utf8');
+
+    console.log('🌱 Starting database seed...');
+
+    await client.query('BEGIN');
+    await client.query(sql);
+    await client.query('COMMIT');
+
+    console.log('✅ Seed completed successfully');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('❌ Seed failed:', err.message);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function runSeed() {
   try {
     await seedDatabase();
-    console.log('✅ Seed completed successfully');
-    process.exit(0);
+    process.exitCode = 0;
   } catch (err) {
-    console.error('❌ Seed failed:', err);
-    process.exit(1);
+    process.exitCode = 1;
+  } finally {
+    await pool.end();
   }
-};
+}
 
 if (require.main === module) {
   runSeed();
 }
 
-module.exports = { runSeed };
+module.exports = {
+  seedDatabase,
+  runSeed
+};

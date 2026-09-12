@@ -56,9 +56,39 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ping', require('./routes/ping'));
 
+// Verificación rápida de que la API (o la función serverless) está en línea
+app.get('/api/v1', (req, res) => {
+  res.json({ status: 'ok', api: 'MéritoDocente', version: 'v1' });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Frontend estático
+// La SPA principal es indexInicial.html (ver docs/roadmap.md).
+// public/ expone /api-client.js y /auth.js en la raíz para la integración provisional.
+const publicDir = path.join(__dirname, '..', 'public');
+const rootDir = path.join(__dirname, '..');
+
+app.use(express.static(publicDir));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(rootDir, 'indexInicial.html'));
+});
+
+app.get('/indexInicial.html', (req, res) => {
+  res.sendFile(path.join(rootDir, 'indexInicial.html'));
+});
+
+// Integración provisional: se retira cuando la SPA principal esté conectada a la API.
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(rootDir, 'index.html'));
+});
+
+app.get('/app.js', (req, res) => {
+  res.sendFile(path.join(rootDir, 'app.js'));
 });
 
 // API documentation (if swagger exists)
@@ -105,6 +135,10 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Escucha solo cuando el archivo se ejecuta directamente (npm start / npm run dev).
+// Al importarse como función serverless (por ejemplo en Vercel) no abre puerto.
+if (require.main === module) {
+  startServer();
+}
 
 module.exports = app;

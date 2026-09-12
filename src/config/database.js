@@ -11,6 +11,11 @@ if (!databaseUrl) {
 
 const pool = new Pool({
   connectionString: databaseUrl,
+  // En serverless (Vercel) cada instancia abre su propio pool: conviene
+  // limitarlo para no agotar las conexiones del pooler de Supabase.
+  max: isProduction ? 3 : 10,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 10000,
   ...(isProduction && {
     ssl: {
       rejectUnauthorized: false,

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const { pool } = require('../config/database');
 const { authenticate } = require('../middleware/auth');
 const { validateProgress } = require('../utils/validators');
@@ -11,101 +12,282 @@ const { validateProgress } = require('../utils/validators');
  */
 router.post('/lesson/:lessonId', authenticate, async (req, res) => {
   try {
-    const { lessonId } = req.params;
-    const { usuarioId } = req.user;
-    const { puntaje } = req.body || {};
+    const lessonId = Number(req.params.lessonId);
+    const usuarioId = req.user.id;
 
-    const { rows } = await pool.query(
-      `SELECT id FROM lessons WHERE id = $1 AND activo = TRUE`,
-      [lessonId]
-    );
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Lección no encontrada' });
+    if (!Number.isInteger(lessonId) || lessonId <= 0) {
+      return res.status(400).json({
+        error: 'Identificador de lección inválido'
+      });
     }
 
-    const result = await pool.query(
-      `INSERT INTO user_progress (usuario_id, leccion_id, completada, fecha_completada, intentos, puntaje)
-       VALUES ($1, $2, TRUE, CURRENT_TIMESTAMP, 1, $3)
-ON CONFLICT (usuario_id, leccion_id) 
-        DO UPDATE SET completada = TRUE, fecha_completada = CURRENT_TIMESTAMP, intentos = user_progress.intentos + 1, puntaje = EXCLUDED.puntaje
-       RETURNING *`,
-      [usuarioId, lessonId, puntaje || 100]
-    );
+    const validation = validateProgress(req.body || {});
 
-    // Calculate module progress
-    const { rows: lessonData } = await pool.query(
-      `SELECT modulo_id FROM lessons WHERE id = $1`,
+    if (validation.error) {
+      return res.status(400).json({
+        error: validation.error.details.map(d => d.message).join(', ')
+      });
+    }
+
+    const puntaje =
+      validation.value.puntaje !== undefined
+        ? validation.value.puntaje
+        : 100;
+
+    // Verificar que la lección exista y esté activa
+    const { rows: lessonRows } = await pool.query(
+      `SELECT
+         l.id,
+         l.modulo_id,
+         m.curso_id
+       FROM lessons l
+       JOIN modules m ON m.id = l.modulo_id
+       JOIN courses c ON c.id = m.curso_id
+       WHERE l.id = $1
+         AND l.activo = TRUE
+         AND m.activo = TRUE
+         AND c.activo = TRUE`,
       [lessonId]
     );
-    const moduloId = lessonData[0].modulo_id;
 
-    const { rows: progress } = await pool.query(
-      `SELECT COUNT(*) as total FROM lessons l JOIN modules m ON l.modulo_id = m.id WHERE m.id = $1 AND l.activo = TRUE`,
-      [moduloId]
-    );
-    const totalLessons = parseInt(progress[0].total);
+    if (lessonRows.length === 0) {
+      return res.status(404).json({
+        error: 'Lección no encontrada'
+      });
+    }
 
-    const { rows: completed } = await pool.query(
-      `SELECT COUNT(*) as done FROM user_progress WHERE usuario_id = $1 AND leccion_id IN (SELECT id FROM lessons WHERE modulo_id = $2) AND completada = TRUE`,
-      [usuarioId, moduloId]
-    );
-    const doneLessons = parseInt(completed[0].done);
-    const moduleProgress = totalLessons ? Math.round((doneLessons / totalLessons) * 100) : 0;
+    const lesson = lessonRows[0];
+    const moduloId = lesson.modulo_id;
+    const cursoId = lesson.curso_id;
 
-    // Update enrollment progress
+    // Inscribir automáticamente al usuario en el curso
+    // si aún no existe la inscripción.
     await pool.query(
-      `UPDATE enrollments SET progreso_total = (
-        SELECT COALESCE(AVG(
-          (SELECT COUNT(*) FROM user_progress WHERE usuario_id = $1 AND leccion_id IN (SELECT id FROM lessons WHERE modulo_id = m.id AND completada = TRUE))::decimal / 
-          NULLIF((SELECT COUNT(*) FROM lessons l2 JOIN modules m2 ON l2.modulo_id = m2.id WHERE m2.id = m.id AND l2.activo = TRUE)::decimal, 0) * 100, 0
-        ))
-        FROM modules m WHERE m.curso_id = (SELECT curso_id FROM modules WHERE id = $2 LIMIT 1)
-      ) WHERE usuario_id = $1 AND curso_id = (SELECT curso_id FROM modules WHERE id = $2 LIMIT 1)`,
-      [usuarioId, moduloId]
+      `INSERT INTO enrollments
+         (usuario_id, curso_id, fecha_inscripcion)
+       VALUES ($1, $2, CURRENT_TIMESTAMP)
+       ON CONFLICT (usuario_id, curso_id)
+       DO NOTHING`,
+      [usuarioId, cursoId]
     );
 
-    // Check if all lessons completed (badge eligibility)
-    const { rows: moduleData } = await pool.query(
-      `SELECT m.id as modulo_id, m.badge_nombre, m.badge_icono, m.badge_color
-       FROM modules m WHERE m.id = $1`,
+    // Crear o actualizar el progreso de la lección
+    const { rows: progressRows } = await pool.query(
+      `INSERT INTO user_progress
+         (
+           usuario_id,
+           leccion_id,
+           completada,
+           fecha_completada,
+           intentos,
+           puntaje
+         )
+       VALUES (
+         $1,
+         $2,
+         TRUE,
+         CURRENT_TIMESTAMP,
+         1,
+         $3
+       )
+       ON CONFLICT (usuario_id, leccion_id)
+       DO UPDATE SET
+         completada = TRUE,
+         fecha_completada = CURRENT_TIMESTAMP,
+         intentos = user_progress.intentos + 1,
+         puntaje = EXCLUDED.puntaje
+       RETURNING *`,
+      [usuarioId, lessonId, puntaje]
+    );
+
+    // Total de lecciones activas del módulo
+    const { rows: totalRows } = await pool.query(
+      `SELECT COUNT(*)::int AS total
+       FROM lessons
+       WHERE modulo_id = $1
+         AND activo = TRUE`,
       [moduloId]
     );
 
+    const totalLessons = totalRows[0].total;
+
+    // Lecciones completadas por el usuario en ese módulo
+    const { rows: completedRows } = await pool.query(
+      `SELECT COUNT(*)::int AS completed
+       FROM user_progress up
+       JOIN lessons l
+         ON l.id = up.leccion_id
+       WHERE up.usuario_id = $1
+         AND l.modulo_id = $2
+         AND l.activo = TRUE
+         AND up.completada = TRUE`,
+      [usuarioId, moduloId]
+    );
+
+    const completedLessons = completedRows[0].completed;
+
+    const moduleProgress =
+      totalLessons > 0
+        ? Math.round((completedLessons / totalLessons) * 100)
+        : 0;
+
+    // Calcular progreso global del curso
+    const { rows: courseProgressRows } = await pool.query(
+      `SELECT
+         COUNT(l.id)::int AS total_lessons,
+         COUNT(
+           CASE
+             WHEN up.completada = TRUE THEN 1
+           END
+         )::int AS completed_lessons
+       FROM modules m
+       JOIN lessons l
+         ON l.modulo_id = m.id
+        AND l.activo = TRUE
+       LEFT JOIN user_progress up
+         ON up.leccion_id = l.id
+        AND up.usuario_id = $1
+       WHERE m.curso_id = $2
+         AND m.activo = TRUE`,
+      [usuarioId, cursoId]
+    );
+
+    const courseTotals = courseProgressRows[0];
+
+    const courseProgress =
+      courseTotals.total_lessons > 0
+        ? Math.round(
+            (courseTotals.completed_lessons /
+              courseTotals.total_lessons) *
+              100
+          )
+        : 0;
+
+    await pool.query(
+      `UPDATE enrollments
+       SET progreso_total = $1
+       WHERE usuario_id = $2
+         AND curso_id = $3`,
+      [courseProgress, usuarioId, cursoId]
+    );
+
+    // Revisar si el usuario ganó un badge
     let badgeEarned = null;
-    if (moduleData.length > 0 && moduleProgress === 100) {
-      const modData = moduleData[0];
-      if (modData.badge_nombre) {
-        const { rows: existingBadge } = await pool.query(
-          `SELECT id FROM user_badges WHERE usuario_id = $1 AND badge_id = (SELECT id FROM badges WHERE modulo_id = $2 AND nombre = $3 LIMIT 1)`,
-          [usuarioId, modData.modulo_id, modData.badge_nombre]
+
+    if (moduleProgress === 100) {
+      const { rows: moduleRows } = await pool.query(
+        `SELECT
+           id,
+           badge_nombre,
+           badge_icono,
+           badge_color
+         FROM modules
+         WHERE id = $1`,
+        [moduloId]
+      );
+
+      if (
+        moduleRows.length > 0 &&
+        moduleRows[0].badge_nombre
+      ) {
+        const moduleData = moduleRows[0];
+
+        // Buscar badge existente
+        let { rows: badgeRows } = await pool.query(
+          `SELECT id
+           FROM badges
+           WHERE modulo_id = $1
+             AND nombre = $2
+           LIMIT 1`,
+          [
+            moduloId,
+            moduleData.badge_nombre
+          ]
         );
-        if (existingBadge.rows.length === 0) {
-          const { rows: badge } = await pool.query(
-            `INSERT INTO badges (modulo_id, nombre, icono, color) VALUES ($1, $2, $3, $4) 
-             ON CONFLICT DO NOTHING 
+
+        // Crear badge si todavía no existe
+        if (badgeRows.length === 0) {
+          const created = await pool.query(
+            `INSERT INTO badges
+               (
+                 modulo_id,
+                 nombre,
+                 descripcion,
+                 icono,
+                 color
+               )
+             VALUES (
+               $1,
+               $2,
+               $3,
+               $4,
+               $5
+             )
              RETURNING id`,
-            [modData.modulo_id, modData.badge_nombre, modData.badge_icono, modData.badge_color]
+            [
+              moduloId,
+              moduleData.badge_nombre,
+              `Badge obtenido al completar el módulo ${moduleData.badge_nombre}`,
+              moduleData.badge_icono,
+              moduleData.badge_color
+            ]
           );
-          if (badge.rows.length > 0) {
-            await pool.query(
-              `INSERT INTO user_badges (usuario_id, badge_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-              [usuarioId, badge.rows[0].id]
-            );
-            badgeEarned = { id: badge.rows[0].id, nombre: modData.badge_nombre, icono: modData.badge_icono, color: modData.badge_color };
-          }
+
+          badgeRows = created.rows;
+        }
+
+        const badgeId = badgeRows[0].id;
+
+        const { rows: existingBadge } = await pool.query(
+          `SELECT id
+           FROM user_badges
+           WHERE usuario_id = $1
+             AND badge_id = $2`,
+          [usuarioId, badgeId]
+        );
+
+        if (existingBadge.length === 0) {
+          await pool.query(
+            `INSERT INTO user_badges
+               (usuario_id, badge_id)
+             VALUES ($1, $2)
+             ON CONFLICT (usuario_id, badge_id)
+             DO NOTHING`,
+            [usuarioId, badgeId]
+          );
+
+          badgeEarned = {
+            id: badgeId,
+            nombre: moduleData.badge_nombre,
+            icono: moduleData.badge_icono,
+            color: moduleData.badge_color
+          };
         }
       }
     }
 
-    res.json({
+    return res.json({
       message: 'Lección completada',
-      progress: { lessonDone: true, moduleProgress, badgeEarned },
+      progress: {
+        lesson: progressRows[0],
+        moduleProgress,
+        courseProgress,
+        badgeEarned
+      }
     });
+
   } catch (err) {
-    console.error('❌ Error completing lesson:', err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error(
+      '❌ Error completing lesson:',
+      err
+    );
+
+    return res.status(500).json({
+      error: 'Error interno del servidor'
+    });
   }
 });
+
 
 /**
  * @route   GET /api/v1/progress
@@ -114,62 +296,161 @@ ON CONFLICT (usuario_id, leccion_id)
  */
 router.get('/', authenticate, async (req, res) => {
   try {
-    const { rows: userProgress } = await pool.query(
-      `SELECT up.leccion_id, l.titulo as leccion_titulo, up.completada, up.fecha_completada, up.puntaje, l.modulo_id
-       FROM user_progress up
-       JOIN lessons l ON up.leccion_id = l.id
-       WHERE up.usuario_id = $1
-       ORDER BY up.fecha_completada DESC`,
-      [req.user.id]
-    );
+    const usuarioId = req.user.id;
 
+    /*
+     * IMPORTANTE:
+     * Las lecciones se consultan desde lessons,
+     * no desde user_progress.
+     *
+     * Así un usuario nuevo ve todas las lecciones
+     * disponibles aunque todavía no haya iniciado.
+     */
     const { rows: modules } = await pool.query(
-      `SELECT m.*, c.titulo as curso_titulo 
-       FROM modules m 
-       JOIN courses c ON m.curso_id = c.id 
-       WHERE c.activo = TRUE 
-       ORDER BY m.orden ASC`
-    );
+      `SELECT
+         m.id,
+         m.curso_id,
+         m.titulo,
+         m.descripcion,
+         m.orden,
+         m.badge_nombre,
+         m.badge_icono,
+         m.badge_color,
+         m.activo,
+         c.titulo AS curso_titulo,
 
-    const progressMap = {};
-    userProgress.forEach(up => {
-      if (!progressMap[up.leccion_id]) {
-        progressMap[up.leccion_id] = up;
-      }
-    });
+         COUNT(l.id)::int AS total_lessons,
+
+         COUNT(
+           CASE
+             WHEN up.completada = TRUE THEN 1
+           END
+         )::int AS completed_lessons,
+
+         COALESCE(
+           json_agg(
+             json_build_object(
+               'id', l.id,
+               'modulo_id', l.modulo_id,
+               'titulo', l.titulo,
+               'orden', l.orden,
+               'completada', COALESCE(up.completada, FALSE)
+             )
+             ORDER BY l.orden, l.id
+           ) FILTER (WHERE l.id IS NOT NULL),
+           '[]'
+         ) AS lessons
+
+       FROM modules m
+
+       JOIN courses c
+         ON c.id = m.curso_id
+
+       LEFT JOIN lessons l
+         ON l.modulo_id = m.id
+        AND l.activo = TRUE
+
+       LEFT JOIN user_progress up
+         ON up.leccion_id = l.id
+        AND up.usuario_id = $1
+
+       WHERE
+         m.activo = TRUE
+         AND c.activo = TRUE
+
+       GROUP BY
+         m.id,
+         c.titulo
+
+       ORDER BY
+         m.curso_id,
+         m.orden`,
+      [usuarioId]
+    );
 
     const modulesWithProgress = modules.map(mod => {
-      const modLessons = userProgress.filter(up => up.modulo_id === mod.id);
-      const totalLessons = modLessons.length;
-      const completedLessons = modLessons.filter(up => up.completada).length;
-      const percent = totalLessons ? Math.round((completedLessons / totalLessons) * 100) : 0;
-      const completed = percent === 100 && totalLessons > 0;
-      return { ...mod, totalLessons, completedLessons, percent, completed };
+      const totalLessons =
+        Number(mod.total_lessons) || 0;
+
+      const completedLessons =
+        Number(mod.completed_lessons) || 0;
+
+      const percent =
+        totalLessons > 0
+          ? Math.round(
+              (completedLessons / totalLessons) * 100
+            )
+          : 0;
+
+      return {
+        ...mod,
+        totalLessons,
+        completedLessons,
+        percent,
+        completed:
+          totalLessons > 0 &&
+          completedLessons === totalLessons
+      };
     });
 
-    const totalAllLessons = modulesWithProgress.reduce((acc, m) => acc + m.totalLessons, 0);
-    const completedAllLessons = modulesWithProgress.reduce((acc, m) => acc + m.completedLessons, 0);
-    const globalPercent = totalAllLessons ? Math.round((completedAllLessons / totalAllLessons) * 100) : 0;
+    const totalLessons =
+      modulesWithProgress.reduce(
+        (total, mod) =>
+          total + mod.totalLessons,
+        0
+      );
+
+    const completedLessons =
+      modulesWithProgress.reduce(
+        (total, mod) =>
+          total + mod.completedLessons,
+        0
+      );
+
+    const globalProgress =
+      totalLessons > 0
+        ? Math.round(
+            (completedLessons /
+              totalLessons) *
+              100
+          )
+        : 0;
 
     const { rows: badges } = await pool.query(
-      `SELECT b.*, ub.fecha_obtencion 
-       FROM user_badges ub 
-       JOIN badges b ON ub.badge_id = b.id 
-       WHERE ub.usuario_id = $1 
+      `SELECT
+         b.id,
+         b.modulo_id,
+         b.nombre,
+         b.descripcion,
+         b.icono,
+         b.color,
+         b.imagen,
+         ub.fecha_obtencion
+       FROM user_badges ub
+       JOIN badges b
+         ON b.id = ub.badge_id
+       WHERE ub.usuario_id = $1
        ORDER BY ub.fecha_obtencion DESC`,
-      [req.user.id]
+      [usuarioId]
     );
 
-    res.json({
-      globalProgress: globalPercent,
+    return res.json({
+      globalProgress,
       modules: modulesWithProgress,
       badges,
-      totalLessons: totalAllLessons,
-      completedLessons: completedAllLessons,
+      totalLessons,
+      completedLessons
     });
+
   } catch (err) {
-    console.error('❌ Error fetching progress:', err);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error(
+      '❌ Error fetching progress:',
+      err
+    );
+
+    return res.status(500).json({
+      error: 'Error interno del servidor'
+    });
   }
 });
 
