@@ -1,7 +1,7 @@
 require('dotenv').config();
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { Pool } = require('pg');
 
-const isProduction = process.env.NODE_ENV === 'production';
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
@@ -9,13 +9,14 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
+const isProduction = process.env.NODE_ENV === 'production';
+const isSupabase = /aws-[a-z0-9-]+\.pooler\.supabase\.com/.test(databaseUrl);
+
 const pool = new Pool({
   connectionString: databaseUrl,
-  ...(isProduction && {
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  }),
+  ssl: {
+    rejectUnauthorized: !!(isProduction || isSupabase),
+  },
 });
 
 pool.on('connect', () => {

@@ -13,7 +13,8 @@ CREATE TABLE users (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ultimo_acceso TIMESTAMP,
     activo BOOLEAN DEFAULT TRUE,
-    foto_perfil VARCHAR(255)
+    foto_perfil VARCHAR(255),
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Courses table
@@ -48,6 +49,7 @@ CREATE TABLE lessons (
     id SERIAL PRIMARY KEY,
     modulo_id INTEGER REFERENCES modules(id) ON DELETE CASCADE,
     titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT,
     contenido TEXT,
     orden INTEGER DEFAULT 0,
     tiene_quiz BOOLEAN DEFAULT TRUE,

@@ -25,6 +25,7 @@ const adminRoutes = require('./routes/admin');
 // Security headers
 const app = express();
 
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
@@ -68,6 +69,11 @@ if (fs.existsSync(swaggerPath)) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
   app.get('/api-docs', (req, res) => res.redirect('/api-docs'));
 }
+
+// Serve the official SPA as entry point
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../indexInicial.html'));
+});
 
 // 404 handler
 app.use((req, res) => {

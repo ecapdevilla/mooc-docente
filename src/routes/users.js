@@ -8,7 +8,7 @@ const auth = require('../middleware/auth');
  * @desc    Get user profile
  * @access  Private
  */
-router.get('/profile', auth, async (req, res) => {
+router.get('/profile', auth.authenticate, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT id, nombre, email, telefono, departamento, rol, activo, foto_perfil, fecha_registro FROM users WHERE id = $1',
@@ -29,11 +29,11 @@ router.get('/profile', auth, async (req, res) => {
  * @desc    Update user profile
  * @access  Private
  */
-router.put('/profile', auth, async (req, res) => {
+router.put('/profile', auth.authenticate, async (req, res) => {
   try {
     const { nombre, telefono, departamento } = req.body;
     const { rows } = await pool.query(
-      'UPDATE users SET nombre = $1, telefono = $2, departamento = $3, actualizado_en = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id, nombre, email, telefono, departamento, rol, activo, foto_perfil, fecha_registro',
+      'UPDATE users SET nombre = $1, telefono = $2, departamento = $3, actualizado_en = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id, nombre, email, telefono, departamento, rol, activo, foto_perfil, fechaRegistro',
       [nombre, telefono, departamento, req.user.id]
     );
     res.json({ user: rows[0], message: 'Perfil actualizado exitosamente' });
@@ -48,13 +48,13 @@ router.put('/profile', auth, async (req, res) => {
  * @desc    Get user enrollments
  * @access  Private
  */
-router.get('/enrollments', auth, async (req, res) => {
+router.get('/enrollments', auth.authenticate, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT e.id, c.titulo, c.area, e.fecha_inscripcion, e.progreso_total 
        FROM enrollments e 
        JOIN courses c ON e.curso_id = c.id 
-       WHERE e.usuario_id = $1 
+       WHERE e.id = $1 
        ORDER BY e.fecha_inscripcion DESC`,
       [req.user.id]
     );

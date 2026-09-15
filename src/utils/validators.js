@@ -18,4 +18,4 @@ const progressSchema = Joi.object({
   puntaje: Joi.number().min(0).max(100),
 });
 
-module.exports = { validateRegister: registerSchema.validate, validateLogin: loginSchema.validate, validateProgress: progressSchema.validate };
+module.exports = { validateRegister: (data) => registerSchema.validate(data), validateLogin: (data) => loginSchema.validate(data), validateProgress: (data) => progressSchema.validate(data) };

@@ -711,6 +711,221 @@
       gap: 1.5rem;
     }
 
+    /* ============================================================
+       QUIZ DIAGNÓSTICO
+    ============================================================ */
+    .quiz-diagnostic-card {
+      background: linear-gradient(135deg, var(--secondary) 0%, #1E40AF 100%);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      color: white;
+      box-shadow: var(--shadow-lg);
+    }
+    .quiz-diagnostic-card h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    .quiz-diagnostic-card p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 0.3rem;
+    }
+    .quiz-diagnostic-card ul {
+      margin: 0.5rem 0 1rem 1.2rem;
+      font-size: 0.85rem;
+    }
+    .quiz-diagnostic-card li {
+      margin-bottom: 0.2rem;
+    }
+    .quiz-instruction {
+      font-size: 0.78rem !important;
+      opacity: 0.75;
+    }
+    .quiz-options {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      text-align: left;
+      background: var(--light);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--r-md);
+      padding: 1rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: var(--t);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .quiz-option:hover {
+      border-color: var(--secondary-light);
+      background: var(--secondary-soft);
+      transform: translateY(-2px);
+    }
+    .quiz-option.selected {
+      border-color: var(--secondary);
+      background: var(--secondary-soft);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+    .quiz-option.correct {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .quiz-option.incorrect {
+      border-color: var(--danger);
+      background: var(--danger-soft);
+    }
+    .quiz-option.disabled {
+      pointer-events: none;
+      opacity: 0.75;
+    }
+    .quiz-option-letter {
+      display: inline-flex;
+      flex: 0 0 1.75rem;
+      height: 1.75rem;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--secondary);
+      color: white;
+      font-weight: 800;
+      font-size: 0.75rem;
+    }
+    .quiz-question-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin: 1.2rem 0 1.5rem;
+      color: var(--dark);
+    }
+    .quiz-progress-bar {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .quiz-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary-light), var(--secondary));
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .quiz-feedback-detail {
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      border-radius: var(--r-md);
+      background: var(--gray-100);
+      border-left: 4px solid var(--secondary-light);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .quiz-feedback-detail strong {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--secondary);
+    }
+    .quiz-result-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .quiz-result-stat {
+      padding: 1.2rem;
+      border-radius: var(--r-md);
+      background: var(--light);
+      border: 1px solid var(--gray-200);
+      text-align: center;
+    }
+    .quiz-result-stat strong {
+      display: block;
+      font-size: 2rem;
+      color: var(--secondary);
+    }
+    .quiz-result-stat span {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+    .quiz-result-area {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: var(--r-md);
+      background: var(--light);
+      border: 1px solid var(--gray-200);
+    }
+    .quiz-result-area h4 {
+      margin-bottom: 0.4rem;
+      color: var(--dark);
+      font-size: 1rem;
+    }
+    .quiz-result-area p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+    .quiz-result-area .weak {
+      border-left: 4px solid var(--danger);
+    }
+    .quiz-result-area .strong {
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-review-item {
+      padding: 1rem;
+      border-radius: var(--r-md);
+      background: var(--light);
+      border: 1px solid var(--gray-200);
+      margin-bottom: 1rem;
+    }
+    .quiz-review-item.correct {
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-review-item.incorrect {
+      border-left: 4px solid var(--danger);
+    }
+    .quiz-review-item p {
+      margin: 0.3rem 0;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-soft);
+    }
+    .quiz-review-item .correct-answer {
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+    .quiz-review-item .wrong-answer {
+      color: var(--danger);
+      font-weight: 700;
+    }
+    .quiz-review-item .normative {
+      margin-top: 0.5rem;
+      padding: 0.8rem;
+      border-radius: var(--r-sm);
+      background: var(--white);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      border: 1px dashed var(--gray-300);
+    }
+    .quiz-review-item .normative strong {
+      color: var(--secondary);
+    }
+
     .module-card {
       background: white;
       border-radius: var(--r-lg);
@@ -1827,6 +2042,30 @@
           <h2 style="font-size:1.6rem;">Continúa tu aprendizaje</h2>
         </div>
 
+        <!-- Tarjeta del Quiz Diagnóstico -->
+        <div class="quiz-diagnostic-card" id="quizDiagnosticCard">
+          <div class="quiz-diagnostic-header">
+            <h3><i class="fas fa-clipboard-check"></i> Evaluación Diagnóstica</h3>
+            <p>Mide tus competencias docentes en áreas clave del concurso</p>
+          </div>
+          <div class="quiz-diagnostic-info">
+            <p>El quiz contiene 30 preguntas situacionales de alta dificultad.</p>
+            <p>Al finalizar, recibirás un informe con:</p>
+            <ul>
+              <li>Áreas que debes fortalecer</li>
+              <li>Número de respuestas correctas e incorrectas</li>
+              <li>Retroalimentación con la normativ aplicable</li>
+              <li>Plan de estudio personalizado</li>
+            </ul>
+          </div>
+          <button class="btn btn-primary btn-block w-100" onclick="startDiagnosticQuiz()" id="startQuizBtn">
+            <i class="fas fa-question-circle"></i> Comenzar Quiz Diagnóstico
+          </button>
+          <p class="quiz-instruction" style="margin-top:1rem; font-size:0.85rem; color:var(--text-soft);">
+            <i class="fas fa-info-circle"></i> El quiz se corregirá automáticamente y obtendrás tu resultado al instante.
+          </p>
+        </div>
+
         <div class="modules-grid" id="modulesGrid"></div>
 
         <div class="badges-section">
@@ -1849,9 +2088,9 @@
     </section>
   </div>
 
-  <!-- ============================================================
-       MODAL DE INSIGNIA
-  ============================================================ -->
+   <!-- ============================================================
+        MODAL DE INSIGNIA
+     ============================================================ -->
   <div class="modal-overlay" id="badgeModal">
     <div class="badge-modal">
       <div class="badge-icon-wrapper">
@@ -1867,8 +2106,30 @@
   </div>
 
   <!-- ============================================================
-       FOOTER
-  ============================================================ -->
+        VISTA: QUIZ DIAGNÓSTICO
+     ============================================================ -->
+  <div id="view-diagnosticQuiz" class="hidden">
+    <section class="dashboard">
+      <div class="container">
+        <div class="quiz-container"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================
+        VISTA: RESULTADOS DEL QUIZ DIAGNÓSTICO
+     ============================================================ -->
+  <div id="view-diagnosticResults" class="hidden">
+    <section class="dashboard">
+      <div class="container">
+        <div class="quiz-container"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================
+        FOOTER
+     ============================================================ -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -1902,9 +2163,11 @@
     </div>
   </footer>
 
-  <!-- ============================================================
-       JAVASCRIPT
+<!-- ============================================================
+        JAVASCRIPT
   ============================================================ -->
+  <script src="public/api-client.js"></script>
+  <script src="public/auth.js"></script>
   <script>
     /* ============================================================
        DATOS: MÓDULOS CON LECCIONES Y QUIZZES
@@ -2133,11 +2396,11 @@
     function updateNavbar() {
       const chip = document.getElementById('userChip');
       const logoutBtn = document.getElementById('logoutBtn');
-      if (state.user) {
+      if (auth.state.user) {
         chip.style.display = 'flex';
         logoutBtn.style.display = 'flex';
-        document.getElementById('userAvatar').textContent = state.user.nombre.charAt(0).toUpperCase();
-        document.getElementById('userName').textContent = state.user.nombre.split(' ')[0];
+        document.getElementById('userAvatar').textContent = auth.state.user.nombre.charAt(0).toUpperCase();
+        document.getElementById('userName').textContent = auth.state.user.nombre.split(' ')[0];
         document.getElementById('userRole').textContent = 'Preparándose';
       } else {
         chip.style.display = 'none';
@@ -2173,9 +2436,9 @@
     }
 
     /* ============================================================
-       REGISTRO
-    ============================================================ */
-    window.handleRegister = function (event) {
+        REGISTRO
+        ============================================================ */
+    window.handleRegister = async function (event) {
       event.preventDefault();
 
       const nombre = document.getElementById('nombre').value.trim();
@@ -2199,22 +2462,30 @@
         return;
       }
 
-      state.user = { nombre, email, celular, departamento };
-      saveState();
+      const userData = {
+        nombre,
+        email,
+        telefono: celular,
+        departamento,
+        password: 'meritodocente123'
+      };
 
-      document.getElementById('registroForm').reset();
-
-      alert(`¡Felicidades ${nombre.split(' ')[0]}! 🎉\n\nTe has matriculado exitosamente en MéritoDocente.\n\nTu progreso se guardará en este dispositivo.`);
-
-      showView('dashboard');
+      try {
+        const result = await auth.register(userData);
+        if (result && result.token) {
+          alert(`¡Felicidades ${nombre.split(' ')[0]}! 🎉\n\nTe has matriculado exitosamente en MéritoDocente.\n\nTu progreso se guardará en este dispositivo.`);
+          showView('dashboard');
+        } else {
+          alert('Error al registrarse: respuesta inesperada del servidor.');
+        }
+      } catch (err) {
+        alert('Error al registrarse: ' + (err.message || 'Error del servidor'));
+      }
     };
 
     window.logout = function () {
-      if (confirm('¿Cerrar sesión? Tu progreso se conservará en este dispositivo.')) {
-        state.user = null;
-        saveState();
-        showView('landing');
-      }
+      auth.logout();
+      showView('landing');
     };
 
     /* ============================================================
@@ -2476,20 +2747,275 @@
       document.getElementById('badgeModal').classList.remove('show');
     };
 
+
     /* ============================================================
-       INICIALIZACIÓN
+       QUIZ DIAGNÓSTICO
     ============================================================ */
+    const DIAGNOSTIC_QUESTIONS = [
+      { area: 'EVALUACIÓN Y SIEE', question: 'Al cierre de un período, una docente encuentra que dos estudiantes obtuvieron resultados bajos en la prueba acumulativa, aunque sus portafolios evidencian avances sostenidos, las rúbricas muestran mejoramiento y las autoevaluaciones identifican con precisión dificultades superadas. El SIEE establece valoración integral, seguimiento continuo y estrategias de apoyo. Algunas familias solicitan que se conserve la nota de la prueba porque fue aplicada en igualdad de condiciones.', options: ['Mantener la prueba como evidencia principal, contrastarla con portafolios y autoevaluaciones, y ofrecer actividades de recuperación para preservar la uniformidad del criterio aplicado al grupo.', 'Integrar las diferentes evidencias conforme a los criterios previamente establecidos en el SIEE, valorar el proceso y determinar los apoyos requeridos sin convertir una única prueba en criterio exclusivo.', 'Recalcular el resultado asignando igual ponderación a prueba, portafolio, rúbrica y autoevaluación, pues la valoración integral exige que todas las evidencias tengan idéntico peso.', 'Sustituir la prueba por las evidencias procesuales cuando estas muestren progreso, dejando constancia de que la evaluación formativa prevalece sobre cualquier valoración sumativa.'], correct: 1, feedback: 'La respuesta correcta es la B. El SIEE establece valoración integral, seguimiento continuo y estrategias de apoyo. Se deben integrar las diferentes evidencias conforme a los criterios previamente establecidos, valorando el proceso y determinando los apoyos requeridos.', normative: 'Decreto 1290 de 2009: Sistema Institucional de Evaluación de la Calidad de la Educación. Ley 115 de 1994: Ley General de Educación. El SIEE establece valoración integral y seguimiento continuo.' },
+      { area: 'PEI / AUTONOMÍA ESCOLAR', question: 'Una institución pretende incorporar al PEI una estrategia pedagógica para responder a cambios significativos en su población.', options: ['Autorizar una implementación provisional desde rectoría.', 'Encargar al Consejo Académico la adopción de la estrategia.', 'Tramitar la propuesta mediante participación y deliberación de los estamentos correspondientes y someter su adopción al Consejo Directivo.', 'Incorporarla directamente cuando responda al diagnóstico institucional.'], correct: 2, feedback: 'La respuesta correcta es la C. La incorporación de una estrategia pedagógica al PEI requiere trámite institucional con participación de estamentos y consulta al Consejo Académico.', normative: 'Ley 115 de 1994: Ley General de Educación. Proyecto Educativo Institucional como documento rector.' },
+      { area: 'INCLUSIÓN / DUA / AJUSTES RAZONABLES', question: 'Un estudiante con discapacidad participa en las mismas actividades del curso, pero persisten barreras para demostrar lo aprendido mediante el formato habitual de evaluación.', options: ['Mantener el instrumento común y ampliar el tiempo.', 'Diseñar una evaluación individual con objetivos diferentes.', 'Identificar las barreras que persisten y establecer los ajustes razonables requeridos, manteniendo los objetivos pertinentes.', 'Eximir al estudiante de la actividad evaluativa.'], correct: 2, feedback: 'La respuesta correcta es la C. Se deben identificar las barreras que persisten y establecer los ajustes razonables requeridos, manteniendo los objetivos pertinentes.', normative: 'Ley 1610 de 2013: Inclusión de personas con discapacidad. Decreto 1290 de 2009: SIEE. PIAR como documento de ajustes.' },
+      { area: 'CONVIVENCIA ESCOLAR / RUTA DE ATENCIÓN', question: 'Durante varias semanas un estudiante recibe mensajes humillantes de compañeros en un grupo digital creado fuera de la institución.', options: ['Esperar la identificación definitiva de los responsables.', 'Abordar como conflicto interpersonal y promover conciliación.', 'Informar y activar los procedimientos institucionales de atención y protección, documentar y preservar debido proceso.', 'Remitir inmediatamente a una autoridad externa.'], correct: 2, feedback: 'La respuesta correcta es la C. Se deben activar procedimientos institucionales de atención y protección sin condicionar la intervención a tener toda responsabilidad definida.', normative: 'Ley 115 de 1994: Ley General de Educación. Ruta de atención para situaciones de convivencia escolar.' },
+      { area: 'FUNCIÓN DOCENTE / GESTIÓN ACADÉMICA', question: 'Un grupo memoriza conceptos pero tiene dificultades para transferirlos. El docente considera aumentar ejercicios repetitivos.', options: ['Conservar planeación y aumentar ejercicios graduados.', 'Revisar planeación, analizar evidencias y ajustar estrategias pedagógicas.', 'Remitir al Consejo Académico para modificación curricular.', 'Mantener actividades y modificar solo la evaluación.'], correct: 1, feedback: 'La respuesta correcta es la B. Revisar la planeación, analizar evidencias y ajustar estrategias pedagógicas y didácticas favorece aplicación y comprensión de conceptos.', normative: 'Decreto 1860 de 2015: Estándares mínimos de calidad educativa. Competencias funcionales del docente de aula.' },
+      { area: 'GOBIERNO ESCOLAR / COMPETENCIAS', question: 'Una familia presenta inconformidad por criterios académicos en una asignatura.', options: ['Remitir al Consejo Académico dentro de sus competencias.', 'Someter directamente al Consejo Directivo.', 'Encargar al rector la decisión.', 'Solicitar modificar la calificación mientras se estudia.'], correct: 0, feedback: 'La respuesta correcta es la A. El análisis académico corresponde al Consejo Académico dentro de sus competencias.', normative: 'Ley 115 de 1994: Ley General de Educación. Competencias del Consejo Académico y Consejo Directivo.' },
+      { area: 'EVALUACIÓN / PROMOCIÓN', question: 'Un estudiante termina el año con desempeño bajo en un área, aunque recibió apoyos y mostró avances parciales.', options: ['Promoverlo por cumplimiento de apoyos.', 'No promoverlo, pues desempeño bajo es causal de no promoción.', 'Aplicar criterios definidos en SIEE valorando evidencias y apoyos.', 'Someter decisión al Consejo Académico.'], correct: 2, feedback: 'La respuesta correcta es la C. Aplicar los criterios de promoción definidos en el SIEE, valorando evidencias y apoyos sin crear reglas nacionales automáticas.', normative: 'Decreto 1290 de 2009: SIEE. Ley 115 de 1994: Criterios de promoción escolar.' },
+      { area: 'MANUAL DE CONVIVENCIA / DEBIDO PROCESO', question: 'Un estudiante reconoce haber participado en una conducta tipificada, pero dice que no se le permitió explicar circunstancias.', options: ['Mantener medida por reconocimiento del hecho.', 'Revisar procedimiento y garantizar oportunidad de defensa.', 'Sustituir por acción pedagógica.', 'Remitir al Consejo Directivo.'], correct: 1, feedback: 'La respuesta correcta es la B. Se debe garantizar la oportunidad efectiva de defensa antes de consolidar una decisión que afecte al estudiante.', normative: 'Ley 115 de 1994: Ley General de Educación. Debido proceso en gestión disciplinaria estudiantil.' },
+      { area: 'CURRÍCULO / PROYECTO PEDAGÓGICO', question: 'Una docente quiere integrar ciencias, matemáticas y lenguaje alrededor de un proyecto sobre contaminación.', options: ['Desarrollarlo extracurricularmente.', 'Integrarlo al trabajo pedagógico en coherencia con currículo y PEI.', 'Reemplazar temporalmente las asignaturas por el proyecto.', 'Ejecutarlo solo si Consejo Directivo lo aprueba.'], correct: 1, feedback: 'La respuesta correcta es la B. Integrar el proyecto al trabajo pedagógico en coherencia con el currículo y el PEI.', normative: 'Decreto 1860 de 2015: Estándares de calidad educativa. Proyecto Pedagógico Institucional.' },
+      { area: 'INCLUSIÓN / CURRÍCULO FLEXIBLE', question: 'Un estudiante presenta barreras persistentes. El equipo propone reducir aprendizajes esperados.', options: ['Reducir objetivos para garantizar éxito.', 'Mantener mismos medios y tiempos para preservar igualdad.', 'Conservar objetivos pertinentes y diversificar accesos y ajustes.', 'Trasladar adaptación al docente de apoyo.'], correct: 2, feedback: 'La respuesta correcta es la C. Conservar objetivos generales pertinentes y diversificar oportunidades, estrategias, apoyos y ajustes.', normative: 'Ley 1610 de 2013: Inclusión. DUA y ajustes razonables en evaluación.' },
+      { area: 'CONVIVENCIA / CORRESPONSABILIDAD', question: 'Familias exigen que el colegio resuelva una agresión entre estudiantes.', options: ['Autonomía institucional.', 'Corresponsabilidad entre familia, establecimiento, sociedad y Estado.', 'Subsidiariedad.', 'Integralidad.' }, correct: 1, feedback: 'La respuesta correcta es la B. La corresponsabilidad implica articular responsabilidades de familia, establecimiento, sociedad y Estado.', normative: 'Ley 115 de 1994: Ley General de Educación. Principio de corresponsabilidad en educación.' },
+      { area: 'AUTOEVALUACIÓN / DECRETO 1290', question: 'Un equipo aplica autoevaluación pero solo con notas numéricas.', options: ['Mantener nota y aumentar porcentaje.', 'Sustituir por coevaluación.', 'Articular con criterios, reflexión de evidencias y compromisos.', 'Aplicar solo a estudiantes con desempeño bajo.'], correct: 2, feedback: 'La respuesta correcta es la C. La autoevaluación debe articularse con criterios conocidos y reflexión sobre evidencias.', normative: 'Decreto 1290 de 2009: SIEE. Decreto 1860 de 2015: Estándares de calidad.' },
+      { area: 'RECTOR / CONSEJO / CONSEJO ACADÉMICO', question: 'Un proyecto aprobado en el PEI no se implementa según lo previsto.', options: ['Consejo Directivo.', 'Consejo Académico.', 'Rector.', 'Consejo de Padres.'], correct: 2, feedback: 'La respuesta correcta es la C. El rector orienta la ejecución del PEI y aplica decisiones del gobierno escolar.', normative: 'Ley 115 de 1994: Ley General de Educación. Funciones del rector.' },
+      { area: 'PLANEACIÓN PEDAGÓGICA / DIVERSIDAD', question: 'Un curso tiene ritmos y formas de participación muy diferentes.', options: ['Conservar planeación e incorporar recuperación.', 'Ajustar estrategias y recursos según evidencias.', 'Diseñar plan distinto para cada estudiante.', 'Flexibilizar calificaciones.'], correct: 1, feedback: 'La respuesta correcta es la B. Ajustar estrategias, recursos y formas de participación según evidencias manteniendo coherencia curricular.', normative: 'Decreto 1860 de 2015: Estándares de calidad. Competencias pedagógicas.' },
+      { area: 'PARTICIPACIÓN ESTUDIANTIL', question: 'Personero recibe quejas sobre una regla del manual de convivencia.', options: ['Suspender regla provisionalmente.', 'Presentar solicitudes a instancias competentes.', 'Convocar a votación del Consejo de Estudiantes.', 'Ordenar al rector revisar disposición.'], correct: 1, feedback: 'La respuesta correcta es la B. Presentar solicitudes y promover protección de derechos ante instancias competentes.', normative: 'Ley 115 de 1994: Ley General de Educación. Participación estudiantil.' },
+      { area: 'EVALUACIÓN / APOYO PEDAGÓGICO', question: 'Un estudiante acumula bajos resultados. El docente no modifica estrategias.', options: ['Correcto si conoce criterios.', 'Insuficiente pues debe informar para implementar apoyos.', 'Correcto si hay recuperación al final.', 'Insuficiente solo si tiene diagnóstico.'], correct: 1, feedback: 'La respuesta correcta es la B. El seguimiento evaluativo debe informar para implementar estrategias de apoyo y mejoramiento.', normative: 'Decreto 1290 de 2009: SIEE. Decreto 1860 de 2015.' },
+      { area: 'CONVIVENCIA / MEDIDAS PEDAGÓGICAS', question: 'Un grupo de docentes propone que la intervención restaurativa sustituya las demás actuaciones.', options: ['Restaurativa siempre sustituye.', 'Articular medidas pedagógicas, protección, seguimiento y procedimiento.', 'Primero sanción y luego acciones.', 'Limitarse a mediar.'], correct: 1, feedback: 'La respuesta correcta es la B. Articular medidas pedagógicas, protección, seguimiento y actuaciones procedimentales según la situación.', normative: 'Ley 115 de 1994: Ley General de Educación. Gestión de conflictos escolares.' },
+      { area: 'PEI / CONTEXTO', question: 'Una institución adopta sin modificaciones el PEI de otro colegio.', options: ['Ninguna objeción si Consejo Directivo lo adopta.', 'El PEI debe reflejar condiciones propias de la institución.', 'Solo si pertenecen a misma entidad.', 'Replicar con manual independiente.'], correct: 1, feedback: 'La respuesta correcta es la B. El PEI debe expresar cómo la institución alcanzará fines educativos con sus propias condiciones.', normative: 'Ley 115 de 1994: Ley General de Educación. Proyecto Educativo Institucional.' },
+      { area: 'COMPETENCIA DOCENTE / TIC', question: 'Una docente incorpora una plataforma que automatiza cuestionarios.', options: ['Mantener herramienta por mejora.', 'Eliminar herramienta.', 'Revisar propósito y rediseñar tareas.', 'Complementar con participación.'], correct: 2, feedback: 'La respuesta correcta es la C. Revisar propósito pedagógico, rediseñar tareas y usar TIC como recurso no como fin.', normative: 'Decreto 1860 de 2015: Estándares de calidad. Competencias digitales del docente.' },
+    ];
+
+    let diagnosticState = {
+      answers: {},
+      currentQuestion: 0,
+      completed: false
+    };
+
+    window.startDiagnosticQuiz = function () {
+      diagnosticState.answers = {};
+      diagnosticState.currentQuestion = 0;
+      diagnosticState.completed = false;
+      const card = document.getElementById('quizDiagnosticCard');
+      if (card) card.classList.add('hidden');
+      renderDiagnosticQuiz();
+      showView('diagnosticQuiz');
+    };
+
+    function renderDiagnosticQuiz() {
+      const view = document.getElementById('view-diagnosticQuiz');
+      if (!view) return;
+      const container = view.querySelector('.quiz-container') || view;
+      const q = DIAGNOSTIC_QUESTIONS[diagnosticState.currentQuestion];
+      const answered = diagnosticState.answers[diagnosticState.currentQuestion] !== undefined;
+      container.innerHTML = '';
+      const quizEl = document.createElement('div');
+      quizEl.className = 'quiz-diagnostic-content';
+      quizEl.innerHTML = `
+        <div class="quiz-header-bar">
+          <span class="quiz-area-tag">${q.area}</span>
+          <span class="quiz-counter">Pregunta ${diagnosticState.currentQuestion + 1} de ${DIAGNOSTIC_QUESTIONS.length}</span>
+        </div>
+        <div class="quiz-progress-bar">
+          <div class="quiz-progress-fill" style="width: ${(diagnosticState.currentQuestion + 1) / DIAGNOSTIC_QUESTIONS.length * 100}%"></div>
+        </div>
+        <div class="quiz-question-text">${q.question}</div>
+        <div class="quiz-options" id="diagnosticOptions">
+          ${q.options.map((opt, i) => `
+            <button class="quiz-option ${answered && i === diagnosticState.answers[diagnosticState.currentQuestion] ? 'selected' : ''}" data-index="${i}" onclick="answerDiagnostic(${i})">
+              <span class="quiz-option-letter">${String.fromCharCode(65 + i)}</span>
+              <span>${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="quiz-feedback-detail" id="diagnosticFeedback"></div>
+        <div class="quiz-actions">
+          <button class="btn btn-ghost btn-sm" onclick="prevDiagnosticQuestion()" ${diagnosticState.currentQuestion === 0 ? 'style="visibility:hidden"' : ''}>
+            <i class="fas fa-arrow-left"></i> Anterior
+          </button>
+          ${diagnosticState.currentQuestion === DIAGNOSTIC_QUESTIONS.length - 1
+            ? `<button class="btn btn-primary btn-sm" onclick="submitDiagnosticQuiz()">
+                 <i class="fas fa-clipboard-check"></i> Ver Resultados
+               </button>`
+            : `<button class="btn btn-secondary btn-sm" onclick="nextDiagnosticQuestion()">
+                 Siguiente <i class="fas fa-arrow-right"></i>
+               </button>`
+          }
+        </div>
+      `;
+      container.appendChild(quizEl);
+    };
+
+    window.answerDiagnostic = function (selectedIdx) {
+      diagnosticState.answers[diagnosticState.currentQuestion] = selectedIdx;
+      const options = document.querySelectorAll('#diagnosticOptions .quiz-option');
+      options.forEach(o => o.classList.remove('selected'));
+      options[selectedIdx].classList.add('selected');
+      const feedback = document.getElementById('diagnosticFeedback');
+      feedback.classList.remove('show');
+      feedback.classList.add('show');
+      feedback.classList.add('ok');
+      feedback.innerHTML = `<i class="fas fa-check-circle"></i> Respuesta guardada. Puedes cambiarla antes de continuar.`;
+    };
+
+    window.prevDiagnosticQuestion = function () {
+      if (diagnosticState.currentQuestion > 0) {
+        diagnosticState.currentQuestion--;
+        renderDiagnosticQuiz();
+      }
+    };
+
+    window.nextDiagnosticQuestion = function () {
+      if (diagnosticState.answers[diagnosticState.currentQuestion] !== undefined) {
+        if (diagnosticState.currentQuestion < DIAGNOSTIC_QUESTIONS.length - 1) {
+          diagnosticState.currentQuestion++;
+          renderDiagnosticQuiz();
+        }
+      } else {
+        alert('Por favor selecciona una respuesta antes de continuar.');
+      }
+    };
+
+    window.submitDiagnosticQuiz = function () {
+      let allAnswered = true;
+      for (let i = 0; i < DIAGNOSTIC_QUESTIONS.length; i++) {
+        if (diagnosticState.answers[i] === undefined) {
+          allAnswered = false;
+          break;
+        }
+      }
+      if (!allAnswered) {
+        if (!confirm('Has dejado algunas preguntas sin responder. ¿Quieres enviar de todos modos?')) return;
+      }
+      diagnosticState.completed = true;
+      showDiagnosticResults();
+    };
+
+    function showDiagnosticResults() {
+      showView('diagnosticResults');
+      const view = document.getElementById('view-diagnosticResults');
+      if (!view) return;
+      const container = view.querySelector('.quiz-container') || view;
+      let correctCount = 0;
+      let incorrectCount = 0;
+      const areaStats = {};
+      DIAGNOSTIC_QUESTIONS.forEach((q, i) => {
+        if (!areaStats[q.area]) areaStats[q.area] = { correct: 0, total: 0 };
+        areaStats[q.area].total++;
+        if (diagnosticState.answers[i] === q.correct) {
+          correctCount++;
+          areaStats[q.area].correct++;
+        } else {
+          incorrectCount++;
+        }
+      });
+      const percentage = Math.round((correctCount / DIAGNOSTIC_QUESTIONS.length) * 100);
+      let riskCategory = '';
+      if (percentage >= 85) riskCategory = 'Dominio fuerte. Mantener práctica de alta dificultad.';
+      else if (percentage >= 70) riskCategory = 'Dominio funcional. Reforzar cruces normativos y casos complejos.';
+      else if (percentage >= 50) riskCategory = 'Riesgo medio. Estudio dirigido del tema + práctica focalizada.';
+      else riskCategory = 'Debilidad prioritaria. Estudio conceptual/normativo antes de nuevos simulacros.';
+      const weakAreas = [];
+      Object.keys(areaStats).forEach(area => {
+        const stat = areaStats[area];
+        const pct = Math.round((stat.correct / stat.total) * 100);
+        if (pct < 70) {
+          weakAreas.push({ area, correct: stat.correct, total: stat.total, pct });
+        }
+      });
+      let weakAreasHtml = '';
+      if (weakAreas.length === 0) {
+        weakAreasHtml = '<p style="color:var(--accent);"><i class="fas fa-check-circle"></i> ¡Excelente! No hay áreas débiles identificadas.</p>';
+      } else {
+        weakAreasHtml = '<h4>Áreas a fortalecer:</h4><ul>';
+        weakAreas.forEach(wa => {
+          weakAreasHtml += `<li><strong>${wa.area}</strong>: ${wa.pct}% (${wa.correct}/${wa.total}) — ${wa.pct < 50 ? 'Estudio conceptual/normativo' : 'Práctica focalizada'}</li>`;
+        });
+        weakAreasHtml += '</ul>';
+      }
+      let reviewHtml = '';
+      DIAGNOSTIC_QUESTIONS.forEach((q, i) => {
+        const selectedAnswer = diagnosticState.answers[i];
+        const isCorrect = selectedAnswer === q.correct;
+        const selectedText = selectedAnswer !== undefined ? q.options[selectedAnswer] : 'Sin respuesta';
+        reviewHtml += `
+          <div class="quiz-review-item ${isCorrect ? 'correct' : 'incorrect'}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+              <div style="flex:1;">
+                <strong>Pregunta ${i + 1}</strong> — <span style="color:var(--secondary); font-weight:600;">${q.area}</span>
+                <p style="margin:0.3rem 0;">${q.question}</p>
+              </div>
+              <span class="quiz-option-letter">${isCorrect ? '<i class="fas fa-check-circle" style="color:var(--accent);"></i>' : '<i class="fas fa-times-circle" style="color:var(--danger);"></i>'}</span>
+            </div>
+            <p style="margin:0.3rem 0 0.5rem;"><span class="wrong-answer">Tu respuesta:</span> ${selectedText}</p>
+            <p style="margin:0.3rem 0 0.5rem;"><span class="correct-answer">Respuesta correcta:</span> ${q.options[q.correct]}</p>
+            <div class="normative">
+              <strong><i class="fas fa-book"></i> Fundamento normativo:</strong>
+              <p style="margin:0.3rem 0;">${q.normative}</p>
+              <strong><i class="fas fa-lightbulb"></i> Explicación:</strong>
+              <p style="margin:0.3rem 0;">${q.feedback}</p>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = `
+        <div class="quiz-results-header">
+          <h2>Resultado del Quiz Diagnóstico</h2>
+        </div>
+        <div class="quiz-result-summary">
+          <div class="quiz-result-stat">
+            <strong>${correctCount}</strong>
+            <span>Respuestas correctas</span>
+          </div>
+          <div class="quiz-result-stat">
+            <strong>${incorrectCount}</strong>
+            <span>Respuestas incorrectas</span>
+          </div>
+          <div class="quiz-result-stat">
+            <strong>${percentage}%</strong>
+            <span>Puntuación total</span>
+          </div>
+        </div>
+        <div class="quiz-result-area ${percentage >= 70 ? 'strong' : 'weak'}">
+          <h4>Nivel de preparación <span style="float:right; font-size:0.8rem;">${percentage}%</span></h4>
+          <p>${riskCategory}</p>
+        </div>
+        ${weakAreasHtml}
+        <hr style="margin:2rem 0; border-color:var(--gray-200);">
+        <h4>Revisión detallada de preguntas y normativas</h4>
+        ${reviewHtml}
+        <div style="text-align:center; margin-top:2rem;">
+          <button class="btn btn-primary btn-block" onclick="restartDiagnosticQuiz()">
+            <i class="fas fa-redo"></i> Realizar Quiz Nuevamente
+          </button>
+          <button class="btn btn-secondary btn-block" style="margin-top:0.5rem;" onclick="closeDiagnosticResults()">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+          </button>
+        </div>
+      `;
+    };
+
+    window.restartDiagnosticQuiz = function () {
+      diagnosticState.answers = {};
+      diagnosticState.currentQuestion = 0;
+      diagnosticState.completed = false;
+      showView('diagnosticQuiz');
+      renderDiagnosticQuiz();
+    };
+
+    window.closeDiagnosticResults = function () {
+      const card = document.getElementById('quizDiagnosticCard');
+      if (card) card.classList.remove('hidden');
+      showView('dashboard');
+      diagnosticState.answers = {};
+      diagnosticState.currentQuestion = 0;
+      diagnosticState.completed = false;
+    };
+
+
+      if (view === 'diagnosticQuiz') document.getElementById('view-diagnosticQuiz').classList.remove('hidden');
+      if (view === 'diagnosticResults') document.getElementById('view-diagnosticResults').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    /* ============================================================
+        INICIALIZACIÓN
+        ============================================================ */
     (function init() {
       loadState();
       updateNavbar();
 
-      // Si ya hay usuario, mostramos el dashboard al cargar
-      if (state.user) {
-        // Dejamos landing por defecto para que vea el hero, pero actualizamos navbar
-        updateNavbar();
+      if (auth.state.user) {
+        showView('dashboard');
       }
 
-      // Sombra navbar al scroll
       const navbar = document.querySelector('.navbar');
       window.addEventListener('scroll', () => {
         navbar.style.boxShadow = window.scrollY > 20
@@ -2497,7 +3023,6 @@
           : 'none';
       }, { passive: true });
 
-      // Cerrar modal al hacer click fuera
       document.getElementById('badgeModal').addEventListener('click', (e) => {
         if (e.target.id === 'badgeModal') closeBadgeModal();
       });

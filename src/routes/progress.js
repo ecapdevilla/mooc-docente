@@ -11,8 +11,13 @@ const { validateProgress } = require('../utils/validators');
  */
 router.post('/lesson/:lessonId', authenticate, async (req, res) => {
   try {
+    const { error } = validateProgress(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
     const { lessonId } = req.params;
-    const { usuarioId } = req.user;
+    const usuarioId = req.user.id;
     const { puntaje } = req.body || {};
 
     const { rows } = await pool.query(
@@ -53,16 +58,29 @@ ON CONFLICT (usuario_id, leccion_id)
     const moduleProgress = totalLessons ? Math.round((doneLessons / totalLessons) * 100) : 0;
 
     // Update enrollment progress
-    await pool.query(
-      `UPDATE enrollments SET progreso_total = (
-        SELECT COALESCE(AVG(
-          (SELECT COUNT(*) FROM user_progress WHERE usuario_id = $1 AND leccion_id IN (SELECT id FROM lessons WHERE modulo_id = m.id AND completada = TRUE))::decimal / 
-          NULLIF((SELECT COUNT(*) FROM lessons l2 JOIN modules m2 ON l2.modulo_id = m2.id WHERE m2.id = m.id AND l2.activo = TRUE)::decimal, 0) * 100, 0
-        ))
-        FROM modules m WHERE m.curso_id = (SELECT curso_id FROM modules WHERE id = $2 LIMIT 1)
-      ) WHERE usuario_id = $1 AND curso_id = (SELECT curso_id FROM modules WHERE id = $2 LIMIT 1)`,
+    const { rows: enrollmentRows } = await pool.query(
+      `SELECT e.id as enrollment_id, e.curso_id FROM enrollments e
+       WHERE e.staff_id = $1 AND e.curso_id = (SELECT curso_id FROM modules WHERE id = $2 LIMIT 1)`,
       [usuarioId, moduloId]
     );
+    for (const enrollment of enrollmentRows) {
+      const { rows: progRows } = await pool.query(
+        `SELECT
+          (SELECT COUNT(*) FROM user_progress up
+           JOIN lessons l ON up.leccion_id = l.id
+           JOIN modules m ON l.modulo_id = m.id
+           WHERE up.[staff_id] = $1 AND m.curso_id = $2 AND up.completada = TRUE)::numeric /
+          NULLIF((SELECT COUNT(*) FROM lessons l2
+                  JOIN modules m2 ON l2.modulo_id = m2.id
+                  WHERE m2.curso_id = $2 AND l2.activo = TRUE)::numeric, 0) * 100 as pct`,
+        [usuarioId, enrollment.curso_id]
+      );
+      const pct = progRows[0]?.pct ? Math.round(parseFloat(progRows[0].pct)) : 0;
+      await pool.query(
+        `UPDATE enrollments SET progreso_total = $1 WHERE id = $2`,
+        [pct, enrollment.enrollment_id]
+      );
+    }
 
     // Check if all lessons completed (badge eligibility)
     const { rows: moduleData } = await pool.query(
@@ -79,7 +97,7 @@ ON CONFLICT (usuario_id, leccion_id)
           `SELECT id FROM user_badges WHERE usuario_id = $1 AND badge_id = (SELECT id FROM badges WHERE modulo_id = $2 AND nombre = $3 LIMIT 1)`,
           [usuarioId, modData.modulo_id, modData.badge_nombre]
         );
-        if (existingBadge.rows.length === 0) {
+        if (existingBadge.length === 0) {
           const { rows: badge } = await pool.query(
             `INSERT INTO badges (modulo_id, nombre, icono, color) VALUES ($1, $2, $3, $4) 
              ON CONFLICT DO NOTHING 

@@ -11,14 +11,43 @@ const { authenticate } = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const { rows: courses } = await pool.query(
-      `SELECT c.*, 
-       (SELECT COUNT(*) FROM modules m WHERE m.curso_id = c.id AND m.activo = TRUE) as modulo_count,
-       (SELECT COUNT(*) FROM modules m JOIN lessons l ON l.modulo_id = m.id WHERE m.curso_id = c.id AND l.activo = TRUE) as lesson_count
-       FROM courses c 
-       WHERE c.activo = TRUE 
-       ORDER BY c.creado_en DESC`
+      `SELECT * FROM courses WHERE activo = TRUE ORDER BY creado_en DESC`
     );
-    res.json({ courses });
+
+    const coursesWithModules = [];
+    for (const course of courses) {
+      const { rows: modules } = await pool.query(
+        `SELECT * FROM modules WHERE curso_id = $1 AND activo = TRUE ORDER BY orden ASC`,
+        [course.id]
+      );
+
+      const courseWithModules = { ...course, modulos: [] };
+
+      for (const mod of modules) {
+        const { rows: lessons } = await pool.query(
+          `SELECT * FROM lessons WHERE modulo_id = $1 AND activo = TRUE ORDER BY orden ASC`,
+          [mod.id]
+        );
+
+        const lessonsWithQuiz = [];
+        for (const lesson of lessons) {
+          const { rows: quizzes } = await pool.query(
+`SELECT q.*, 
+           (SELECT json_agg(json_build_object('id', qo.id, 'detalle', qo.opcion, 'es_correcta', qo.es_correcta, 'orden', qo.orden) ORDER BY qo.orden)
+            FROM quiz_options qo WHERE qo.quiz_id = q.id) as opciones
+           FROM quizzes q WHERE q.leccion_id = $1`,
+            [lesson.id]
+          );
+          lessonsWithQuiz.push({ ...lesson, quizzes });
+        }
+
+        courseWithModules.modulos.push({ ...mod, lecciones: lessonsWithQuiz });
+      }
+
+      coursesWithModules.push(courseWithModules);
+    }
+
+    res.json({ courses: coursesWithModules });
   } catch (err) {
     console.error('❌ Error fetching courses:', err);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -58,9 +87,9 @@ router.get('/:id', async (req, res) => {
       const lessonsWithQuiz = [];
       for (const lesson of lessons) {
         const { rows: quizzes } = await pool.query(
-          `SELECT q.*, 
-           (SELECT json_agg(json_build_object('id', qo.id, 'opcion', qo.opcion, 'es_correcta', qo.es_correcta, 'orden', qo.orden))
-            FROM quiz_options qo WHERE qo.quiz_id = q.id ORDER BY qo.orden) as opciones
+`SELECT q.*, 
+           (SELECT json_agg(json_build_object('id', qo.id, 'detalle', qo.opcion, 'es_correcta', qo.es_correcta, 'orden', qo.orden) ORDER BY qo.orden)
+            FROM quiz_options qo WHERE qo.quiz_id = q.id) as opciones
            FROM quizzes q WHERE q.leccion_id = $1`,
           [lesson.id]
         );
