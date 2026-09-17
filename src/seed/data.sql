@@ -405,6 +405,132 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'PEI, currículo y autonomía institucional',
+    'Análisis de diagnóstico institucional, currículo, participación y actualización del PEI.',
+    5,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'PEI, currículo y autonomía institucional'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Gobierno escolar y distribución de competencias',
+    'Análisis de las funciones de los órganos del gobierno escolar y las responsabilidades institucionales.',
+    6,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Gobierno escolar y distribución de competencias'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Función docente, planeación y contexto',
+    'Análisis de la responsabilidad profesional docente para contextualizar la planeación y articularla con el currículo y el PEI.',
+    7,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Función docente, planeación y contexto'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Familia, autonomía escolar y responsabilidad docente',
+    'Análisis de la participación familiar, la autonomía pedagógica y la responsabilidad institucional en el acompañamiento.',
+    8,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Familia, autonomía escolar y responsabilidad docente'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Protección de derechos, confidencialidad y actuación institucional',
+    'Análisis de la actuación docente e institucional ante posibles situaciones de vulneración de derechos.',
+    9,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Protección de derechos, confidencialidad y actuación institucional'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Familia, información y participación educativa',
+    'Análisis del derecho de las familias a la información y participación, junto con la protección de datos y la autonomía profesional docente.',
+    10,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Familia, información y participación educativa'
+);
+
+
 /* ============================================================
    5. QUIZZES
    ============================================================ */
@@ -621,9 +747,174 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Durante una actividad de laboratorio en grado décimo desaparece un teléfono celular. Dos estudiantes manifiestan haber visto a un compañero cerca del lugar donde estaba el dispositivo y uno afirma que anteriormente lo escuchó decir que necesitaba dinero. El coordinador revisa, con autorización del estudiante, su maleta y encuentra el teléfono entre sus pertenencias. El estudiante sostiene que otro compañero lo introdujo allí para perjudicarlo y solicita revisar las cámaras de seguridad. El manual de convivencia tipifica la apropiación de bienes ajenos como una conducta grave y contempla medidas que pueden afectar la permanencia del estudiante, previa aplicación del procedimiento correspondiente. La familia del propietario exige una sanción inmediata; varios docentes consideran que el hallazgo constituye evidencia suficiente; y el rector señala que la institución debe responder con prontitud porque la demora podría interpretarse como tolerancia frente a la conducta. ¿Cuál actuación institucional resulta más consistente?',
+    'La institución debe documentar los hechos, preservar las evidencias, escuchar al estudiante y a quienes puedan aportar información, permitir la contradicción y decidir por la autoridad competente conforme al procedimiento, diferenciando medidas inmediatas de protección de una sanción que presuponga responsabilidad.',
+    'El hallazgo material no elimina la presunción de responsabilidad ni permite sancionar de inmediato. Tampoco corresponde suspender sin garantías, remitir el caso y detener la actuación institucional o confundir una medida preventiva con una consecuencia disciplinaria.'
+FROM lessons l
+WHERE l.titulo = 'Convivencia escolar y protección frente al acoso'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Durante una actividad de laboratorio en grado décimo desaparece un teléfono celular%'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Después de analizar los resultados institucionales de dos años consecutivos, el Consejo Académico concluye que existen dificultades en la articulación curricular entre quinto y sexto grado. Como respuesta, aprueba una reorganización que modifica secuencias de aprendizaje, criterios comunes de planeación y mecanismos de seguimiento entre áreas. El rector considera técnicamente pertinente la propuesta, pero advierte que algunos componentes inciden en elementos formalizados dentro del PEI y el plan de estudios. Un grupo de docentes solicita comenzar inmediatamente porque la propuesta ya fue aprobada por el órgano encargado de estudiar el currículo. El Consejo Directivo considera que puede modificar directamente los componentes pedagógicos antes de aprobarlos definitivamente. ¿Cuál actuación conserva mejor las competencias de los órganos involucrados?',
+    'Debe reconocerse la función del Consejo Académico de estudiar, organizar y orientar los asuntos curriculares, pero tramitar las modificaciones que incidan en componentes institucionales mediante los procedimientos y órganos correspondientes, sin sustituir las competencias de adopción ni la elaboración técnica.',
+    'La aprobación académica no basta para modificar componentes formalizados del PEI, y el Consejo Directivo no debe elaborar directamente los aspectos técnicos que corresponden al ámbito académico. La modificación debe seguir el procedimiento institucional.'
+FROM lessons l
+WHERE l.titulo = 'Gobierno escolar y distribución de competencias'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Después de analizar los resultados institucionales de dos años consecutivos%'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Un docente de Ciencias Sociales de grado noveno decide reemplazar durante un período buena parte de las actividades previstas en el plan de área por una secuencia diseñada a partir de problemas contemporáneos del contexto local. La propuesta desarrolla argumentación, interpretación de fuentes y participación ciudadana, pero deja sin abordar algunos contenidos y desempeños programados. El docente sostiene que sus estudiantes alcanzan aprendizajes más significativos y que la libertad de cátedra le permite seleccionar contenidos y métodos. El jefe de área reconoce el valor de la propuesta, aunque advierte que los estudiantes deberán continuar posteriormente una secuencia curricular articulada con otros grados. ¿Cuál decisión armoniza mejor las responsabilidades involucradas?',
+    'Debe analizarse la propuesta frente a los referentes curriculares, propósitos del área, aprendizajes previstos y articulación institucional; conservar las innovaciones pertinentes, ajustar lo necesario para garantizar los aprendizajes y tramitar las modificaciones mediante los espacios institucionales correspondientes.',
+    'La libertad de cátedra no autoriza a sustituir unilateralmente los referentes institucionales ni obliga a eliminar toda innovación. La equivalencia no se presume por los resultados y no puede formalizarse retrospectivamente sin articulación institucional.'
+FROM lessons l
+WHERE l.titulo = 'Función docente, planeación y contexto'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Un docente de Ciencias Sociales de grado noveno decide reemplazar durante un período%'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Una estudiante de grado octavo solicita hablar en privado con su directora de grupo. Le manifiesta que durante las últimas semanas ha recibido mensajes de un adulto conocido de su familia que le generan temor y que recientemente este le pidió encontrarse con él sin informar a sus padres. La estudiante insiste en que nadie conozca la conversación porque teme provocar un conflicto familiar y afirma que dejará de responder los mensajes. No presenta lesiones visibles ni informa que haya ocurrido un encuentro. La docente considera importante preservar su confianza, pero advierte que la información podría revelar una situación que excede el manejo pedagógico ordinario. ¿Cuál actuación resulta más consistente con las responsabilidades de la docente y del establecimiento?',
+    'Debe comunicarse oportunamente la información por los conductos institucionales para activar las actuaciones de protección, preservar la intimidad frente a quienes no necesiten conocer el caso y evitar interrogatorios o investigaciones propias, sin usar la confidencialidad para posponer una actuación potencialmente protectora.',
+    'La ausencia de lesiones o de un encuentro consumado no permite esperar nuevas evidencias. La docente no debe investigar por cuenta propia ni trasladar la decisión exclusivamente a la familia antes de activar los mecanismos institucionales de protección.'
+FROM lessons l
+WHERE l.titulo = 'Protección de derechos, confidencialidad y actuación institucional'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Una estudiante de grado octavo solicita hablar en privado%'
+);
+
 /* ============================================================
    6. OPCIONES QUIZ - PEDAGOGÍA
    ============================================================ */
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'En grado octavo, cuatro estudiantes desarrollan durante seis semanas un proyecto interdisciplinario cuya valoración combina producto colectivo, sustentación individual, bitácora y coevaluación. Dos días antes de la entrega final, uno elimina deliberadamente una carpeta compartida que contenía parte del trabajo del equipo. La información puede recuperarse parcialmente y el estudiante reconoce haberla eliminado, aunque afirma que varios archivos eran elaboraciones suyas y que actuó molesto porque sus compañeros habían modificado sus aportes sin consultarlo. El manual de convivencia contempla procedimientos frente al uso inadecuado de recursos tecnológicos y afectaciones a otros integrantes. El SIEE establece que la valoración debe corresponder a evidencias del aprendizaje individual y colectivo. ¿Qué debe hacer la institución?',
+    'Debe separar, aunque articular, las consecuencias de convivencia y la valoración de aprendizajes: reconstruir las evidencias, valorar los desempeños individuales y colectivos efectivamente demostrados y aplicar el procedimiento por la eliminación de archivos, sin usar la calificación como sanción ni ignorar sus efectos reales sobre las evidencias.',
+    'La conducta no autoriza a asignar cero automáticamente ni a mantener intacta la calificación sin analizar las evidencias afectadas. La valoración académica y el procedimiento de convivencia tienen finalidades y garantías distintas.'
+FROM lessons l WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'En grado octavo, cuatro estudiantes desarrollan durante seis semanas%');
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Una institución oficial identifica un aumento sostenido de reprobación y ausentismo durante la transición de quinto a sexto. Después de analizar información académica, entrevistas con familias y observaciones docentes, un equipo propone reorganizar parcialmente el primer período de sexto con secuencias articuladas, acompañamiento y nuevos mecanismos de seguimiento. El Consejo Académico considera pertinente la propuesta y el rector dispone iniciar un piloto mientras se tramitan ajustes institucionales. ¿Cuál alternativa organiza con mayor precisión las actuaciones?',
+    'Debe reconocerse la función del Consejo Académico en asuntos pedagógicos y curriculares, determinar qué puede desarrollarse dentro de la planeación vigente y qué exige modificaciones institucionales, y articular rectoría y órganos de gobierno según sus competencias, sin desplazar atribuciones por urgencia o jerarquía.',
+    'La pertinencia académica no autoriza un piloto que modifique sin trámite componentes institucionales, y el Consejo Directivo no debe asumir la elaboración técnica. La respuesta debe distinguir implementación dentro de lo vigente y cambios que requieren adopción formal.'
+FROM lessons l WHERE l.titulo = 'PEI, currículo y autonomía institucional'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Una institución oficial identifica un aumento sostenido de reprobación%');
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Una estudiante de séptimo grado ha trabajado durante el año con apoyos y ajustes documentados a partir de una valoración pedagógica. En Matemáticas conserva los mismos propósitos fundamentales del grado, utiliza material concreto, instrucciones segmentadas y tiempos diferenciados, y evidencia avances significativos, aunque algunas evidencias muestran que todavía no alcanza determinados desempeños. Algunas metas, apoyos y criterios quedaron documentados, pero no todas las acciones acordadas fueron ejecutadas con la regularidad prevista. ¿Qué actuación resulta más consistente antes de adoptar la decisión?',
+    'Debe examinarse lo alcanzado a la luz de los criterios institucionales, propósitos curriculares y ajustes, verificando también si los apoyos fueron implementados; ante omisiones relevantes, deben adoptarse medidas pedagógicas antes de hacer recaer sus efectos sobre la estudiante, sin convertir progreso o uniformidad instrumental en promoción automática.',
+    'Los ajustes no sustituyen automáticamente los criterios del grado ni hacen del progreso individual el único criterio. Tampoco permite la igualdad aplicar instrumentos idénticos ignorando barreras, apoyos previstos y omisiones institucionales.'
+FROM lessons l WHERE l.titulo = 'Educación inclusiva y ajustes pedagógicos'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Una estudiante de séptimo grado ha trabajado durante el año%');
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Dos estudiantes de grado noveno mantienen desde hace meses una relación conflictiva, con insultos, exclusión y comentarios ofensivos en redes sociales. En tres ocasiones uno difundió montajes ridiculizando al otro, pero también existen respuestas ofensivas y una confrontación iniciada por este último. Una familia exige reconocer inmediatamente a su hijo como víctima de acoso y al otro como agresor. ¿Cuál actuación ofrece el tratamiento inicial más consistente?',
+    'Debe reconstruirse la reiteración, efectos y dinámica de las conductas, incluyendo posibles relaciones de poder y actuaciones de ambos; adoptar medidas de protección necesarias y tramitar la situación por los protocolos, sin deducir automáticamente de la reciprocidad igualdad entre las partes ni de la reiteración una clasificación definitiva.',
+    'La reciprocidad no convierte automáticamente el caso en conflicto ni la reiteración basta para clasificarlo como acoso. La institución debe caracterizar los hechos, proteger y aplicar el protocolo correspondiente con garantías.'
+FROM lessons l WHERE l.titulo = 'Convivencia escolar y protección frente al acoso'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Dos estudiantes de grado noveno mantienen desde hace meses%');
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Durante el primer período, un estudiante de cuarto grado muestra disminución progresiva en participación y cumplimiento. La docente implementa cambios metodológicos y registra avances parciales. El padre exige copia completa de calificaciones, anotaciones, observaciones sobre otros estudiantes y comunicaciones internas entre docentes, además de autorización previa para cualquier cambio metodológico aplicado a su hijo. ¿Cuál respuesta institucional resulta más consistente?',
+    'Debe garantizarse información pertinente y comprensible sobre el proceso del estudiante, avances, dificultades, criterios y acompañamiento, establecer diálogo y participación familiar y proteger la información de terceros, diferenciando ese derecho del supuesto poder de autorizar cada decisión metodológica ordinaria.',
+    'La familia tiene derecho a conocer y participar en el acompañamiento, pero no a recibir información de terceros o comunicaciones internas sin límite ni a autorizar cada decisión profesional. Tampoco corresponde negar toda información adicional al boletín.'
+FROM lessons l WHERE l.titulo = 'Familia, información y participación educativa'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Durante el primer período, un estudiante de cuarto grado%');
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Una institución educativa oficial inicia la revisión de su Proyecto Educativo Institucional después de identificar bajo desempeño sostenido en comprensión lectora en varios grados. El rector propone incorporar una estrategia transversal de lectura que comprometa a todas las áreas y solicita que cada docente incluya actividades de comprensión y argumentación relacionadas con los contenidos de su asignatura. Un grupo de profesores objeta que esta decisión invade la autonomía de cada área y sostiene que las dificultades lectoras deben ser atendidas exclusivamente por Lengua Castellana. El Consejo Académico, por su parte, propone modificar inmediatamente los planes de área y comenzar su implementación mientras posteriormente se actualizan los componentes correspondientes del PEI. Algunos padres apoyan la estrategia, pero solicitan participar antes de que se consoliden los cambios porque consideran que estos pueden modificar prácticas pedagógicas y criterios institucionales que afectan a sus hijos. ¿Cuál actuación articula de manera más consistente las competencias institucionales involucradas?',
+    'La propuesta debe partir del diagnóstico, pasar por las instancias competentes, incluir la participación correspondiente y adoptar las modificaciones del PEI mediante el procedimiento institucional, sin reducir la comprensión lectora a un área ni reemplazar la participación por una decisión unilateral.',
+    'El Consejo Académico no puede adoptar por sí solo modificaciones del PEI, el Consejo Directivo no absorbe todas las funciones pedagógicas y la autonomía de las áreas no justifica una respuesta fragmentada frente a un problema institucional.'
+FROM lessons l
+WHERE l.titulo = 'PEI, currículo y autonomía institucional'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Una institución educativa oficial inicia la revisión de su Proyecto Educativo Institucional%'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'En una institución oficial se presentan dificultades reiteradas con el cumplimiento de horarios, la entrega tardía de informes académicos y diferencias entre docentes sobre orientaciones pedagógicas. Después de recibir quejas de varias familias, el Consejo Directivo aprueba un procedimiento obligatorio de seguimiento semanal a los docentes y dispone que los casos de incumplimiento sean evaluados directamente por dicho Consejo. El rector advierte que algunas actuaciones podrían corresponder a otras autoridades. El Consejo Académico sostiene que cualquier asunto relacionado con docentes debe pasar por él. ¿Cuál curso de acción preserva mejor la distribución institucional de responsabilidades?',
+    'Debe diferenciarse la naturaleza de cada asunto: el Consejo Académico conserva lo relativo a orientación pedagógica, la rectoría ejerce las funciones de dirección, coordinación y seguimiento que le correspondan y cada órgano actúa dentro de sus atribuciones, sin que el Consejo Directivo absorba competencias específicas.',
+    'La condición de máxima instancia no permite al Consejo Directivo absorber todas las competencias, ni el Consejo Académico reemplaza a la rectoría en funciones de dirección y seguimiento. Las decisiones deben tramitarse según la competencia normativa de cada actor.'
+FROM lessons l
+WHERE l.titulo = 'Gobierno escolar y distribución de competencias'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'En una institución oficial se presentan dificultades reiteradas con el cumplimiento de horarios%'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Una docente de Ciencias Naturales de grado sexto recibe al inicio del año una planeación institucional utilizada durante los tres años anteriores. Esta contiene contenidos, actividades, tiempos e instrumentos de evaluación uniformes para todos los grupos. Durante las primeras semanas identifica conocimientos previos muy heterogéneos: algunos estudiantes resuelven situaciones de indagación, mientras otros tienen dificultades para interpretar información básica. Además, la institución dispone de nuevos recursos tecnológicos y el PEI establece fortalecer el aprendizaje autónomo, el trabajo colaborativo y la relación con el contexto. ¿Qué actuación corresponde de manera más completa a la responsabilidad profesional de la docente?',
+    'Debe analizar la planeación a la luz del currículo, el PEI, los referentes aplicables y las características del grupo; conservar los propósitos institucionales y ajustar estrategias, secuencias, recursos y seguimiento cuando sea pedagógicamente necesario, documentándolo y articulándolo con la planeación institucional.',
+    'La planeación institucional no debe aplicarse de manera rígida ni reemplazarse unilateralmente. La docente debe contextualizarla sin romper la coherencia curricular ni esperar a que una evaluación formal revele dificultades ya identificadas.'
+FROM lessons l
+WHERE l.titulo = 'Función docente, planeación y contexto'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Una docente de Ciencias Naturales de grado sexto recibe al inicio del año%'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Durante el segundo período, la madre de un estudiante de quinto grado solicita que su hijo no participe en un proyecto grupal porque considera que dos compañeros le hacen perder tiempo y pueden afectar su calificación. El estudiante manifiesta que desea continuar trabajando con el grupo. La docente verifica desacuerdos sobre la distribución de tareas, pero no encuentra elementos suficientes para establecer agresión. Las evidencias muestran que el estudiante cumple los aprendizajes, aunque necesita mejorar la negociación de responsabilidades. La madre exige un proyecto individual y afirma que puede decidir las condiciones de participación. ¿Cuál actuación resulta institucional y pedagógicamente más consistente?',
+    'La institución debe analizar las dificultades con el estudiante y el grupo, implementar estrategias para mejorar la distribución de responsabilidades y hacer seguimiento; debe escuchar e informar a la familia e involucrarla en el acompañamiento, sin darle facultad unilateral para sustituir una decisión pedagógica ni desconocer la participación del estudiante.',
+    'La familia participa y puede ser escuchada, pero no decide unilateralmente la metodología. Tampoco basta con rechazar la solicitud o remitirla directamente al Consejo Directivo: corresponde una intervención pedagógica y un seguimiento proporcionales a la situación.'
+FROM lessons l
+WHERE l.titulo = 'Familia, autonomía escolar y responsabilidad docente'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Durante el segundo período, la madre de un estudiante de quinto grado%'
+);
 
 /* Reconciliación: el seed es la fuente canónica de las opciones.
    Se eliminan opciones obsoletas de los quizzes sembrados y luego
@@ -672,6 +963,58 @@ WHERE qo.quiz_id = q.id
         OR (
             l.titulo = 'Educación inclusiva y ajustes pedagógicos'
             AND q.pregunta LIKE 'Una estudiante de sexto grado presenta dificultades persistentes%'
+        )
+        OR (
+            l.titulo = 'PEI, currículo y autonomía institucional'
+            AND q.pregunta LIKE 'Una institución educativa oficial inicia la revisión de su Proyecto Educativo Institucional%'
+        )
+        OR (
+            l.titulo = 'Gobierno escolar y distribución de competencias'
+            AND q.pregunta LIKE 'En una institución oficial se presentan dificultades reiteradas con el cumplimiento de horarios%'
+        )
+        OR (
+            l.titulo = 'Función docente, planeación y contexto'
+            AND q.pregunta LIKE 'Una docente de Ciencias Naturales de grado sexto recibe al inicio del año%'
+        )
+        OR (
+            l.titulo = 'Familia, autonomía escolar y responsabilidad docente'
+            AND q.pregunta LIKE 'Durante el segundo período, la madre de un estudiante de quinto grado%'
+        )
+        OR (
+            l.titulo = 'Convivencia escolar y protección frente al acoso'
+            AND q.pregunta LIKE 'Durante una actividad de laboratorio en grado décimo desaparece un teléfono celular%'
+        )
+        OR (
+            l.titulo = 'Gobierno escolar y distribución de competencias'
+            AND q.pregunta LIKE 'Después de analizar los resultados institucionales de dos años consecutivos%'
+        )
+        OR (
+            l.titulo = 'Función docente, planeación y contexto'
+            AND q.pregunta LIKE 'Un docente de Ciencias Sociales de grado noveno decide reemplazar durante un período%'
+        )
+        OR (
+            l.titulo = 'Protección de derechos, confidencialidad y actuación institucional'
+            AND q.pregunta LIKE 'Una estudiante de grado octavo solicita hablar en privado%'
+        )
+        OR (
+            l.titulo = 'Evaluación integral y autonomía del SIEE'
+            AND q.pregunta LIKE 'En grado octavo, cuatro estudiantes desarrollan durante seis semanas%'
+        )
+        OR (
+            l.titulo = 'PEI, currículo y autonomía institucional'
+            AND q.pregunta LIKE 'Una institución oficial identifica un aumento sostenido de reprobación%'
+        )
+        OR (
+            l.titulo = 'Educación inclusiva y ajustes pedagógicos'
+            AND q.pregunta LIKE 'Una estudiante de séptimo grado ha trabajado durante el año%'
+        )
+        OR (
+            l.titulo = 'Convivencia escolar y protección frente al acoso'
+            AND q.pregunta LIKE 'Dos estudiantes de grado noveno mantienen desde hace meses%'
+        )
+        OR (
+            l.titulo = 'Familia, información y participación educativa'
+            AND q.pregunta LIKE 'Durante el primer período, un estudiante de cuarto grado%'
         )
         OR (
             l.titulo = 'PEI, participación y autonomía institucional'
@@ -1161,9 +1504,177 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Encargar al Consejo Académico la formulación técnica de la estrategia y autorizar su incorporación inmediata en todos los planes de área, dado que este órgano orienta los procesos pedagógicos; posteriormente, el Consejo Directivo puede formalizar su inclusión en el PEI y socializarla con la comunidad educativa.', FALSE, 1),
+    ('Construir la propuesta a partir del diagnóstico institucional, someter sus componentes pedagógicos y curriculares a las instancias que tienen competencia para estudiarlos y articularlos, garantizar la participación que corresponda a los integrantes de la comunidad educativa y adoptar las modificaciones del PEI mediante el procedimiento institucional previsto, sin reducir la comprensión lectora a responsabilidad exclusiva de un área ni sustituir el procedimiento participativo por una decisión unilateral.', TRUE, 2),
+    ('Mantener los planes vigentes hasta que el Consejo Directivo diseñe directamente la estrategia transversal y determine las actividades mínimas obligatorias de cada asignatura, puesto que este órgano es la máxima instancia institucional.', FALSE, 3),
+    ('Permitir que cada área determine autónomamente si incorpora la estrategia, exigiendo únicamente a Lengua Castellana un plan específico de mejoramiento; una vez se evidencien resultados positivos, el rector podrá extender la experiencia sin necesidad de modificar el PEI.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'PEI, currículo y autonomía institucional'
+AND q.pregunta LIKE 'Una institución educativa oficial inicia la revisión de su Proyecto Educativo Institucional%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Ejecutar integralmente la decisión del Consejo Directivo mientras permanezca vigente, dado que sus decisiones obligan a la comunidad educativa; las posibles dudas sobre competencia pueden revisarse posteriormente.', FALSE, 1),
+    ('Trasladar el seguimiento completo al Consejo Académico, porque las actuaciones de los docentes inciden directamente en el proceso educativo y este órgano posee competencia pedagógica.', FALSE, 2),
+    ('Diferenciar la naturaleza de cada asunto y tramitarlo ante la instancia competente: conservar en el Consejo Académico aquello que corresponda a orientación y organización pedagógica, ejercer desde la rectoría las funciones de dirección, coordinación y seguimiento que normativamente le correspondan, y reservar a los demás órganos las atribuciones que efectivamente tengan asignadas.', TRUE, 3),
+    ('Solicitar al Consejo Directivo que delegue formalmente en el rector todas las actuaciones relacionadas con seguimiento docente, conservando aquel únicamente la revisión de los resultados.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Gobierno escolar y distribución de competencias'
+AND q.pregunta LIKE 'En una institución oficial se presentan dificultades reiteradas con el cumplimiento de horarios%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Aplicar inicialmente la planeación institucional sin modificaciones para obtener resultados comparables entre los estudiantes y, después de la primera evaluación formal, introducir actividades diferenciadas únicamente para quienes obtengan desempeño bajo.', FALSE, 1),
+    ('Reemplazar la planeación recibida por una propuesta propia construida a partir del diagnóstico del grupo, pues la responsabilidad directa sobre el aprendizaje otorga a la docente autonomía para seleccionar contenidos, secuencias e instrumentos.', FALSE, 2),
+    ('Analizar la planeación a la luz del currículo, el PEI, los referentes aplicables y las características identificadas en los estudiantes; conservar los propósitos y referentes institucionales que correspondan, pero ajustar estrategias, secuencias, recursos y procesos de seguimiento cuando resulte pedagógicamente necesario, documentando su desarrollo y articulándolo con los mecanismos institucionales de planeación y mejoramiento.', TRUE, 3),
+    ('Mantener contenidos y actividades institucionales, incorporando únicamente los nuevos recursos tecnológicos como apoyo, dado que las diferencias en conocimientos previos deben atenderse mediante estrategias de recuperación posteriores.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Función docente, planeación y contexto'
+AND q.pregunta LIKE 'Una docente de Ciencias Naturales de grado sexto recibe al inicio del año%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Mantener al estudiante en el proyecto sin introducir modificaciones, informando a la madre que las decisiones metodológicas pertenecen exclusivamente a la institución y que la participación familiar no comprende controvertir estrategias pedagógicas.', FALSE, 1),
+    ('Aceptar temporalmente el trabajo individual mientras se determina si los desacuerdos pueden evolucionar hacia una situación de convivencia, porque la prevención justifica privilegiar la solicitud familiar mientras exista incertidumbre.', FALSE, 2),
+    ('Analizar con el estudiante y los integrantes del grupo las dificultades observadas, implementar estrategias pedagógicas para mejorar la distribución de responsabilidades y efectuar seguimiento; escuchar e informar a la familia e involucrarla en el acompañamiento, sin atribuirle la facultad unilateral de sustituir una decisión pedagógica ni desconocer la participación del estudiante y las competencias institucionales.', TRUE, 3),
+    ('Remitir la solicitud al Consejo Directivo para que determine si prevalece la decisión familiar o la metodología docente, pues corresponde a la máxima instancia resolver cuál interés debe prevalecer.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Familia, autonomía escolar y responsabilidad docente'
+AND q.pregunta LIKE 'Durante el segundo período, la madre de un estudiante de quinto grado%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Adoptar provisionalmente la consecuencia establecida para la conducta, debido a la evidencia material encontrada, y permitir posteriormente que el estudiante solicite su revisión aportando pruebas.', FALSE, 1),
+    ('Separar al estudiante de las actividades presenciales mientras se revisan las cámaras y se escucha a los involucrados, manteniendo sus actividades académicas en casa sin aplicar las garantías disciplinarias.', FALSE, 2),
+    ('Documentar los hechos y preservar las evidencias disponibles, escuchar al estudiante y a quienes puedan aportar información, permitir la contradicción de los elementos considerados y adoptar la decisión por la autoridad competente conforme al procedimiento establecido, diferenciando las medidas inmediatas de protección de una sanción que presuponga responsabilidad.', TRUE, 3),
+    ('Remitir inicialmente el hecho a la autoridad externa competente y suspender la actuación institucional hasta conocer su determinación.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Convivencia escolar y protección frente al acoso'
+AND q.pregunta LIKE 'Durante una actividad de laboratorio en grado décimo desaparece un teléfono celular%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Implementar la reorganización aprobada por el Consejo Académico y someter posteriormente sus resultados al Consejo Directivo, pues la competencia académica permite introducir modificaciones cuya formalización puede producirse después.', FALSE, 1),
+    ('Reconocer al Consejo Académico su función de estudiar, organizar y orientar los asuntos curriculares y académicos, pero tramitar las modificaciones que incidan en los componentes institucionales mediante los procedimientos y órganos correspondientes para su incorporación, evitando que la aprobación académica sustituya las competencias de adopción o que otro órgano asuma la elaboración técnica.', TRUE, 2),
+    ('Trasladar la propuesta al Consejo Directivo para que determine directamente las secuencias, criterios y mecanismos definitivos, porque su posición le permite modificar las propuestas de los demás órganos.', FALSE, 3),
+    ('Mantener sin modificaciones el currículo vigente hasta el siguiente año escolar y utilizar la propuesta únicamente como plan de mejoramiento.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Gobierno escolar y distribución de competencias'
+AND q.pregunta LIKE 'Después de analizar los resultados institucionales de dos años consecutivos%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Mantener íntegramente la propuesta del docente siempre que existan evidencias de aprendizaje, porque la libertad de cátedra protege la selección profesional y los planes institucionales pueden sustituirse cuando el contexto justifique una alternativa.', FALSE, 1),
+    ('Exigir el retorno completo a la planeación original y permitir innovaciones exclusivamente como actividades complementarias, porque la aprobación institucional convierte contenidos, secuencias y metodologías en elementos inmodificables.', FALSE, 2),
+    ('Analizar la propuesta respecto de los referentes curriculares, propósitos del área, aprendizajes previstos y articulación institucional; conservar las innovaciones pertinentes, realizar los ajustes necesarios y articular las modificaciones mediante los espacios institucionales correspondientes.', TRUE, 3),
+    ('Permitir que el docente termine el período con su propuesta y aplicar posteriormente una evaluación común sobre los contenidos omitidos; si los resultados son satisfactorios, formalizar retrospectivamente la modificación.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Función docente, planeación y contexto'
+AND q.pregunta LIKE 'Un docente de Ciencias Sociales de grado noveno decide reemplazar durante un período%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Mantener inicialmente la confidencialidad solicitada, documentar reservadamente la conversación y realizar seguimiento cercano; informar solo si aparecen nuevas evidencias de una afectación concreta.', FALSE, 1),
+    ('Comunicar oportunamente la información por los conductos institucionales correspondientes para activar las actuaciones de protección, preservar la intimidad de la estudiante frente a quienes no necesiten conocer el caso y evitar interrogatorios o investigaciones dirigidas a demostrar por cuenta propia los hechos.', TRUE, 2),
+    ('Informar inmediatamente a la familia para que determine si autoriza otras actuaciones, pues los padres son los primeros responsables mientras no exista evidencia de una agresión consumada.', FALSE, 3),
+    ('Solicitar inicialmente capturas completas y verificar personalmente identidad, frecuencia e intención del adulto antes de informar el caso, porque se requieren elementos de corroboración.', FALSE, 4)
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Protección de derechos, confidencialidad y actuación institucional'
+AND q.pregunta LIKE 'Una estudiante de grado octavo solicita hablar en privado%'
+AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id = q.id AND qo.opcion = v.opcion);
+
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Determinar por separado, aunque de manera articulada, las consecuencias que correspondan al hecho de convivencia y la valoración de los aprendizajes demostrados; reconstruir las evidencias académicas disponibles y aplicar el procedimiento institucional respecto de la eliminación, sin utilizar la calificación como sanción.', TRUE, 1),
+('Conservar los aportes individuales acreditados, pero asignar desempeño bajo al componente colectivo porque la eliminación demuestra incumplimiento, y tramitar adicionalmente el comportamiento.', FALSE, 2),
+('Valorar exclusivamente las evidencias producidas antes del incidente y excluir del cálculo cualquier componente afectado, dejando al procedimiento de convivencia las demás consecuencias.', FALSE, 3),
+('Suspender el cierre académico hasta concluir el procedimiento de convivencia y después establecer si la eliminación incide sobre los componentes de valoración.', FALSE, 4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'En grado octavo, cuatro estudiantes desarrollan durante seis semanas%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Mantener el piloto autorizado por el rector, documentar resultados y solicitar posteriormente al Consejo Directivo la incorporación de modificaciones.', FALSE, 1),
+('Reconocer la función del Consejo Académico en asuntos pedagógicos y curriculares, determinar qué puede desarrollarse dentro de la planeación vigente y qué exige modificaciones institucionales, y articular rectoría y órganos de gobierno según sus competencias.', TRUE, 2),
+('Someter integralmente la propuesta al Consejo Directivo antes de cualquier implementación y facultarlo para introducir las modificaciones pedagógicas necesarias.', FALSE, 3),
+('Autorizar al Consejo Académico para aprobar el piloto y sus ajustes durante el año, reservando al Consejo Directivo únicamente la incorporación definitiva al PEI.', FALSE, 4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='PEI, currículo y autonomía institucional' AND q.pregunta LIKE 'Una institución oficial identifica un aumento sostenido de reprobación%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Determinar la promoción comparando prioritariamente el progreso de la estudiante consigo misma, utilizando los aprendizajes del grado únicamente como referentes secundarios.', FALSE, 1),
+('Aplicar los criterios generales de promoción mediante los mismos instrumentos utilizados con el grupo, incorporando posteriormente un informe cualitativo.', FALSE, 2),
+('Examinar los aprendizajes alcanzados a la luz de criterios, propósitos y ajustes; valorar si los apoyos fueron implementados y, ante omisiones relevantes, adoptar medidas antes de hacer recaer sus efectos sobre la estudiante.', TRUE, 3),
+('Aplicar exclusivamente las metas individualizadas, pues su formalización sustituye los criterios generales del grado.', FALSE, 4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Educación inclusiva y ajustes pedagógicos' AND q.pregunta LIKE 'Una estudiante de séptimo grado ha trabajado durante el año%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Clasificar provisionalmente la situación como conflicto escolar, puesto que existen actuaciones ofensivas atribuibles a ambos estudiantes, y aplicar mecanismos de mediación.', FALSE, 1),
+('Reconocer inicialmente una posible situación de acoso debido a la reiteración, aplicar medidas de protección y exigir al otro suspender cualquier contacto mientras se decide.', FALSE, 2),
+('Reconstruir características, reiteración, efectos y dinámica, incluyendo posibles relaciones de poder y actuaciones de ambos; adoptar medidas de protección y tramitar la situación conforme a los protocolos.', TRUE, 3),
+('Abstenerse de clasificar mientras existan versiones contradictorias y remitir el caso a orientación para determinar quién es víctima.', FALSE, 4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Convivencia escolar y protección frente al acoso' AND q.pregunta LIKE 'Dos estudiantes de grado noveno mantienen desde hace meses%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, v.opcion, v.es_correcta, v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Entregar al padre toda la información relacionada directa o indirectamente con el proceso, suprimiendo únicamente los nombres de compañeros, y solicitar autorización para cualquier estrategia individual.', FALSE, 1),
+('Negar el acceso a registros pedagógicos internos y limitar la información familiar a los boletines institucionales.', FALSE, 2),
+('Garantizar información pertinente sobre el proceso, avances, dificultades, criterios y acompañamiento, establecer diálogo y participación familiar, proteger información de terceros y diferenciar ese derecho del poder de autorizar cada decisión metodológica.', TRUE, 3),
+('Remitir la solicitud al Consejo Directivo para que establezca qué documentos pueden ser conocidos y qué estrategias requieren autorización.', FALSE, 4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Familia, información y participación educativa' AND q.pregunta LIKE 'Durante el primer período, un estudiante de cuarto grado%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+
 /* ============================================================
-   11. BADGES
-   ============================================================ */
+    11. BADGES
+    ============================================================ */
 
 INSERT INTO badges
 (modulo_id, nombre, descripcion, icono, color)

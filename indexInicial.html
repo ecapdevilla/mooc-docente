@@ -1114,6 +1114,39 @@
         line-height: 1.55;
       }
 
+      .diagnostic-progress {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: var(--text-soft);
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .diagnostic-progress-bar {
+        height: 7px;
+        flex: 1;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--gray-200);
+      }
+
+      .diagnostic-progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: var(--secondary);
+        transition: width 0.25s ease;
+      }
+
+      .diagnostic-nav {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+
       .post-login-question + .post-login-question {
         margin-top: 1.5rem;
         padding-top: 1.5rem;
@@ -2530,6 +2563,8 @@
         }
 
         state.postLoginAnswers = {};
+        state.postLoginQuiz = data.quiz;
+        state.postLoginQuestionIndex = 0;
         renderPostLoginQuiz(data.quiz);
       } catch (err) {
         panel.classList.add('hidden');
@@ -2555,6 +2590,9 @@
     function renderPostLoginQuiz(quiz) {
       const panel = document.getElementById('postLoginQuizPanel');
       panel.innerHTML = '';
+      const questionIndex = state.postLoginQuestionIndex || 0;
+      const question = quiz.preguntas[questionIndex];
+      const isLastQuestion = questionIndex === quiz.preguntas.length - 1;
 
       const title = document.createElement('h3');
       title.id = 'postLoginQuizTitle';
@@ -2573,48 +2611,66 @@
       intro.textContent = 'Responde estas preguntas avanzadas para identificar tus puntos de partida.';
       panel.appendChild(intro);
 
-      quiz.preguntas.forEach((question, questionIndex) => {
-        const questionBlock = document.createElement('div');
-        questionBlock.className = 'post-login-question';
+      const progress = document.createElement('div');
+      progress.className = 'diagnostic-progress';
+      progress.innerHTML = `<span>Pregunta ${questionIndex + 1} de ${quiz.preguntas.length}</span><div class="diagnostic-progress-bar"><div class="diagnostic-progress-fill" style="width:${((questionIndex + 1) / quiz.preguntas.length) * 100}%"></div></div>`;
+      panel.appendChild(progress);
 
-        const questionTitle = document.createElement('div');
-        questionTitle.className = 'quiz-question';
-        questionTitle.textContent = `${questionIndex + 1}. ${question.pregunta}`;
-        questionBlock.appendChild(questionTitle);
+      const questionBlock = document.createElement('div');
+      questionBlock.className = 'post-login-question';
 
-        const options = document.createElement('div');
-        options.className = 'quiz-options';
+      const questionTitle = document.createElement('div');
+      questionTitle.className = 'quiz-question';
+      questionTitle.textContent = question.pregunta;
+      questionBlock.appendChild(questionTitle);
 
-        question.opciones.forEach((option, optionIndex) => {
-          const optionButton = document.createElement('button');
-          optionButton.type = 'button';
-          optionButton.className = 'quiz-option';
-          optionButton.dataset.questionId = question.id;
-          optionButton.dataset.optionId = option.id;
+      const options = document.createElement('div');
+      options.className = 'quiz-options';
 
-          const letter = document.createElement('span');
-          letter.className = 'letter';
-          letter.textContent = String.fromCharCode(65 + optionIndex);
+      question.opciones.forEach((option, optionIndex) => {
+        const optionButton = document.createElement('button');
+        optionButton.type = 'button';
+        optionButton.className = 'quiz-option';
+        optionButton.dataset.questionId = question.id;
+        optionButton.dataset.optionId = option.id;
 
-          const optionText = document.createElement('span');
-          optionText.textContent = option.opcion;
-          optionButton.append(letter, optionText);
-          optionButton.addEventListener('click', () => selectPostLoginOption(optionButton));
-          options.appendChild(optionButton);
-        });
+        const letter = document.createElement('span');
+        letter.className = 'letter';
+        letter.textContent = String.fromCharCode(65 + optionIndex);
 
-        questionBlock.appendChild(options);
-        panel.appendChild(questionBlock);
+        const optionText = document.createElement('span');
+        optionText.textContent = option.opcion;
+        optionButton.append(letter, optionText);
+        if (state.postLoginAnswers[question.id] === option.id) optionButton.classList.add('selected');
+        optionButton.addEventListener('click', () => selectPostLoginOption(optionButton));
+        options.appendChild(optionButton);
       });
 
-      const submitButton = document.createElement('button');
-      submitButton.type = 'button';
-      submitButton.id = 'postLoginQuizSubmit';
-      submitButton.className = 'btn btn-secondary';
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar diagnóstico';
-      submitButton.addEventListener('click', submitPostLoginQuiz);
-      panel.appendChild(submitButton);
+      questionBlock.appendChild(options);
+      panel.appendChild(questionBlock);
+
+      const navigation = document.createElement('div');
+      navigation.className = 'diagnostic-nav';
+
+      const previousButton = document.createElement('button');
+      previousButton.type = 'button';
+      previousButton.className = 'btn btn-ghost btn-sm';
+      previousButton.innerHTML = '<i class="fas fa-arrow-left"></i> Anterior';
+      previousButton.disabled = questionIndex === 0;
+      previousButton.addEventListener('click', () => changePostLoginQuestion(-1));
+      navigation.appendChild(previousButton);
+
+      const nextButton = document.createElement('button');
+      nextButton.type = 'button';
+      nextButton.className = 'btn btn-secondary btn-sm';
+      nextButton.disabled = state.postLoginAnswers[question.id] === undefined;
+      nextButton.innerHTML = isLastQuestion ? '<i class="fas fa-paper-plane"></i> Finalizar simulacro' : 'Siguiente <i class="fas fa-arrow-right"></i>';
+      nextButton.addEventListener('click', () => {
+        if (isLastQuestion) submitPostLoginQuiz();
+        else changePostLoginQuestion(1);
+      });
+      navigation.appendChild(nextButton);
+      panel.appendChild(navigation);
     }
 
     function selectPostLoginOption(optionButton) {
@@ -2623,19 +2679,17 @@
       options.forEach((option) => option.classList.remove('selected'));
       optionButton.classList.add('selected');
       state.postLoginAnswers[questionId] = Number(optionButton.dataset.optionId);
+      renderPostLoginQuiz(state.postLoginQuiz);
+    }
 
-      const questionCount = new Set([...document.querySelectorAll('[data-question-id]')].map((option) => option.dataset.questionId)).size;
-      const submitButton = document.getElementById('postLoginQuizSubmit');
-      if (submitButton) submitButton.disabled = Object.keys(state.postLoginAnswers).length !== questionCount;
+    function changePostLoginQuestion(direction) {
+      const nextIndex = state.postLoginQuestionIndex + direction;
+      if (nextIndex < 0 || nextIndex >= state.postLoginQuiz.preguntas.length) return;
+      state.postLoginQuestionIndex = nextIndex;
+      renderPostLoginQuiz(state.postLoginQuiz);
     }
 
     async function submitPostLoginQuiz() {
-      const submitButton = document.getElementById('postLoginQuizSubmit');
-      if (!submitButton) return;
-
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calificando...';
-
       try {
         const answers = Object.entries(state.postLoginAnswers).map(([questionId, optionId]) => ({
           questionId: Number(questionId),
@@ -2647,8 +2701,6 @@
         });
         renderPostLoginResult(data);
       } catch (err) {
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar diagnóstico';
         alert(`No pudimos calificar el diagnóstico: ${err.message}`);
       }
     }
