@@ -1164,6 +1164,70 @@
 
       .post-login-result strong { color: var(--dark); }
 
+      .diagnostic-report {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+
+      .diagnostic-report h4 { margin: 0; color: var(--dark); }
+
+      .diagnostic-chart {
+        display: grid;
+        gap: 0.8rem;
+        padding: 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--r-sm);
+        background: white;
+      }
+
+      .diagnostic-chart-row {
+        display: grid;
+        grid-template-columns: minmax(150px, 0.8fr) 1.4fr auto;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.84rem;
+      }
+
+      .diagnostic-chart-label { color: var(--text-mid); font-weight: 700; }
+      .diagnostic-chart-track { height: 9px; overflow: hidden; border-radius: 999px; background: var(--gray-200); }
+      .diagnostic-chart-fill { height: 100%; border-radius: inherit; background: var(--accent); }
+      .diagnostic-chart-fill.low { background: var(--danger); }
+      .diagnostic-chart-fill.mid { background: var(--primary-dark); }
+
+      .diagnostic-focus {
+        padding: 1rem;
+        border-left: 4px solid var(--primary-dark);
+        border-radius: var(--r-sm);
+        background: #FFFBEB;
+        color: var(--text-mid);
+        line-height: 1.55;
+      }
+
+      .diagnostic-focus strong { color: var(--dark); }
+
+      .diagnostic-details {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .diagnostic-detail {
+        padding: 0.75rem 0.9rem;
+        border-radius: var(--r-sm);
+        background: var(--gray-100);
+        color: var(--text-mid);
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      .diagnostic-detail.ok { border-left: 4px solid var(--accent); }
+      .diagnostic-detail.review { border-left: 4px solid var(--danger); }
+
+      @media (max-width: 600px) {
+        .diagnostic-chart-row { grid-template-columns: 1fr auto; }
+        .diagnostic-chart-track { grid-column: 1 / -1; grid-row: 2; }
+      }
+
       .diagnostic-launch {
         display: flex;
         align-items: center;
@@ -2722,14 +2786,77 @@
 
       const summary = document.createElement('div');
       summary.className = 'post-login-result';
-      summary.innerHTML = `<strong>${data.attempt.aciertos}/${data.attempt.total_preguntas} respuestas correctas · ${data.attempt.puntaje}%</strong>`;
+      const summaryText = document.createElement('strong');
+      summaryText.textContent = `${data.attempt.aciertos}/${data.attempt.total_preguntas} respuestas correctas · ${data.attempt.puntaje}%`;
+      summary.appendChild(summaryText);
       panel.appendChild(summary);
 
-      data.results.forEach((result, resultIndex) => {
-        const detail = document.createElement('p');
-        detail.textContent = `${resultIndex + 1}. ${result.correct ? 'Correcta' : 'Para revisar'}: ${result.explanation}`;
-        panel.appendChild(detail);
+      const grouped = {};
+      data.results.forEach((result) => {
+        const key = result.topic || result.area || 'General';
+        if (!grouped[key]) grouped[key] = { correct: 0, total: 0 };
+        grouped[key].total += 1;
+        if (result.correct) grouped[key].correct += 1;
       });
+
+      const report = document.createElement('div');
+      report.className = 'diagnostic-report';
+
+      const chartTitle = document.createElement('h4');
+      chartTitle.textContent = 'Tu desempeño por área de estudio';
+      report.appendChild(chartTitle);
+
+      const chart = document.createElement('div');
+      chart.className = 'diagnostic-chart';
+      const priorities = [];
+
+      Object.entries(grouped).forEach(([topic, values]) => {
+        const percentage = Math.round((values.correct / values.total) * 100);
+        if (percentage < 70) priorities.push(topic);
+
+        const row = document.createElement('div');
+        row.className = 'diagnostic-chart-row';
+        const label = document.createElement('span');
+        label.className = 'diagnostic-chart-label';
+        label.textContent = topic;
+        const track = document.createElement('div');
+        track.className = 'diagnostic-chart-track';
+        const fill = document.createElement('div');
+        fill.className = `diagnostic-chart-fill ${percentage < 50 ? 'low' : (percentage < 70 ? 'mid' : '')}`;
+        fill.style.width = `${percentage}%`;
+        track.appendChild(fill);
+        const value = document.createElement('strong');
+        value.textContent = `${percentage}%`;
+        row.append(label, track, value);
+        chart.appendChild(row);
+      });
+      report.appendChild(chart);
+
+      const focus = document.createElement('div');
+      focus.className = 'diagnostic-focus';
+      const focusTitle = document.createElement('strong');
+      focusTitle.textContent = priorities.length ? 'Áreas prioritarias para reforzar: ' : 'Fortaleza inicial: ';
+      focus.appendChild(focusTitle);
+      const focusText = document.createElement('span');
+      focusText.textContent = priorities.length
+        ? `${priorities.join(', ')}. Te recomendamos comenzar por estas lecciones y revisar nuevamente los conceptos antes de repetir el simulacro.`
+        : 'Presentas un punto de partida equilibrado. Continúa con las lecciones y profundiza en las explicaciones de cada respuesta.';
+      focus.appendChild(focusText);
+      report.appendChild(focus);
+
+      const detailsTitle = document.createElement('h4');
+      detailsTitle.textContent = 'Retroalimentación de tus respuestas';
+      report.appendChild(detailsTitle);
+      const details = document.createElement('div');
+      details.className = 'diagnostic-details';
+      data.results.forEach((result, resultIndex) => {
+        const detail = document.createElement('div');
+        detail.className = `diagnostic-detail ${result.correct ? 'ok' : 'review'}`;
+        detail.textContent = `${resultIndex + 1}. ${result.correct ? 'Correcta' : 'Para revisar'} · ${result.topic}: ${result.explanation}`;
+        details.appendChild(detail);
+      });
+      report.appendChild(details);
+      panel.appendChild(report);
     }
 
     /* ============================================================

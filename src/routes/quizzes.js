@@ -11,6 +11,7 @@ const questionsQuery = `
     q.id,
     q.pregunta,
     l.titulo AS leccion,
+    c.area,
     q.explicacion_correcta,
     q.explicacion_incorrecta,
     json_agg(
@@ -26,7 +27,7 @@ const questionsQuery = `
   JOIN courses c ON c.id = m.curso_id AND c.activo = TRUE
   JOIN quiz_options qo ON qo.quiz_id = q.id
   WHERE c.titulo = $1
-  GROUP BY q.id, l.titulo, q.explicacion_correcta, q.explicacion_incorrecta
+  GROUP BY q.id, l.titulo, c.area, q.explicacion_correcta, q.explicacion_incorrecta
   ORDER BY q.id
 `;
 
@@ -69,6 +70,8 @@ router.post('/post-login/attempts', authenticate, async (req, res) => {
       `SELECT
          q.id AS quiz_id,
          q.pregunta,
+         l.titulo AS leccion,
+         c.area,
          q.explicacion_correcta,
          q.explicacion_incorrecta,
          qo.id AS option_id,
@@ -124,6 +127,8 @@ router.post('/post-login/attempts', authenticate, async (req, res) => {
         selectedText: selected.opcion,
         correct: selected.es_correcta,
         questionText: question.pregunta,
+        topic: question.leccion,
+        area: question.area,
         explanation: selected.es_correcta
           ? question.explicacion_correcta
           : question.explicacion_incorrecta,
@@ -162,10 +167,12 @@ router.post('/post-login/attempts', authenticate, async (req, res) => {
 
     res.status(201).json({
       attempt: attempts[0],
-      results: graded.map(({ questionId, correct, explanation }) => ({
+      results: graded.map(({ questionId, correct, explanation, topic, area }) => ({
         questionId,
         correct,
         explanation,
+        topic,
+        area,
       })),
     });
   } catch (err) {

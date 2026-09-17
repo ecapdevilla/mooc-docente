@@ -43,6 +43,7 @@ El flujo actual es:
 - Los quizzes de lección ya existen en PostgreSQL mediante `quizzes` y `quiz_options`; `GET /api/v1/courses/:id` devuelve la pregunta y sus opciones.
 - La interfaz muestra el quiz de lección al abrir una lección y ofrece el quiz independiente como submódulo opcional `Simulacro diagnóstico` dentro del dashboard; no se abre automáticamente después de iniciar sesión.
 - El `Simulacro diagnóstico` presenta una pregunta por pantalla, con indicador de avance, navegación anterior/siguiente y envío únicamente al finalizar.
+- La retroalimentación del simulacro muestra puntaje general, gráfico de desempeño por tema, áreas prioritarias para reforzar y explicación individual de cada respuesta; los resultados del backend incluyen `area` y `topic` sin exponer respuestas correctas antes del envío.
 - Las primeras preguntas se alojarán en Supabase/PostgreSQL, no dentro de `indexInicial.html`. Para esta primera carga se usarán `src/seed/data.sql` y `src/seed/seed.js`, manteniendo el seed idempotente.
 - Cuando el volumen crezca, las preguntas deberán pasar a un editor administrativo/importador desde Word. Ese editor será la fuente operativa; el seed quedará para datos base y entornos nuevos.
 - Antes de cargar preguntas nuevas, validar: enunciado, mínimo dos opciones, exactamente una respuesta correcta, explicación opcional, área/tema y fuente.
