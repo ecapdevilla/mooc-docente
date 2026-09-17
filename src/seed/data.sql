@@ -839,6 +839,46 @@ AND NOT EXISTS (
    6. OPCIONES QUIZ - PEDAGOGÍA
    ============================================================ */
 
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Un estudiante de grado décimo acumula durante el año incumplimientos reiterados de compromisos establecidos en el manual de convivencia. La institución ha documentado intervenciones pedagógicas, participación familiar y actuaciones previas. Al finalizar el año, el Consejo Directivo concluye que la convivencia se ha deteriorado y decide que el estudiante puede terminar el grado, pero que no se le renovará la matrícula para el año siguiente. La decisión no se presenta como sanción, sino como ejercicio de la autonomía institucional para organizar la admisión y permanencia. ¿Cuál consideración resulta determinante para examinar esa decisión?',
+    'La denominación no determina por sí sola la naturaleza de la medida: deben examinarse fundamento, efectos, reglas, competencia y garantías, evitando usar una decisión administrativa sobre matrícula para producir materialmente una consecuencia que eluda las exigencias aplicables a la afectación de la permanencia educativa.',
+    'La no renovación no se vuelve automáticamente una decisión libre por llamarse administrativa, pero tampoco existe una garantía absoluta de permanencia. La institución debe revisar la medida según sus efectos reales y las garantías exigibles.'
+FROM lessons l WHERE l.titulo='Convivencia escolar y protección frente al acoso'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Un estudiante de grado décimo acumula durante el año%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'El rector solicita a los docentes registrar semanalmente en una matriz institucional evidencias sobre planeación, retroalimentación, seguimiento a estudiantes y comunicación con familias. Un docente se niega porque varias actuaciones ya aparecen en otros registros y el nuevo formato no está expresamente previsto en el manual de funciones. ¿Cuál criterio permite resolver con mayor precisión la controversia?',
+    'Debe analizarse si el requerimiento es un mecanismo razonablemente relacionado con funciones y procesos institucionales a cargo del docente y si el rector tiene competencia para organizar su seguimiento. Que el formato no aparezca literalmente en el manual no lo vuelve improcedente, pero la facultad organizativa no permite imponer obligaciones ajenas al empleo o contrarias al marco aplicable.',
+    'La ausencia literal del formato no lo invalida automáticamente, pero tampoco toda instrucción del rector es ilimitada. La exigencia debe guardar relación razonable con las funciones docentes, ser competente y respetar el marco aplicable.'
+FROM lessons l WHERE l.titulo='Función docente, planeación y contexto'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'El rector solicita a los docentes registrar semanalmente%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Durante el primer período, un estudiante demuestra desempeños superiores de manera consistente. Sus docentes consideran que podría cursar el grado siguiente y la familia solicita formalmente su promoción anticipada. El director de grupo reúne evidencias y el Consejo Académico concluye favorablemente y comunica a la familia que el estudiante será promovido desde la semana siguiente. ¿Cuál aspecto exige revisar la actuación?',
+    'El concepto académico favorable es un elemento del procedimiento, pero debe distinguirse la instancia que estudia y recomienda de aquella que adopta la decisión conforme al procedimiento previsto, garantizando consentimiento familiar y registro de la determinación.',
+    'El Consejo Académico no necesariamente adopta por sí solo la promoción, y el desempeño superior actual no elimina el procedimiento, consentimiento y registro requeridos para una decisión de esa naturaleza.'
+FROM lessons l WHERE l.titulo='Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Durante el primer período, un estudiante demuestra desempeños superiores%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'En septiembre, después de identificar inconsistencias en la valoración de trabajos colaborativos, la institución modifica su SIEE y establece nuevos criterios para diferenciar desempeño individual y grupal. El Consejo Directivo adopta la modificación y algunos docentes proponen aplicarla también a actividades calificadas durante períodos anteriores. ¿Qué decisión resulta más consistente?',
+    'Debe determinarse la entrada en aplicación conforme al procedimiento de adopción y divulgación, preservando los criterios bajo los cuales se produjeron las valoraciones ya consolidadas. Una mejora posterior no autoriza por sí misma a reconstruir retrospectivamente resultados con reglas que los estudiantes no conocían.',
+    'La finalidad formativa no permite recalcular automáticamente resultados anteriores, pero tampoco obliga a esperar necesariamente al año siguiente si el procedimiento institucional fija una entrada en vigor válida para actividades futuras.'
+FROM lessons l WHERE l.titulo='Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'En septiembre, después de identificar inconsistencias%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Un estudiante de grado undécimo cumple 18 años durante el año escolar. Su madre continúa registrada como acudiente y solicita al director de grupo información detallada sobre calificaciones, ausencias y dificultades académicas. El estudiante manifiesta expresamente que no autoriza compartir información adicional con ella y solicita que las comunicaciones se realicen directamente con él. ¿Cuál actuación requiere el análisis más preciso?',
+    'Debe distinguirse la participación familiar del acceso a información personal individualizada: la mayoría de edad modifica la posición jurídica del estudiante sobre sus datos y decisiones. La institución debe revisar qué puede comunicar, con qué fundamento y autorización, sin asumir acceso irrestricto por la condición histórica de acudiente ni que toda relación con la familia desaparezca.',
+    'La mayoría de edad no mantiene automáticamente el acceso previo ni elimina toda comunicación institucional. La institución debe proteger los datos personales y revisar la base jurídica, autorización y alcance de cada comunicación.'
+FROM lessons l WHERE l.titulo='Familia, información y participación educativa'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Un estudiante de grado undécimo cumple 18 años%');
+
 INSERT INTO quizzes
 (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
 SELECT l.id,
@@ -1089,6 +1129,11 @@ WHERE qo.quiz_id = q.id
         OR (l.titulo = 'Competencias disciplinarias y gobierno escolar' AND q.pregunta LIKE 'Dos docentes mantienen un conflicto que comienza a afectar%')
         OR (l.titulo = 'Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector dispone que todos los docentes permanezcan diariamente%')
         OR (l.titulo = 'Protección de derechos, confidencialidad y actuación institucional' AND q.pregunta LIKE 'Al finalizar la jornada, el acudiente de un estudiante de primaria%')
+        OR (l.titulo = 'Convivencia escolar y protección frente al acoso' AND q.pregunta LIKE 'Un estudiante de grado décimo acumula durante el año%')
+        OR (l.titulo = 'Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector solicita a los docentes registrar semanalmente%')
+        OR (l.titulo = 'Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'Durante el primer período, un estudiante demuestra desempeños superiores%')
+        OR (l.titulo = 'Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'En septiembre, después de identificar inconsistencias%')
+        OR (l.titulo = 'Familia, información y participación educativa' AND q.pregunta LIKE 'Un estudiante de grado undécimo cumple 18 años%')
         OR (
             l.titulo = 'PEI, participación y autonomía institucional'
             AND q.pregunta LIKE 'Una institución identifica cambios en su población%'
@@ -1748,6 +1793,51 @@ CROSS JOIN (VALUES
 /* ============================================================
     11. BADGES
     ============================================================ */
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('La no renovación es distinta de una sanción y puede fundamentarse en la autonomía si se comunica antes del siguiente año y hay incumplimientos.',FALSE,1),
+('Los antecedentes permiten no renovar aunque las conductas no justifiquen individualmente una consecuencia de esa magnitud.',FALSE,2),
+('La denominación no determina la naturaleza: deben examinarse fundamento, efectos, reglas, competencia y garantías, evitando usar la matrícula para eludir exigencias sobre la permanencia.',TRUE,3),
+('La continuidad debe garantizarse necesariamente hasta finalizar la educación media.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Convivencia escolar y protección frente al acoso' AND q.pregunta LIKE 'Un estudiante de grado décimo acumula durante el año%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('El docente debe cumplir toda instrucción del rector dentro de la jornada mientras no modifique funciones esenciales.',FALSE,1),
+('La ausencia del formato en el manual impide exigirlo obligatoriamente.',FALSE,2),
+('Debe analizarse si es un mecanismo razonable relacionado con funciones y procesos a cargo del docente y la competencia del rector; que no aparezca literalmente no lo invalida, pero tampoco permite imponer obligaciones ajenas al empleo.',TRUE,3),
+('El Consejo Directivo debe aprobar previamente cualquier instrumento de seguimiento docente.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector solicita a los docentes registrar semanalmente%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('La promoción procede porque el Consejo Académico es la instancia especializada y puede materializarla directamente.',FALSE,1),
+('El concepto favorable es parte del procedimiento, pero debe distinguirse la instancia que recomienda de aquella que adopta la decisión, garantizando consentimiento familiar y registro.',TRUE,2),
+('Solo puede producirse si antes alcanzó todos los desempeños del grado siguiente.',FALSE,3),
+('La decisión corresponde exclusivamente al rector y el Consejo Académico solo interviene facultativamente.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'Durante el primer período, un estudiante demuestra desempeños superiores%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Recalcular valoraciones anteriores cuando el nuevo criterio beneficie al estudiante.',FALSE,1),
+('Mantener necesariamente todos los resultados anteriores y aplicar el criterio solo desde el siguiente año.',FALSE,2),
+('Determinar la entrada en aplicación según adopción y divulgación, preservando criterios de valoraciones consolidadas; una mejora posterior no autoriza reconstruir resultados con reglas desconocidas al evaluar.',TRUE,3),
+('Aplicar inmediatamente el criterio a todas las evidencias disponibles del año.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'En septiembre, después de identificar inconsistencias%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Mantener el mismo flujo de información anterior porque la corresponsabilidad familiar continúa hasta finalizar la educación media.',FALSE,1),
+('Suspender automáticamente toda comunicación con la madre, incluso convocatorias generales.',FALSE,2),
+('Distinguir participación familiar de acceso a información individualizada: la mayoría de edad modifica la posición jurídica del estudiante y debe revisarse qué información se comunica, con qué fundamento y autorización.',TRUE,3),
+('Mantener acceso solo a calificaciones y asistencia, reservando información cualitativa.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Familia, información y participación educativa' AND q.pregunta LIKE 'Un estudiante de grado undécimo cumple 18 años%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
 
 INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
 SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
