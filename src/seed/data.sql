@@ -363,6 +363,48 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Convivencia escolar y protección frente al acoso',
+    'Análisis de responsabilidades institucionales ante situaciones de acoso y ciberacoso.',
+    3,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Convivencia escolar y protección frente al acoso'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Educación inclusiva y ajustes pedagógicos',
+    'Análisis de barreras, apoyos, ajustes y seguimiento sin reducir las expectativas de aprendizaje.',
+    4,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Educación inclusiva y ajustes pedagógicos'
+);
+
+
 /* ============================================================
    5. QUIZZES
    ============================================================ */
@@ -460,6 +502,112 @@ INSERT INTO quizzes
 (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
 SELECT
     l.id,
+    'En una institución educativa oficial, el SIEE establece desde el inicio del año que la valoración es continua, que los estudiantes con desempeños bajos deben recibir estrategias de apoyo durante cada período y que la promoción se determina con base en el proceso desarrollado a lo largo del año. Al finalizar el cuarto período, una estudiante de grado octavo presenta desempeño bajo en dos áreas. En una de ellas las dificultades fueron identificadas desde el segundo período, pero las actividades de apoyo previstas no se desarrollaron; en la otra sí existen evidencias de apoyo, retroalimentación y nuevas oportunidades de valoración, aunque no alcanzó los desempeños. ¿Qué decisión institucional es más consistente con el Decreto 1290 de 2009?',
+    'La institución debe revisar separadamente el proceso de cada área: aplicar el SIEE donde sí hubo apoyo y seguimiento, y subsanar la omisión donde las estrategias previstas no se garantizaron, permitiendo demostrar los aprendizajes sin convertir automáticamente una prueba final no prevista en el SIEE en el criterio de promoción.',
+    'No basta con aplicar mecánicamente la no promoción ni corresponde crear una prueba extraordinaria general no prevista. La autonomía institucional debe ejercerse junto con la valoración integral, el seguimiento y la garantía efectiva de las estrategias de apoyo establecidas en el SIEE.'
+FROM lessons l
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'En una institución educativa oficial, el SIEE establece desde el inicio del año%'
+);
+
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Al finalizar el tercer período, una docente de grado séptimo encuentra que tres estudiantes no alcanzaron los desempeños previstos en su área. El SIEE establece valoración continua, diversidad de evidencias, retroalimentación y estrategias de apoyo durante cada período. Al revisar los registros, observa que uno de los estudiantes obtuvo resultados bajos en las dos pruebas escritas, pero sus producciones posteriores, corregidas a partir de retroalimentación, evidencian progresión consistente; otro presenta resultados bajos tanto en pruebas como en actividades de aplicación, pese a haber participado en las estrategias de apoyo; y del tercero existen calificaciones bajas, pero no aparecen registros suficientes de retroalimentación ni de las actividades de apoyo que debían implementarse. La coordinación académica solicita cerrar las valoraciones dentro del plazo institucional y advierte que los criterios de evaluación y sus ponderaciones fueron comunicados desde el inicio del año. Las familias de los tres estudiantes solicitan una actividad adicional antes del cierre, argumentando que debe garantizarse igualdad de oportunidades. ¿Cuál actuación permite resolver de manera más consistente los tres casos?',
+    'Debe conservarse el SIEE e individualizar la respuesta: valorar la progresión del primer caso sin convertirla automáticamente en aprobación, aplicar los criterios al segundo con las evidencias disponibles y garantizar en el tercero las acciones de seguimiento y apoyo omitidas antes de atribuirle exclusivamente las consecuencias del cierre.',
+    'La igualdad no exige una recuperación idéntica para los tres casos ni permite que un órgano colegiado sustituya el análisis pedagógico. Tampoco corresponde reemplazar automáticamente valoraciones previas: la respuesta debe atender las diferencias en evidencias, apoyos y garantías del proceso.'
+FROM lessons l
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Al finalizar el tercer período, una docente de grado séptimo%'
+);
+
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Durante un proyecto de grado octavo, cuatro estudiantes crean un grupo de mensajería para distribuir tareas. Con el transcurso de las semanas, uno de ellos comienza a recibir montajes de sus fotografías, mensajes despectivos y audios en los que dos compañeros ridiculizan reiteradamente su forma de hablar. Parte del contenido se publica durante fines de semana desde dispositivos personales. El estudiante informa a su directora de grupo, pero solicita que nadie sea citado porque teme que la situación empeore. Al indagar sin confrontar públicamente a los involucrados, la docente encuentra indicios de reiteración y constata que el estudiante ha dejado de participar en el proyecto y ha faltado algunos días. Uno de los señalados reconoce haber enviado mensajes, aunque sostiene que existía confianza entre ellos y que nunca pretendió causar daño. La madre del estudiante afectado conoce posteriormente la situación y exige la expulsión inmediata. El rector señala que antes de adoptar decisiones deben establecerse las características de los hechos y garantizarse los procedimientos institucionales. ¿Cuál actuación corresponde con mayor precisión a las responsabilidades que surgen de la situación?',
+    'La actuación debe iniciar poniendo oportunamente los hechos en conocimiento de las instancias institucionales, adoptando medidas de acompañamiento y protección y garantizando la participación y los derechos de los involucrados, sin exigir que la docente determine por sí sola la existencia definitiva de acoso ni convertir la expulsión en sanción automática.',
+    'La reserva solicitada no permite aplazar indefinidamente la activación institucional, y la reiteración no autoriza a clasificar o sancionar de manera automática. La institución debe proteger, verificar los hechos y respetar el procedimiento y los derechos de las partes.'
+FROM lessons l
+WHERE l.titulo = 'Convivencia escolar y protección frente al acoso'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Durante un proyecto de grado octavo, un estudiante recibe montajes%'
+);
+
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Una estudiante de sexto grado presenta durante el primer semestre dificultades persistentes para organizar información extensa, completar evaluaciones dentro del tiempo ordinario y seguir instrucciones que contienen varias acciones consecutivas. Sin embargo, cuando recibe instrucciones segmentadas, organizadores visuales y tiempos adicionales, alcanza los mismos aprendizajes previstos para el grupo. No existe diagnóstico clínico ni certificado de discapacidad. La familia informa que ha solicitado una valoración externa, pero esta tardará varios meses. En reunión de docentes se proponen cuatro alternativas. El director de grupo advierte además que algunas de las medidas implementadas inicialmente para la estudiante han resultado beneficiosas para otros alumnos y que el establecimiento debe evitar tanto disminuir injustificadamente las expectativas como convertir una respuesta pedagógica en un diagnóstico. ¿Qué curso de actuación resulta más consistente?',
+    'La institución debe documentar las barreras y respuestas observadas, mantener los objetivos de aprendizaje, incorporar estrategias que favorezcan al grupo y aplicar apoyos o ajustes pedagógicamente justificados con seguimiento, sin condicionar necesariamente la respuesta a un diagnóstico clínico previo.',
+    'No corresponde esperar el diagnóstico para remover barreras ni reducir anticipadamente las expectativas. Tampoco es necesario convertir una estrategia útil para el grupo en una medida exclusivamente individual: deben combinarse accesibilidad, apoyos pertinentes y seguimiento.'
+FROM lessons l
+WHERE l.titulo = 'Educación inclusiva y ajustes pedagógicos'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Una estudiante de sexto grado presenta dificultades persistentes%'
+);
+
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'En una institución oficial, el SIEE establece que la autoevaluación constituye una de las evidencias del proceso, que los resultados deben ser objeto de seguimiento continuo y que las estrategias de apoyo se desarrollan durante el período. En grado noveno, un estudiante obtiene desempeño alto en producciones escritas, proyectos y actividades de aplicación, pero bajo en una prueba acumulativa que representa el porcentaje individual más alto de la valoración. Su autoevaluación reconoce dificultades específicas presentes en la prueba y describe cómo las corrigió posteriormente en dos actividades. La docente comprueba esas mejoras. No obstante, al aplicar literalmente las ponderaciones previamente establecidas, el resultado numérico queda apenas por debajo del nivel aprobatorio. El Consejo Académico considera tres posibilidades: modificar excepcionalmente el porcentaje de la prueba; mantener el resultado matemático sin más análisis; o examinar cómo deben operar los criterios previamente definidos frente al conjunto de evidencias. La familia solicita que simplemente se elimine la prueba porque considera que la evaluación formativa no puede producir reprobación. ¿Qué decisión conserva mejor la coherencia entre las reglas institucionales y el proceso evaluativo?',
+    'Debe mantenerse el marco de ponderaciones, pero interpretarse el resultado dentro del conjunto de criterios y evidencias que reconoce el SIEE, verificando los aprendizajes demostrados, la progresión posterior y el seguimiento, sin modificar retrospectivamente porcentajes ni eliminar discrecionalmente la prueba.',
+    'No corresponde recalcular porcentajes o sustituir una evidencia de manera excepcional, pero tampoco basta con aceptar el resultado aritmético sin analizar el proceso. La decisión debe estar sustentada en los criterios y evidencias previstos por el SIEE.'
+FROM lessons l
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'En una institución oficial, el SIEE establece que la autoevaluación es una evidencia%'
+);
+
+
+UPDATE quizzes q
+SET pregunta = 'Al finalizar el tercer período, una docente de grado séptimo encuentra que tres estudiantes no alcanzaron los desempeños previstos en su área. El SIEE establece valoración continua, diversidad de evidencias, retroalimentación y estrategias de apoyo durante cada período. Al revisar los registros, observa que uno de los estudiantes obtuvo resultados bajos en las dos pruebas escritas, pero sus producciones posteriores, corregidas a partir de retroalimentación, evidencian progresión consistente; otro presenta resultados bajos tanto en pruebas como en actividades de aplicación, pese a haber participado en las estrategias de apoyo; y del tercero existen calificaciones bajas, pero no aparecen registros suficientes de retroalimentación ni de las actividades de apoyo que debían implementarse. La coordinación académica solicita cerrar las valoraciones dentro del plazo institucional y advierte que los criterios de evaluación y sus ponderaciones fueron comunicados desde el inicio del año. Las familias de los tres estudiantes solicitan una actividad adicional antes del cierre, argumentando que debe garantizarse igualdad de oportunidades. ¿Cuál actuación permite resolver de manera más consistente los tres casos?'
+WHERE q.leccion_id = (SELECT l.id FROM lessons l WHERE l.titulo = 'Evaluación integral y autonomía del SIEE')
+AND q.pregunta LIKE 'Al finalizar el tercer período, una docente de grado séptimo%';
+
+UPDATE quizzes q
+SET pregunta = 'Durante un proyecto de grado octavo, cuatro estudiantes crean un grupo de mensajería para distribuir tareas. Con el transcurso de las semanas, uno de ellos comienza a recibir montajes de sus fotografías, mensajes despectivos y audios en los que dos compañeros ridiculizan reiteradamente su forma de hablar. Parte del contenido se publica durante fines de semana desde dispositivos personales. El estudiante informa a su directora de grupo, pero solicita que nadie sea citado porque teme que la situación empeore. Al indagar sin confrontar públicamente a los involucrados, la docente encuentra indicios de reiteración y constata que el estudiante ha dejado de participar en el proyecto y ha faltado algunos días. Uno de los señalados reconoce haber enviado mensajes, aunque sostiene que existía confianza entre ellos y que nunca pretendió causar daño. La madre del estudiante afectado conoce posteriormente la situación y exige la expulsión inmediata. El rector señala que antes de adoptar decisiones deben establecerse las características de los hechos y garantizarse los procedimientos institucionales. ¿Cuál actuación corresponde con mayor precisión a las responsabilidades que surgen de la situación?'
+WHERE q.leccion_id = (SELECT l.id FROM lessons l WHERE l.titulo = 'Convivencia escolar y protección frente al acoso')
+AND q.pregunta LIKE 'Durante un proyecto de grado octavo, un estudiante recibe montajes%';
+
+UPDATE quizzes q
+SET pregunta = 'Una estudiante de sexto grado presenta durante el primer semestre dificultades persistentes para organizar información extensa, completar evaluaciones dentro del tiempo ordinario y seguir instrucciones que contienen varias acciones consecutivas. Sin embargo, cuando recibe instrucciones segmentadas, organizadores visuales y tiempos adicionales, alcanza los mismos aprendizajes previstos para el grupo. No existe diagnóstico clínico ni certificado de discapacidad. La familia informa que ha solicitado una valoración externa, pero esta tardará varios meses. En reunión de docentes se proponen cuatro alternativas. El director de grupo advierte además que algunas de las medidas implementadas inicialmente para la estudiante han resultado beneficiosas para otros alumnos y que el establecimiento debe evitar tanto disminuir injustificadamente las expectativas como convertir una respuesta pedagógica en un diagnóstico. ¿Qué curso de actuación resulta más consistente?'
+WHERE q.leccion_id = (SELECT l.id FROM lessons l WHERE l.titulo = 'Educación inclusiva y ajustes pedagógicos')
+AND q.pregunta LIKE 'Una estudiante de sexto grado presenta dificultades persistentes%';
+
+UPDATE quizzes q
+SET pregunta = 'En una institución oficial, el SIEE establece que la autoevaluación constituye una de las evidencias del proceso, que los resultados deben ser objeto de seguimiento continuo y que las estrategias de apoyo se desarrollan durante el período. En grado noveno, un estudiante obtiene desempeño alto en producciones escritas, proyectos y actividades de aplicación, pero bajo en una prueba acumulativa que representa el porcentaje individual más alto de la valoración. Su autoevaluación reconoce dificultades específicas presentes en la prueba y describe cómo las corrigió posteriormente en dos actividades. La docente comprueba esas mejoras. No obstante, al aplicar literalmente las ponderaciones previamente establecidas, el resultado numérico queda apenas por debajo del nivel aprobatorio. El Consejo Académico considera tres posibilidades: modificar excepcionalmente el porcentaje de la prueba; mantener el resultado matemático sin más análisis; o examinar cómo deben operar los criterios previamente definidos frente al conjunto de evidencias. La familia solicita que simplemente se elimine la prueba porque considera que la evaluación formativa no puede producir reprobación. ¿Qué decisión conserva mejor la coherencia entre las reglas institucionales y el proceso evaluativo?'
+WHERE q.leccion_id = (SELECT l.id FROM lessons l WHERE l.titulo = 'Evaluación integral y autonomía del SIEE')
+AND q.pregunta LIKE 'En una institución oficial, el SIEE establece que la autoevaluación es una evidencia%';
+
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
     'Una institución identifica cambios en su población y diseña una propuesta pedagógica que exige ajustes curriculares. Antes de formalizar la modificación del PEI, considera implementarla transitoriamente por urgencia. ¿Cuál procedimiento distribuye con mayor precisión las competencias institucionales?',
     'La institución debe desarrollar el procedimiento participativo y elevar la propuesta al consejo directivo para que decida su adopción; el consejo académico aporta el análisis y la asesoría pedagógica, pero no reemplaza al órgano competente para adoptar el PEI.',
     'La urgencia pedagógica no habilita a implementar unilateralmente una modificación del PEI ni a postergar su adopción formal. El aval consultivo del consejo académico no sustituye el procedimiento participativo ni la decisión del consejo directivo.'
@@ -504,6 +652,26 @@ WHERE qo.quiz_id = q.id
         OR (
             l.titulo = 'Evaluación integral y autonomía del SIEE'
             AND q.pregunta LIKE 'Al finalizar un período, una prueba acumulativa arroja resultados bajos%'
+        )
+        OR (
+            l.titulo = 'Evaluación integral y autonomía del SIEE'
+            AND q.pregunta LIKE 'En una institución educativa oficial, el SIEE establece desde el inicio del año%'
+        )
+        OR (
+            l.titulo = 'Evaluación integral y autonomía del SIEE'
+            AND q.pregunta LIKE 'Al finalizar el tercer período, una docente de grado séptimo%'
+        )
+        OR (
+            l.titulo = 'Evaluación integral y autonomía del SIEE'
+            AND q.pregunta LIKE 'En una institución oficial, el SIEE establece que la autoevaluación es una evidencia%'
+        )
+        OR (
+            l.titulo = 'Convivencia escolar y protección frente al acoso'
+            AND q.pregunta LIKE 'Durante un proyecto de grado octavo, un estudiante recibe montajes%'
+        )
+        OR (
+            l.titulo = 'Educación inclusiva y ajustes pedagógicos'
+            AND q.pregunta LIKE 'Una estudiante de sexto grado presenta dificultades persistentes%'
         )
         OR (
             l.titulo = 'PEI, participación y autonomía institucional'
@@ -733,6 +901,216 @@ CROSS JOIN (
 ) AS v(opcion, es_correcta, orden)
 WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
 AND q.pregunta LIKE 'Al finalizar un período, una prueba acumulativa arroja resultados bajos%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Aplicar el criterio de no promoción del SIEE en las dos áreas, porque la autonomía institucional permite trasladar a la estudiante la responsabilidad de las actividades de apoyo no realizadas.',
+        FALSE,
+        1
+    ),
+    (
+        'Autorizar una prueba extraordinaria en las dos áreas y usar su resultado para decidir la promoción, aunque ese mecanismo no estuviera establecido previamente.',
+        FALSE,
+        2
+    ),
+    (
+        'Revisar separadamente el proceso de cada área: aplicar el SIEE donde hubo apoyo y seguimiento, y subsanar la omisión donde no se garantizaron las estrategias previstas, sin convertir automáticamente una prueba final no prevista en el criterio de promoción.',
+        TRUE,
+        3
+    ),
+    (
+        'Mantener las valoraciones y remitir el caso al consejo directivo para que determine si las inasistencias justificadas permiten autorizar actividades adicionales antes de aplicar el SIEE.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND q.pregunta LIKE 'En una institución educativa oficial, el SIEE establece desde el inicio del año%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Conservar las ponderaciones y criterios establecidos, incorporar las evidencias obtenidas durante el proceso según las reglas del SIEE y diferenciar las actuaciones: valorar en el primer caso la progresión demostrada sin convertirla automáticamente en aprobación; aplicar en el segundo los criterios previstos considerando las estrategias ya desarrolladas; y, en el tercero, garantizar las acciones de seguimiento y apoyo omitidas antes de hacer recaer exclusivamente sobre el estudiante las consecuencias académicas del cierre.',
+        TRUE,
+        1
+    ),
+    (
+        'Aplicar a los tres estudiantes una actividad equivalente de recuperación antes del cierre y ponderarla con las demás evidencias, porque la igualdad exige ofrecer una oportunidad común cuando varios estudiantes presentan desempeño bajo; posteriormente, conservar para cada uno el resultado más favorable entre la valoración acumulada y la recuperación.',
+        FALSE,
+        2
+    ),
+    (
+        'Mantener provisionalmente las valoraciones obtenidas por los tres estudiantes y remitir los casos al Consejo Académico para que determine individualmente la promoción, pues las diferencias encontradas comprometen la aplicación uniforme del SIEE.',
+        FALSE,
+        3
+    ),
+    (
+        'Aplicar los criterios y ponderaciones previamente comunicados en los dos primeros casos y autorizar únicamente al tercero una evaluación extraordinaria equivalente a las evidencias faltantes, utilizando su resultado para reemplazar las valoraciones anteriores.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND q.pregunta LIKE 'Al finalizar el tercer período, una docente de grado séptimo%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Preservar inicialmente la solicitud de reserva del estudiante, realizar acompañamiento pedagógico y recopilar durante un período razonable evidencias adicionales antes de activar el procedimiento correspondiente.',
+        FALSE,
+        1
+    ),
+    (
+        'Poner oportunamente los hechos conocidos en conocimiento de las instancias institucionales correspondientes, adoptar las medidas de acompañamiento y protección pertinentes y garantizar la participación y los derechos de los involucrados, sin supeditar la actuación a que el docente determine previamente por sí mismo la existencia definitiva de acoso ni convertir la solicitud de expulsión en una sanción automática.',
+        TRUE,
+        2
+    ),
+    (
+        'Activar inmediatamente el procedimiento institucional clasificando preliminarmente los hechos como ciberacoso, dado que la reiteración y el medio tecnológico permiten establecer esa naturaleza independientemente de la intención alegada.',
+        FALSE,
+        3
+    ),
+    (
+        'Diferenciar los mensajes enviados durante la jornada escolar de aquellos producidos fuera de ella, tramitar institucionalmente los primeros y comunicar los segundos a las familias para su manejo, salvo que exista evidencia de amenaza o riesgo grave.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Convivencia escolar y protección frente al acoso'
+AND q.pregunta LIKE 'Durante un proyecto de grado octavo, un estudiante recibe montajes%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Incorporar al trabajo del grupo aquellas estrategias que favorezcan diferentes formas de acceso y participación, documentar las barreras y respuestas observadas y mantener los objetivos de aprendizaje; cuando persistan necesidades particulares, implementar los apoyos o ajustes pedagógicamente justificados y efectuar seguimiento, sin condicionar necesariamente esas actuaciones a la obtención previa de un diagnóstico clínico.',
+        TRUE,
+        1
+    ),
+    (
+        'Mantener para la estudiante los mismos instrumentos y tiempos mientras se obtiene la valoración externa, pero permitirle posteriormente recuperar las actividades no superadas mediante formatos alternativos.',
+        FALSE,
+        2
+    ),
+    (
+        'Formalizar inmediatamente un plan individual que sustituya los objetivos en los que la estudiante presenta mayores dificultades por desempeños de menor complejidad, conservando los restantes.',
+        FALSE,
+        3
+    ),
+    (
+        'Extender a todos los estudiantes los tiempos adicionales, la segmentación de instrucciones y los organizadores visuales, evitando medidas individuales mientras no exista diagnóstico.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Educación inclusiva y ajustes pedagógicos'
+AND q.pregunta LIKE 'Una estudiante de sexto grado presenta dificultades persistentes%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Mantener las ponderaciones previamente establecidas, pero interpretar el resultado dentro del conjunto de criterios y evidencias que el propio SIEE reconoce, verificando qué aprendizajes fueron efectivamente demostrados, qué progresión ocurrió después de la prueba y cómo deben operar las estrategias de seguimiento y apoyo.',
+        TRUE,
+        1
+    ),
+    (
+        'Recalcular excepcionalmente la valoración reduciendo el peso de la prueba y aumentando proporcionalmente las evidencias procesuales, siempre que la modificación favorezca al estudiante.',
+        FALSE,
+        2
+    ),
+    (
+        'Conservar estrictamente el resultado aritmético porque las ponderaciones fueron previamente conocidas y cualquier consideración posterior sobre progresión, autoevaluación o retroalimentación ya está representada en las demás calificaciones.',
+        FALSE,
+        3
+    ),
+    (
+        'Sustituir la prueba acumulativa por las dos actividades posteriores en las que se evidenció superación de las dificultades, conservando el mismo porcentaje originalmente asignado al instrumento.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND q.pregunta LIKE 'En una institución oficial, el SIEE establece que la autoevaluación es una evidencia%'
 AND NOT EXISTS (
     SELECT 1
     FROM quiz_options qo

@@ -1131,6 +1131,22 @@
 
       .post-login-result strong { color: var(--dark); }
 
+      .diagnostic-launch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        margin: 0 0 2rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--r-md);
+        background: white;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .diagnostic-launch h3 { margin: 0 0 0.35rem; color: var(--dark); }
+      .diagnostic-launch p { margin: 0; color: var(--text-soft); line-height: 1.5; }
+
     .lesson-nav {
       display: flex;
       justify-content: space-between;
@@ -1627,6 +1643,11 @@
       .welcome-progress { width: 100%; }
     }
 
+    @media (max-width: 600px) {
+      .diagnostic-launch { align-items: stretch; flex-direction: column; }
+      .diagnostic-launch .btn { width: 100%; }
+    }
+
     @media (max-width: 768px) {
       .nav-links { display: none; }
       .user-info { display: none; }
@@ -1880,7 +1901,17 @@
           </div>
         </div>
 
-          <section class="quiz post-login-quiz hidden" id="postLoginQuizPanel" aria-labelledby="postLoginQuizTitle"></section>
+        <div class="diagnostic-launch" id="diagnosticLaunch">
+          <div>
+            <h3><i class="fas fa-clipboard-check"></i> Simulacro diagnóstico</h3>
+            <p>Responde el banco avanzado cuando quieras y conoce tus áreas por reforzar.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="button" onclick="openDiagnosticQuiz()">
+            <i class="fas fa-play"></i> Iniciar simulacro
+          </button>
+        </div>
+
+        <section class="quiz post-login-quiz hidden" id="postLoginQuizPanel" aria-labelledby="postLoginQuizTitle"></section>
 
         <div class="dash-stats">
           <div class="dash-stat">
@@ -2508,6 +2539,19 @@
       }
     }
 
+    window.openDiagnosticQuiz = function () {
+      const panel = document.getElementById('postLoginQuizPanel');
+      if (!panel) return;
+
+      panel.classList.remove('hidden');
+      loadPostLoginQuiz();
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.closeDiagnosticQuiz = function () {
+      document.getElementById('postLoginQuizPanel')?.classList.add('hidden');
+    };
+
     function renderPostLoginQuiz(quiz) {
       const panel = document.getElementById('postLoginQuizPanel');
       panel.innerHTML = '';
@@ -2516,6 +2560,13 @@
       title.id = 'postLoginQuizTitle';
       title.innerHTML = '<i class="fas fa-clipboard-check"></i> Diagnóstico inicial';
       panel.appendChild(title);
+
+      const closeButton = document.createElement('button');
+      closeButton.type = 'button';
+      closeButton.className = 'btn btn-ghost btn-sm';
+      closeButton.textContent = 'Cerrar';
+      closeButton.addEventListener('click', closeDiagnosticQuiz);
+      panel.appendChild(closeButton);
 
       const intro = document.createElement('p');
       intro.className = 'quiz-intro';
@@ -2609,6 +2660,13 @@
       const title = document.createElement('h3');
       title.innerHTML = '<i class="fas fa-chart-line"></i> Resultado del diagnóstico';
       panel.appendChild(title);
+
+      const closeButton = document.createElement('button');
+      closeButton.type = 'button';
+      closeButton.className = 'btn btn-ghost btn-sm';
+      closeButton.textContent = 'Cerrar';
+      closeButton.addEventListener('click', closeDiagnosticQuiz);
+      panel.appendChild(closeButton);
 
       const summary = document.createElement('div');
       summary.className = 'post-login-result';
@@ -2853,7 +2911,6 @@
         badgesGrid.appendChild(badge);
       });
 
-      loadPostLoginQuiz();
     }
 
     /* ============================================================

@@ -127,6 +127,9 @@ describe('SPA indexInicial.html', () => {
     expect(window.document.getElementById('view-dashboard').classList.contains('hidden')).toBe(false);
     expect(window.document.getElementById('loginError').style.display).toBe('none');
 
+    expect(window.document.getElementById('postLoginQuizPanel').classList.contains('hidden')).toBe(true);
+    expect(typeof window.openDiagnosticQuiz).toBe('function');
+    window.openDiagnosticQuiz();
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(window.document.getElementById('postLoginQuizPanel').textContent).toMatch(/Diagnóstico inicial/i);
 

@@ -41,14 +41,16 @@ El flujo actual es:
 
 - El login de `indexInicial.html` funciona contra `/api/v1/auth/login`, guarda el token y carga cursos/progreso desde la API.
 - Los quizzes de lección ya existen en PostgreSQL mediante `quizzes` y `quiz_options`; `GET /api/v1/courses/:id` devuelve la pregunta y sus opciones.
-- La interfaz actual muestra el quiz al abrir una lección, no inmediatamente después de iniciar sesión. Aún no existe el flujo de quiz independiente post-login.
+- La interfaz muestra el quiz de lección al abrir una lección y ofrece el quiz independiente como submódulo opcional `Simulacro diagnóstico` dentro del dashboard; no se abre automáticamente después de iniciar sesión.
 - Las primeras preguntas se alojarán en Supabase/PostgreSQL, no dentro de `indexInicial.html`. Para esta primera carga se usarán `src/seed/data.sql` y `src/seed/seed.js`, manteniendo el seed idempotente.
 - Cuando el volumen crezca, las preguntas deberán pasar a un editor administrativo/importador desde Word. Ese editor será la fuente operativa; el seed quedará para datos base y entornos nuevos.
 - Antes de cargar preguntas nuevas, validar: enunciado, mínimo dos opciones, exactamente una respuesta correcta, explicación opcional, área/tema y fuente.
 - Riesgo conocido: el detalle actual de cursos devuelve `es_correcta` porque el quiz de lección se califica en el navegador. El nuevo quiz independiente post-login debe ocultar la respuesta correcta, calificar en backend y persistir el intento.
 - Preguntas incorporadas el 2026-09-16: se creó el curso `Evaluación Educativa y Autonomía Institucional`, con las lecciones `Evaluación integral y autonomía del SIEE` y `PEI, participación y autonomía institucional`. Cada pregunta quedó con 4 opciones y exactamente 1 correcta, con dificultad avanzada y explicaciones ampliadas.
+- Se añadió una tercera pregunta avanzada sobre continuidad de la valoración, estrategias de apoyo y promoción según el Decreto 1290 de 2009; quedó en la lección `Evaluación integral y autonomía del SIEE`, con la opción C como única correcta.
+- Se añadieron cuatro preguntas avanzadas: dos nuevas en `Evaluación integral y autonomía del SIEE` sobre valoración y SIEE, una en `Convivencia escolar y protección frente al acoso` y una en `Educación inclusiva y ajustes pedagógicos`. Sus respuestas correctas son A, B, A y A, respectivamente.
 - El listado de cursos quedó ordenado por `id ASC` en `src/routes/courses.js`; al agregar el curso avanzado, el orden por fecha hacía que una prueba de progreso tomara un curso de dos lecciones y devolviera 50% en lugar de 100%.
-- El quiz independiente post-login ya cuenta con `GET /api/v1/quizzes/post-login` y `POST /api/v1/quizzes/post-login/attempts`. El primero oculta `es_correcta`; el segundo califica en backend y guarda intentos/respuestas en `quiz_attempts` y `quiz_attempt_answers`.
+- El simulacro diagnóstico cuenta con `GET /api/v1/quizzes/post-login` y `POST /api/v1/quizzes/post-login/attempts`. El primero oculta `es_correcta`; el segundo califica en backend y guarda intentos/respuestas en `quiz_attempts` y `quiz_attempt_answers`. La SPA solo solicita las preguntas cuando la persona pulsa `Iniciar simulacro`.
 
 ### Decisión de producto
 
@@ -61,7 +63,7 @@ El flujo actual es:
 - Pública: `GET /health`, `GET /api/v1/ping/health`, registro, login, listado y detalle de cursos.
 - Autenticada: usuario actual, progreso, completar lección, perfil, actualización de perfil e inscripciones.
 - Administrativa: listado de usuarios y actualización de usuarios bajo `/api/v1/admin`.
-- Quiz post-login: ruta protegida para obtener preguntas sin respuestas correctas y ruta protegida para calificar/persistir el intento.
+- Simulacro diagnóstico: ruta protegida para obtener preguntas sin respuestas correctas y ruta protegida para calificar/persistir el intento; el acceso se muestra como submódulo opcional del dashboard.
 
 ### Bloqueos funcionales: estado
 
@@ -102,7 +104,7 @@ Evaluar Supabase Auth, Storage y Row Level Security únicamente después de esta
 
 ## Punto actual y siguiente acción
 
-Estado (2026-09-16): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 30 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar. Las dos primeras preguntas avanzadas ya están cargadas en Supabase mediante el seed. El diagnóstico independiente aparece en el dashboard después del login, se califica en backend y guarda el intento.
+Estado (2026-09-16): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 30 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar. Las preguntas avanzadas están cargadas en Supabase mediante el seed. El dashboard ofrece el `Simulacro diagnóstico` como submódulo opcional; al abrirlo, se califica en backend y se guarda el intento.
 
 Siguiente acción concreta: revisar el diagnóstico en navegador y ampliar el banco con nuevas preguntas; después construir el editor/importador administrativo para dejar de depender del seed.
 
