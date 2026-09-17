@@ -531,6 +531,34 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT m.id, 'Carrera docente, traslados y provisión de vacantes',
+    'Análisis de traslados, encargos, concursos de méritos y provisión de empleos docentes.', 11, TRUE, TRUE
+FROM modules m JOIN courses c ON c.id=m.curso_id
+WHERE c.titulo='Evaluación Educativa y Autonomía Institucional'
+AND m.titulo='Evaluación y Autonomía Institucional'
+AND NOT EXISTS (SELECT 1 FROM lessons l WHERE l.modulo_id=m.id AND l.titulo='Carrera docente, traslados y provisión de vacantes');
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT m.id, 'Fondo de Servicios Educativos y contratación',
+    'Análisis de ordenación del gasto, disponibilidad presupuestal y procedimientos de contratación escolar.', 12, TRUE, TRUE
+FROM modules m JOIN courses c ON c.id=m.curso_id
+WHERE c.titulo='Evaluación Educativa y Autonomía Institucional'
+AND m.titulo='Evaluación y Autonomía Institucional'
+AND NOT EXISTS (SELECT 1 FROM lessons l WHERE l.modulo_id=m.id AND l.titulo='Fondo de Servicios Educativos y contratación');
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT m.id, 'Competencias disciplinarias y gobierno escolar',
+    'Análisis de la diferencia entre resolver conflictos y ejercer potestad disciplinaria.', 13, TRUE, TRUE
+FROM modules m JOIN courses c ON c.id=m.curso_id
+WHERE c.titulo='Evaluación Educativa y Autonomía Institucional'
+AND m.titulo='Evaluación y Autonomía Institucional'
+AND NOT EXISTS (SELECT 1 FROM lessons l WHERE l.modulo_id=m.id AND l.titulo='Competencias disciplinarias y gobierno escolar');
+
+
 /* ============================================================
    5. QUIZZES
    ============================================================ */
@@ -856,6 +884,46 @@ SELECT l.id,
 FROM lessons l WHERE l.titulo = 'Familia, información y participación educativa'
 AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Durante el primer período, un estudiante de cuarto grado%');
 
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'En una entidad territorial certificada se produce una vacante definitiva en una institución educativa urbana. Una docente nombrada en propiedad en otro establecimiento del mismo municipio solicita ser trasladada a esa plaza por reunificación familiar y acredita el perfil requerido. Simultáneamente, un docente del establecimiento donde se originó la vacante manifiesta interés en ocuparla mediante encargo. La secretaría informa que existe una lista de elegibles vigente derivada de un concurso de méritos para el empleo correspondiente. ¿Cuál actuación resulta jurídicamente más consistente?',
+    'Debe analizarse separadamente la naturaleza de la vacante, la situación administrativa de quienes solicitan ocuparla y las reglas aplicables, determinando si existe un derecho de provisión derivado del concurso que deba materializarse antes de utilizar mecanismos de movilidad o provisión temporal. La antigüedad, el conocimiento del PEI o la conveniencia no alteran por sí solos el orden jurídico.',
+    'Ni la propiedad, la reunificación familiar, el encargo o el conocimiento del PEI generan automáticamente prelación frente a una lista de elegibles vigente. La continuidad del servicio tampoco permite prescindir de las reglas de provisión.'
+FROM lessons l WHERE l.titulo='Carrera docente, traslados y provisión de vacantes'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'En una entidad territorial certificada se produce una vacante definitiva%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Una institución educativa requiere adquirir equipos para reemplazar elementos dañados de un laboratorio. Los recursos están disponibles en el Fondo de Servicios Educativos y la adquisición responde a una necesidad institucional. Para agilizar el proceso, el rector selecciona un proveedor y ordena la compra argumentando que, como ordenador del gasto, puede comprometer los recursos si existe disponibilidad presupuestal. ¿Cuál consideración determina principalmente la validez de su actuación?',
+    'La ordenación del gasto debe sujetarse a las reglas, procedimientos y competencias aplicables al Fondo y a la contratación correspondiente. Ser ordenador del gasto no autoriza por sí solo a prescindir del procedimiento exigible.',
+    'La disponibilidad presupuestal y la urgencia no sustituyen los procedimientos de contratación. Tampoco toda adquisición requiere autorización individual del Consejo Directivo si la normativa asigna la ordenación al rector; lo decisivo es cumplir las reglas aplicables.'
+FROM lessons l WHERE l.titulo='Fondo de Servicios Educativos y contratación'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Una institución educativa requiere adquirir equipos para reemplazar elementos dañados%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Dos docentes mantienen un conflicto que comienza a afectar la coordinación de actividades académicas. Tras escuchar a ambos, el Consejo Directivo concluye que uno incumplió compromisos institucionales y decide imponerle una amonestación escrita, argumentando que entre sus funciones está resolver conflictos entre docentes y administrativos. ¿Cuál interpretación es jurídicamente más precisa?',
+    'La competencia para intervenir en la solución del conflicto no implica por sí misma competencia para imponer una consecuencia disciplinaria. Debe distinguirse la actuación del Consejo Directivo de la potestad atribuida legalmente a la autoridad competente para adelantar actuaciones disciplinarias.',
+    'La contradicción, la tipificación institucional o la existencia de un conflicto no crean por sí solas competencia disciplinaria. Resolver un desacuerdo y sancionar una conducta son actuaciones diferentes.'
+FROM lessons l WHERE l.titulo='Competencias disciplinarias y gobierno escolar'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Dos docentes mantienen un conflicto que comienza a afectar%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'El rector dispone que todos los docentes permanezcan diariamente en la institución durante ocho horas continuas, aunque parte de ese tiempo no corresponda a asignación académica. Sustenta la decisión en que la jornada laboral docente es de ocho horas y destina el tiempo restante a planeación, evaluación, atención a familias y reuniones institucionales. Un docente objeta que puede desarrollar fuera del establecimiento parte de las actividades curriculares complementarias. ¿Cuál análisis resuelve con mayor precisión la controversia?',
+    'Debe distinguirse la duración de la jornada laboral de la permanencia obligatoria en el establecimiento: una jornada de ocho horas no autoriza a convertir automáticamente todo ese tiempo en permanencia presencial, sin perjuicio del tiempo que deba cumplirse en la institución para asignación académica y actividades curriculares complementarias conforme a la regulación aplicable.',
+    'La jornada laboral no equivale automáticamente a ocho horas de presencia física, pero tampoco desaparece toda obligación de permanencia institucional después de la asignación académica. El lugar y tiempo de las actividades dependen de la regulación aplicable.'
+FROM lessons l WHERE l.titulo='Función docente, planeación y contexto'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'El rector dispone que todos los docentes permanezcan diariamente%');
+
+INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT l.id,
+    'Al finalizar la jornada, el acudiente de un estudiante de primaria envía un mensaje al teléfono personal del docente autorizando que el niño regrese solo a casa. El procedimiento institucional exige entrega a acudiente o persona previamente autorizada. El padre argumenta que ejerce la representación del menor y que su autorización expresa libera a la institución de responsabilidad. ¿Qué actuación resulta más consistente?',
+    'Debe aplicarse el procedimiento institucional de salida y gestionarse la novedad por los canales previstos, pues la manifestación unilateral del acudiente no modifica automáticamente las condiciones de custodia ni traslada por sí sola la responsabilidad institucional.',
+    'La autorización por mensaje no desplaza automáticamente el procedimiento de custodia, pero tampoco significa que la institución deba ignorar al representante o negar toda gestión: debe aplicar el protocolo y canalizar la solicitud conforme a sus reglas.'
+FROM lessons l WHERE l.titulo='Protección de derechos, confidencialidad y actuación institucional'
+AND NOT EXISTS (SELECT 1 FROM quizzes q WHERE q.leccion_id=l.id AND q.pregunta LIKE 'Al finalizar la jornada, el acudiente de un estudiante de primaria%');
+
 INSERT INTO quizzes
 (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
 SELECT
@@ -1016,6 +1084,11 @@ WHERE qo.quiz_id = q.id
             l.titulo = 'Familia, información y participación educativa'
             AND q.pregunta LIKE 'Durante el primer período, un estudiante de cuarto grado%'
         )
+        OR (l.titulo = 'Carrera docente, traslados y provisión de vacantes' AND q.pregunta LIKE 'En una entidad territorial certificada se produce una vacante definitiva%')
+        OR (l.titulo = 'Fondo de Servicios Educativos y contratación' AND q.pregunta LIKE 'Una institución educativa requiere adquirir equipos para reemplazar elementos dañados%')
+        OR (l.titulo = 'Competencias disciplinarias y gobierno escolar' AND q.pregunta LIKE 'Dos docentes mantienen un conflicto que comienza a afectar%')
+        OR (l.titulo = 'Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector dispone que todos los docentes permanezcan diariamente%')
+        OR (l.titulo = 'Protección de derechos, confidencialidad y actuación institucional' AND q.pregunta LIKE 'Al finalizar la jornada, el acudiente de un estudiante de primaria%')
         OR (
             l.titulo = 'PEI, participación y autonomía institucional'
             AND q.pregunta LIKE 'Una institución identifica cambios en su población%'
@@ -1675,6 +1748,51 @@ CROSS JOIN (VALUES
 /* ============================================================
     11. BADGES
     ============================================================ */
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Priorizar el traslado de la docente en propiedad, previa verificación de requisitos y necesidades del servicio, porque conserva la vinculación de carrera.',FALSE,1),
+('Analizar separadamente la naturaleza de la vacante, la situación administrativa y las reglas de provisión, determinando si existe un derecho derivado del concurso que deba materializarse antes de movilidad o provisión temporal.',TRUE,2),
+('Conceder inicialmente el encargo al docente de la institución mientras se resuelven traslado y lista de elegibles.',FALSE,3),
+('Valorar continuidad, antigüedad, desempeño, situación familiar y contexto, seleccionando la alternativa de menor afectación administrativa.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Carrera docente, traslados y provisión de vacantes' AND q.pregunta LIKE 'En una entidad territorial certificada se produce una vacante definitiva%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('La disponibilidad presupuestal y la relación con la necesidad habilitan al rector para seleccionar el mecanismo más eficiente.',FALSE,1),
+('El Consejo Directivo debe autorizar previamente cada contrato del Fondo.',FALSE,2),
+('La ordenación del gasto debe sujetarse a las reglas, procedimientos y competencias aplicables al Fondo y a la contratación; ser ordenador no permite prescindir del procedimiento exigible.',TRUE,3),
+('La urgencia permite simplificar las actuaciones si no se alteran las apropiaciones.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Fondo de Servicios Educativos y contratación' AND q.pregunta LIKE 'Una institución educativa requiere adquirir equipos para reemplazar elementos dañados%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('La decisión es procedente si hubo contradicción y defensa, porque resolver conflictos comprende medidas correctivas.',FALSE,1),
+('La decisión es procedente si la conducta y amonestación están previstas en normas institucionales.',FALSE,2),
+('Resolver el conflicto no implica competencia para imponer una consecuencia disciplinaria; debe acudirse a la autoridad competente para la actuación disciplinaria.',TRUE,3),
+('La decisión es improcedente porque todo conflicto entre docentes corresponde exclusivamente al rector.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Competencias disciplinarias y gobierno escolar' AND q.pregunta LIKE 'Dos docentes mantienen un conflicto que comienza a afectar%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('La decisión es válida porque ocho horas de jornada permiten exigir ocho horas de presencia cuando se asignen actividades docentes.',FALSE,1),
+('La objeción es siempre válida después de cumplir la asignación académica, porque las actividades complementarias no pueden ser presenciales.',FALSE,2),
+('Debe distinguirse la jornada laboral de la permanencia obligatoria: ocho horas no autorizan automáticamente toda la permanencia presencial, sin perjuicio del tiempo institucional exigible según la regulación.',TRUE,3),
+('La inclusión de actividades en el PEI permite al rector determinar libremente el lugar de cumplimiento.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector dispone que todos los docentes permanezcan diariamente%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id,v.opcion,v.es_correcta,v.orden FROM quizzes q JOIN lessons l ON l.id=q.leccion_id
+CROSS JOIN (VALUES
+('Permitir la salida conservando el mensaje como evidencia, porque la autorización expresa desplaza el procedimiento.',FALSE,1),
+('Negar siempre la salida y exigir presencia física del acudiente, incluso si el protocolo contempla personas autorizadas.',FALSE,2),
+('Aplicar el procedimiento institucional de salida y gestionar la novedad por los canales previstos, pues la autorización unilateral no modifica automáticamente la custodia ni traslada por sí sola la responsabilidad.',TRUE,3),
+('Valorar la madurez y distancia y permitir la salida si el docente considera que no hay riesgo.',FALSE,4)
+) v(opcion,es_correcta,orden) WHERE l.titulo='Protección de derechos, confidencialidad y actuación institucional' AND q.pregunta LIKE 'Al finalizar la jornada, el acudiente de un estudiante de primaria%' AND NOT EXISTS (SELECT 1 FROM quiz_options qo WHERE qo.quiz_id=q.id AND qo.opcion=v.opcion);
 
 INSERT INTO badges
 (modulo_id, nombre, descripcion, icono, color)
