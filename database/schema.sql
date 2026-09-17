@@ -72,6 +72,30 @@ CREATE TABLE quiz_options (
     orden INTEGER DEFAULT 0
 );
 
+-- Independent post-login quiz attempts
+CREATE TABLE quiz_attempts (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    estado VARCHAR(20) DEFAULT 'finalizado',
+    iniciado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finalizado_en TIMESTAMP,
+    puntaje DECIMAL(5,2),
+    aciertos INTEGER NOT NULL DEFAULT 0,
+    total_preguntas INTEGER NOT NULL DEFAULT 0
+);
+
+-- Answers submitted for an independent quiz attempt
+CREATE TABLE quiz_attempt_answers (
+    id SERIAL PRIMARY KEY,
+    intento_id INTEGER REFERENCES quiz_attempts(id) ON DELETE CASCADE,
+    quiz_id INTEGER REFERENCES quizzes(id) ON DELETE CASCADE,
+    opcion_id INTEGER REFERENCES quiz_options(id) ON DELETE SET NULL,
+    respuesta_correcta BOOLEAN NOT NULL,
+    pregunta_snapshot TEXT NOT NULL,
+    opcion_snapshot TEXT,
+    respondida_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- User progress table
 CREATE TABLE user_progress (
     id SERIAL PRIMARY KEY,
@@ -120,6 +144,8 @@ CREATE INDEX idx_users_activo ON users(activo);
 CREATE INDEX idx_modules_curso ON modules(curso_id);
 CREATE INDEX idx_lessons_modulo ON lessons(modulo_id);
 CREATE INDEX idx_quiz_leccion ON quizzes(leccion_id);
+CREATE INDEX idx_quiz_attempts_usuario ON quiz_attempts(usuario_id);
+CREATE INDEX idx_quiz_attempt_answers_intento ON quiz_attempt_answers(intento_id);
 CREATE INDEX idx_user_progress_usuario ON user_progress(usuario_id);
 CREATE INDEX idx_user_progress_leccion ON user_progress(leccion_id);
 CREATE INDEX idx_user_badges_usuario ON user_badges(usuario_id);

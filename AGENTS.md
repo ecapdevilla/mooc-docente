@@ -14,7 +14,7 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 - Esquema de datos: `database/schema.sql`.
 - Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`, idempotentes. Las opciones de quiz se reconcilian al reejecutar el seed.
 - Base de datos de desarrollo: Supabase (pooler) mediante `DATABASE_URL` en `.env`.
-- Pruebas: `tests/` tiene 5 suites (salud, autenticación, cursos, progreso y la interfaz del SPA con jsdom). `npm test` pasa 26/26 (2026-09-12).
+- Pruebas: `tests/` tiene 5 suites (salud, autenticación, cursos, progreso y la interfaz del SPA con jsdom). `npm test` pasa 26/26 (validado 2026-09-16).
 - Servido local: `GET /` entrega `indexInicial.html`; `public/` expone `/api-client.js` y `/auth.js` en la raíz.
 - Despliegue: `vercel.json` y `api/index.js` preparan frontend estático + API serverless. Aún no desplegado ni verificado en Vercel.
 - Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
@@ -37,6 +37,19 @@ El flujo actual es:
 - `app.js` es la lógica que intenta consumir la API.
 - `indexInicial.html` es la SPA documentada, pero actualmente usa principalmente módulos y progreso locales; existe una segunda integración en `app.js`.
 
+### Estado validado para el quiz (2026-09-16)
+
+- El login de `indexInicial.html` funciona contra `/api/v1/auth/login`, guarda el token y carga cursos/progreso desde la API.
+- Los quizzes de lección ya existen en PostgreSQL mediante `quizzes` y `quiz_options`; `GET /api/v1/courses/:id` devuelve la pregunta y sus opciones.
+- La interfaz actual muestra el quiz al abrir una lección, no inmediatamente después de iniciar sesión. Aún no existe el flujo de quiz independiente post-login.
+- Las primeras preguntas se alojarán en Supabase/PostgreSQL, no dentro de `indexInicial.html`. Para esta primera carga se usarán `src/seed/data.sql` y `src/seed/seed.js`, manteniendo el seed idempotente.
+- Cuando el volumen crezca, las preguntas deberán pasar a un editor administrativo/importador desde Word. Ese editor será la fuente operativa; el seed quedará para datos base y entornos nuevos.
+- Antes de cargar preguntas nuevas, validar: enunciado, mínimo dos opciones, exactamente una respuesta correcta, explicación opcional, área/tema y fuente.
+- Riesgo conocido: el detalle actual de cursos devuelve `es_correcta` porque el quiz de lección se califica en el navegador. El nuevo quiz independiente post-login debe ocultar la respuesta correcta, calificar en backend y persistir el intento.
+- Preguntas incorporadas el 2026-09-16: se creó el curso `Evaluación Educativa y Autonomía Institucional`, con las lecciones `Evaluación integral y autonomía del SIEE` y `PEI, participación y autonomía institucional`. Cada pregunta quedó con 4 opciones y exactamente 1 correcta, con dificultad avanzada y explicaciones ampliadas.
+- El listado de cursos quedó ordenado por `id ASC` en `src/routes/courses.js`; al agregar el curso avanzado, el orden por fecha hacía que una prueba de progreso tomara un curso de dos lecciones y devolviera 50% en lugar de 100%.
+- El quiz independiente post-login ya cuenta con `GET /api/v1/quizzes/post-login` y `POST /api/v1/quizzes/post-login/attempts`. El primero oculta `es_correcta`; el segundo califica en backend y guarda intentos/respuestas en `quiz_attempts` y `quiz_attempt_answers`.
+
 ### Decisión de producto
 
 `indexInicial.html` es la fuente principal de diseño, contenido y flujo de usuario: no es un archivo descartable, sino el prototipo más completo del producto. Los módulos, lecciones, quizzes, badges y pantallas que hoy funcionan con `localStorage` deben migrarse progresivamente a persistencia real.
@@ -48,6 +61,7 @@ El flujo actual es:
 - Pública: `GET /health`, `GET /api/v1/ping/health`, registro, login, listado y detalle de cursos.
 - Autenticada: usuario actual, progreso, completar lección, perfil, actualización de perfil e inscripciones.
 - Administrativa: listado de usuarios y actualización de usuarios bajo `/api/v1/admin`.
+- Quiz post-login: ruta protegida para obtener preguntas sin respuestas correctas y ruta protegida para calificar/persistir el intento.
 
 ### Bloqueos funcionales: estado
 
@@ -59,6 +73,7 @@ Corregidos además en la sesión del 2026-09-12:
 2. Al reejecutar el seed quedaban opciones de quiz obsoletas y aparecían quizzes con dos respuestas correctas. Ahora el seed reconcilia las opciones de los quizzes sembrados (4 opciones y 1 correcta por quiz).
 3. `public/api-client.js` terminaba con `module.exports`, que lanza `ReferenceError` en el navegador; ahora expone `window.api` y mantiene compatibilidad con Node.
 4. `GET /api/v1/progress` no exponía el detalle por lección; ahora cada módulo incluye `lessons` con `completada`.
+5. Al cargar el curso de evaluación, `GET /api/v1/courses` podía cambiar el primer curso por el orden de `creado_en`; ahora el orden es determinista por `id ASC`.
 
 Pendientes reconocidos (no bloquean el desarrollo actual):
 
@@ -87,9 +102,9 @@ Evaluar Supabase Auth, Storage y Row Level Security únicamente después de esta
 
 ## Punto actual y siguiente acción
 
-Estado (2026-09-12): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 19 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar.
+Estado (2026-09-16): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 30 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar. Las dos primeras preguntas avanzadas ya están cargadas en Supabase mediante el seed. El diagnóstico independiente aparece en el dashboard después del login, se califica en backend y guarda el intento.
 
-Siguiente acción concreta: implementar el simulacro gratuito sin registro (Fase 2 del roadmap) y, en paralelo, reconciliar el contenido del SPA con el del seed para que cada lección del prototipo tenga su fila real (Fase 3). Después desplegar en Vercel y verificar rutas públicas, autenticadas y administrativas en producción.
+Siguiente acción concreta: revisar el diagnóstico en navegador y ampliar el banco con nuevas preguntas; después construir el editor/importador administrativo para dejar de depender del seed.
 
 ## Comandos
 
@@ -126,6 +141,7 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en 
 - No exponer secretos de `.env`, tokens ni contraseñas en código, logs o documentación.
 - Los cambios de esquema deben incluir la actualización de `database/schema.sql` y del seed cuando aplique.
 - Mantener compatibilidad con las respuestas que consume `indexInicial.html` y `public/api-client.js`.
+- Preguntas iniciales: guardar en PostgreSQL/Supabase mediante `quizzes` y `quiz_options`; no hardcodearlas en el HTML. Usar el seed para la primera carga y reservar un editor/importador para la gestión posterior.
 - Mapeo SPA ↔ API: `indexInicial.html` empareja cada módulo del prototipo con un curso por título, resuelve las lecciones por orden (`modulos[].lecciones[]`) y guarda cada lección completada con `POST /api/v1/progress/lesson/:id`. `GET /api/v1/progress` entrega, por módulo, `lessons` con `completada`.
 - Origen de la API en el SPA: `window.MERITO_API_BASE` si está definido; si no, `origen actual + /api/v1`; si no, `http://localhost:3000/api/v1` (apertura con `file://`). Si la API no responde, el SPA degrada a modo local y avisa al usuario.
 - Claves de `localStorage` compartidas: `auth_token` y `user`.

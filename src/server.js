@@ -19,6 +19,7 @@ const { pool } = require('./config/database');
 const authRoutes = require('./routes/auth');
 const courseRoutes = require('./routes/courses');
 const progressRoutes = require('./routes/progress');
+const quizRoutes = require('./routes/quizzes');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 
@@ -52,6 +53,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/progress', progressRoutes);
+app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ping', require('./routes/ping'));

@@ -3,6 +3,30 @@
    Versión corregida e idempotente
    ============================================================ */
 
+/* Tablas de intentos del quiz independiente. Se mantienen aquí
+   para que el seed también prepare bases existentes. */
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    estado VARCHAR(20) DEFAULT 'finalizado',
+    iniciado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finalizado_en TIMESTAMP,
+    puntaje DECIMAL(5,2),
+    aciertos INTEGER NOT NULL DEFAULT 0,
+    total_preguntas INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
+    id SERIAL PRIMARY KEY,
+    intento_id INTEGER REFERENCES quiz_attempts(id) ON DELETE CASCADE,
+    quiz_id INTEGER REFERENCES quizzes(id) ON DELETE CASCADE,
+    opcion_id INTEGER REFERENCES quiz_options(id) ON DELETE SET NULL,
+    respuesta_correcta BOOLEAN NOT NULL,
+    pregunta_snapshot TEXT NOT NULL,
+    opcion_snapshot TEXT,
+    respondida_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 /* ============================================================
    1. USUARIOS DEMO
@@ -74,6 +98,22 @@ WHERE NOT EXISTS (
     SELECT 1
     FROM courses
     WHERE titulo = 'Legislación Educativa Colombiana'
+);
+
+
+INSERT INTO courses
+(titulo, area, nivel, descripcion, icono, activo)
+SELECT
+    'Evaluación Educativa y Autonomía Institucional',
+    'Evaluación Educativa',
+    'Avanzado',
+    'Analiza situaciones complejas sobre evaluación, SIEE, PEI y autonomía institucional en el contexto educativo colombiano.',
+    'fas fa-clipboard-check',
+    TRUE
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM courses
+    WHERE titulo = 'Evaluación Educativa y Autonomía Institucional'
 );
 
 
@@ -169,6 +209,28 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO modules
+(curso_id, titulo, descripcion, orden,
+ badge_nombre, badge_icono, badge_color, activo)
+SELECT
+    c.id,
+    'Evaluación y Autonomía Institucional',
+    'Análisis normativo y toma de decisiones pedagógicas',
+    1,
+    'Analista Institucional',
+    'fas fa-clipboard-check',
+    'blue',
+    TRUE
+FROM courses c
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM modules m
+    WHERE m.curso_id = c.id
+    AND m.titulo = 'Evaluación y Autonomía Institucional'
+);
+
+
 /* ============================================================
    4. LECCIONES
    IMPORTANTE:
@@ -259,6 +321,48 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Evaluación integral y autonomía del SIEE',
+    'Análisis de criterios, ponderaciones y evidencias en la evaluación institucional.',
+    1,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Evaluación integral y autonomía del SIEE'
+);
+
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'PEI, participación y autonomía institucional',
+    'Análisis del procedimiento para actualizar el PEI y distribuir responsabilidades entre los órganos escolares.',
+    2,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Evaluación Educativa y Autonomía Institucional'
+AND m.titulo = 'Evaluación y Autonomía Institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'PEI, participación y autonomía institucional'
+);
+
+
 /* ============================================================
    5. QUIZZES
    ============================================================ */
@@ -335,6 +439,40 @@ AND NOT EXISTS (
 );
 
 
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Al finalizar un período, una prueba acumulativa arroja resultados bajos para dos estudiantes, aunque su portafolio evidencia progresión, las rúbricas muestran superación de desempeños y la autoevaluación es consistente. Si el SIEE ya contempla criterios, valoración integral y seguimiento, ¿qué decisión respeta mejor la autonomía institucional sin alterar extemporáneamente las reglas de evaluación?',
+    'La decisión correcta es mantener los criterios y ponderaciones definidos previamente en el SIEE y resolver la tensión mediante una actividad adicional equivalente, siempre que sea compatible con el sistema adoptado. Así se integran nuevas evidencias sin reponderar la prueba durante el período.',
+    'No es procedente conservar mecánicamente la prueba ignorando el proceso, reponderarla después de conocer los resultados ni sustituirla unilateralmente por evidencias procesuales. La autonomía exige aplicar el SIEE previamente adoptado y no cambiar sus reglas sobre la marcha.'
+FROM lessons l
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Al finalizar un período, una prueba acumulativa arroja resultados bajos%'
+);
+
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    'Una institución identifica cambios en su población y diseña una propuesta pedagógica que exige ajustes curriculares. Antes de formalizar la modificación del PEI, considera implementarla transitoriamente por urgencia. ¿Cuál procedimiento distribuye con mayor precisión las competencias institucionales?',
+    'La institución debe desarrollar el procedimiento participativo y elevar la propuesta al consejo directivo para que decida su adopción; el consejo académico aporta el análisis y la asesoría pedagógica, pero no reemplaza al órgano competente para adoptar el PEI.',
+    'La urgencia pedagógica no habilita a implementar unilateralmente una modificación del PEI ni a postergar su adopción formal. El aval consultivo del consejo académico no sustituye el procedimiento participativo ni la decisión del consejo directivo.'
+FROM lessons l
+WHERE l.titulo = 'PEI, participación y autonomía institucional'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta LIKE 'Una institución identifica cambios en su población%'
+);
+
+
 /* ============================================================
    6. OPCIONES QUIZ - PEDAGOGÍA
    ============================================================ */
@@ -363,6 +501,14 @@ WHERE qo.quiz_id = q.id
       l.titulo = 'Constitución Política de Colombia'
       AND q.pregunta = '¿Cuál es el artículo principal que garantiza la educación en la Constitución?'
     )
+        OR (
+            l.titulo = 'Evaluación integral y autonomía del SIEE'
+            AND q.pregunta LIKE 'Al finalizar un período, una prueba acumulativa arroja resultados bajos%'
+        )
+        OR (
+            l.titulo = 'PEI, participación y autonomía institucional'
+            AND q.pregunta LIKE 'Una institución identifica cambios en su población%'
+        )
   );
 
 INSERT INTO quiz_options
@@ -550,7 +696,95 @@ AND NOT EXISTS (
 
 
 /* ============================================================
-   10. BADGES
+   10. OPCIONES QUIZ - EVALUACIÓN Y AUTONOMÍA
+   ============================================================ */
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Conservar la ponderación original de la prueba y usar las evidencias procesuales únicamente para definir apoyos, sin afectar la valoración.',
+        FALSE,
+        1
+    ),
+    (
+        'Contrastar ambas fuentes y ajustar la incidencia de la prueba después de conocer los resultados, porque la progresión debe prevalecer.',
+        FALSE,
+        2
+    ),
+    (
+        'Mantener los criterios y ponderaciones definidos en el SIEE y resolver la tensión mediante una actividad adicional equivalente y compatible con el sistema adoptado.',
+        TRUE,
+        3
+    ),
+    (
+        'Sustituir la prueba por las evidencias procesuales para garantizar la permanencia, aunque el cambio no esté previsto en el SIEE.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'Evaluación integral y autonomía del SIEE'
+AND q.pregunta LIKE 'Al finalizar un período, una prueba acumulativa arroja resultados bajos%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+INSERT INTO quiz_options
+(quiz_id, opcion, es_correcta, orden)
+SELECT
+    q.id,
+    v.opcion,
+    v.es_correcta,
+    v.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (
+    VALUES
+    (
+        'Solicitar concepto del consejo académico e iniciar la implementación mientras el consejo directivo formaliza el ajuste.',
+        FALSE,
+        1
+    ),
+    (
+        'Implementar la propuesta con aval interno del consejo académico y postergar la adopción formal hasta medir sus resultados.',
+        FALSE,
+        2
+    ),
+    (
+        'Desarrollar el procedimiento participativo y elevar la propuesta al consejo directivo para decidir su adopción, manteniendo el consejo académico su función consultiva.',
+        TRUE,
+        3
+    ),
+    (
+        'Implementar la modificación por decisión de rectoría, dado que responde a una necesidad pedagógica inmediata.',
+        FALSE,
+        4
+    )
+) AS v(opcion, es_correcta, orden)
+WHERE l.titulo = 'PEI, participación y autonomía institucional'
+AND q.pregunta LIKE 'Una institución identifica cambios en su población%'
+AND NOT EXISTS (
+    SELECT 1
+    FROM quiz_options qo
+    WHERE qo.quiz_id = q.id
+    AND qo.opcion = v.opcion
+);
+
+
+/* ============================================================
+   11. BADGES
    ============================================================ */
 
 INSERT INTO badges
@@ -572,8 +806,8 @@ AND NOT EXISTS (
 
 
 /* ============================================================
-   11. INSCRIPCIONES
-   Todos los usuarios demo quedan inscritos en los dos cursos.
+    12. INSCRIPCIONES
+    Todos los usuarios demo quedan inscritos en los cursos base.
    ON CONFLICT evita duplicados.
    ============================================================ */
 

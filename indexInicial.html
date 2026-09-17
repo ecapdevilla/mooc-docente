@@ -1048,6 +1048,12 @@
       background: var(--secondary-soft);
     }
 
+    .quiz-option.selected {
+      border-color: var(--secondary);
+      background: var(--secondary-soft);
+      color: var(--secondary);
+    }
+
     .quiz-option .letter {
       width: 26px;
       height: 26px;
@@ -1095,6 +1101,35 @@
     .quiz-feedback.show { display: flex; }
     .quiz-feedback.ok { background: var(--accent-soft); color: var(--accent-dark); }
     .quiz-feedback.ko { background: var(--danger-soft); color: #991B1B; }
+
+      .post-login-quiz {
+        margin: 0 0 2rem;
+        border: 1px solid var(--secondary-light);
+        background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 68%);
+      }
+
+      .post-login-quiz .quiz-intro {
+        color: var(--text-mid);
+        margin: -0.35rem 0 1.25rem;
+        line-height: 1.55;
+      }
+
+      .post-login-question + .post-login-question {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+      }
+
+      .post-login-result {
+        margin-top: 1rem;
+        padding: 1rem 1.1rem;
+        border-radius: var(--r-sm);
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+        line-height: 1.55;
+      }
+
+      .post-login-result strong { color: var(--dark); }
 
     .lesson-nav {
       display: flex;
@@ -1845,6 +1880,8 @@
           </div>
         </div>
 
+          <section class="quiz post-login-quiz hidden" id="postLoginQuizPanel" aria-labelledby="postLoginQuizTitle"></section>
+
         <div class="dash-stats">
           <div class="dash-stat">
             <div class="dash-stat-icon blue"><i class="fas fa-book-open"></i></div>
@@ -2160,7 +2197,8 @@
       progress: {}, // { mod1: { lessonsDone: [0,1], completed: true, badge: true }, ... }
       currentLesson: null, // { moduleId, lessonIndex }
       apiOnline: false, // true cuando sesión y progreso vienen de la API
-      courseMap: {} // { mod1: { courseId, moduloIds: [], lessons: [{ id, moduloId }] } }
+        courseMap: {}, // { mod1: { courseId, moduloIds: [], lessons: [{ id, moduloId }] } }
+        postLoginAnswers: {}
     };
 
     function loadState() {
@@ -2440,6 +2478,150 @@
       }
     }
 
+    async function loadPostLoginQuiz() {
+      if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+      const panel = document.getElementById('postLoginQuizPanel');
+      if (!panel || !state.user || !state.apiOnline || !localStorage.getItem(TOKEN_KEY)) {
+        panel?.classList.add('hidden');
+        return;
+      }
+
+      panel.classList.remove('hidden');
+      panel.innerHTML = '<h3><i class="fas fa-clipboard-check"></i> Diagnóstico inicial</h3><p class="quiz-intro">Responde estas preguntas avanzadas para identificar tus puntos de partida.</p><p>Cargando preguntas...</p>';
+
+      try {
+        const data = await apiFetch('/quizzes/post-login');
+        const questions = data.quiz?.preguntas || [];
+
+        if (!questions.length) {
+          panel.classList.add('hidden');
+          return;
+        }
+
+        state.postLoginAnswers = {};
+        renderPostLoginQuiz(data.quiz);
+      } catch (err) {
+        panel.classList.add('hidden');
+        if (err.status !== 401) {
+          console.warn('No se pudo cargar el diagnóstico inicial:', err.message);
+        }
+      }
+    }
+
+    function renderPostLoginQuiz(quiz) {
+      const panel = document.getElementById('postLoginQuizPanel');
+      panel.innerHTML = '';
+
+      const title = document.createElement('h3');
+      title.id = 'postLoginQuizTitle';
+      title.innerHTML = '<i class="fas fa-clipboard-check"></i> Diagnóstico inicial';
+      panel.appendChild(title);
+
+      const intro = document.createElement('p');
+      intro.className = 'quiz-intro';
+      intro.textContent = 'Responde estas preguntas avanzadas para identificar tus puntos de partida.';
+      panel.appendChild(intro);
+
+      quiz.preguntas.forEach((question, questionIndex) => {
+        const questionBlock = document.createElement('div');
+        questionBlock.className = 'post-login-question';
+
+        const questionTitle = document.createElement('div');
+        questionTitle.className = 'quiz-question';
+        questionTitle.textContent = `${questionIndex + 1}. ${question.pregunta}`;
+        questionBlock.appendChild(questionTitle);
+
+        const options = document.createElement('div');
+        options.className = 'quiz-options';
+
+        question.opciones.forEach((option, optionIndex) => {
+          const optionButton = document.createElement('button');
+          optionButton.type = 'button';
+          optionButton.className = 'quiz-option';
+          optionButton.dataset.questionId = question.id;
+          optionButton.dataset.optionId = option.id;
+
+          const letter = document.createElement('span');
+          letter.className = 'letter';
+          letter.textContent = String.fromCharCode(65 + optionIndex);
+
+          const optionText = document.createElement('span');
+          optionText.textContent = option.opcion;
+          optionButton.append(letter, optionText);
+          optionButton.addEventListener('click', () => selectPostLoginOption(optionButton));
+          options.appendChild(optionButton);
+        });
+
+        questionBlock.appendChild(options);
+        panel.appendChild(questionBlock);
+      });
+
+      const submitButton = document.createElement('button');
+      submitButton.type = 'button';
+      submitButton.id = 'postLoginQuizSubmit';
+      submitButton.className = 'btn btn-secondary';
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar diagnóstico';
+      submitButton.addEventListener('click', submitPostLoginQuiz);
+      panel.appendChild(submitButton);
+    }
+
+    function selectPostLoginOption(optionButton) {
+      const questionId = optionButton.dataset.questionId;
+      const options = document.querySelectorAll(`[data-question-id="${questionId}"]`);
+      options.forEach((option) => option.classList.remove('selected'));
+      optionButton.classList.add('selected');
+      state.postLoginAnswers[questionId] = Number(optionButton.dataset.optionId);
+
+      const questionCount = new Set([...document.querySelectorAll('[data-question-id]')].map((option) => option.dataset.questionId)).size;
+      const submitButton = document.getElementById('postLoginQuizSubmit');
+      if (submitButton) submitButton.disabled = Object.keys(state.postLoginAnswers).length !== questionCount;
+    }
+
+    async function submitPostLoginQuiz() {
+      const submitButton = document.getElementById('postLoginQuizSubmit');
+      if (!submitButton) return;
+
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calificando...';
+
+      try {
+        const answers = Object.entries(state.postLoginAnswers).map(([questionId, optionId]) => ({
+          questionId: Number(questionId),
+          optionId,
+        }));
+        const data = await apiFetch('/quizzes/post-login/attempts', {
+          method: 'POST',
+          body: { answers },
+        });
+        renderPostLoginResult(data);
+      } catch (err) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar diagnóstico';
+        alert(`No pudimos calificar el diagnóstico: ${err.message}`);
+      }
+    }
+
+    function renderPostLoginResult(data) {
+      const panel = document.getElementById('postLoginQuizPanel');
+      panel.innerHTML = '';
+
+      const title = document.createElement('h3');
+      title.innerHTML = '<i class="fas fa-chart-line"></i> Resultado del diagnóstico';
+      panel.appendChild(title);
+
+      const summary = document.createElement('div');
+      summary.className = 'post-login-result';
+      summary.innerHTML = `<strong>${data.attempt.aciertos}/${data.attempt.total_preguntas} respuestas correctas · ${data.attempt.puntaje}%</strong>`;
+      panel.appendChild(summary);
+
+      data.results.forEach((result, resultIndex) => {
+        const detail = document.createElement('p');
+        detail.textContent = `${resultIndex + 1}. ${result.correct ? 'Correcta' : 'Para revisar'}: ${result.explanation}`;
+        panel.appendChild(detail);
+      });
+    }
+
     /* ============================================================
        REGISTRO
     ============================================================ */
@@ -2670,6 +2852,8 @@
         `;
         badgesGrid.appendChild(badge);
       });
+
+      loadPostLoginQuiz();
     }
 
     /* ============================================================

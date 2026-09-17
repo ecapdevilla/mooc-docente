@@ -127,6 +127,9 @@ describe('SPA indexInicial.html', () => {
     expect(window.document.getElementById('view-dashboard').classList.contains('hidden')).toBe(false);
     expect(window.document.getElementById('loginError').style.display).toBe('none');
 
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(window.document.getElementById('postLoginQuizPanel').textContent).toMatch(/Diagnóstico inicial/i);
+
     await pool.query('DELETE FROM users WHERE email = $1', [email]);
   });
 

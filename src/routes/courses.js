@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
        (SELECT COUNT(*) FROM modules m JOIN lessons l ON l.modulo_id = m.id WHERE m.curso_id = c.id AND l.activo = TRUE) as lesson_count
        FROM courses c 
        WHERE c.activo = TRUE 
-       ORDER BY c.creado_en DESC`
+      ORDER BY c.id ASC`
     );
     res.json({ courses });
   } catch (err) {
