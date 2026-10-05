@@ -19,7 +19,7 @@ const questionsQuery = `
         'id', qo.id,
         'opcion', qo.opcion,
         'orden', qo.orden
-      ) ORDER BY qo.orden
+      ) ORDER BY random()
     ) AS opciones
   FROM quizzes q
   JOIN lessons l ON l.id = q.leccion_id AND l.activo = TRUE
@@ -28,7 +28,7 @@ const questionsQuery = `
   JOIN quiz_options qo ON qo.quiz_id = q.id
   WHERE c.titulo = $1
   GROUP BY q.id, l.titulo, c.area, q.explicacion_correcta, q.explicacion_incorrecta
-  ORDER BY q.id
+  ORDER BY random()
 `;
 
 /**
