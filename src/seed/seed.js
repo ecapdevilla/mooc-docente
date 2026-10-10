@@ -40,11 +40,12 @@ function splitStatements(sql) {
       current += '\'';
       i++;
       while (i < sql.length) {
-        if (sql[i] === '\\') {
-          current += sql[i];
-          i++;
-        }
         if (sql[i] === '\'') {
+          if (i + 1 < sql.length && sql[i + 1] === '\'') {
+            current += '\'\'';
+            i += 2;
+            continue;
+          }
           current += '\'';
           i++;
           break;
@@ -70,14 +71,24 @@ function splitStatements(sql) {
 const runSeed = async () => {
   try {
     const sql = fs.readFileSync(path.join(__dirname, 'data.sql'), 'utf8');
-    for (const stmt of splitStatements(sql)) {
+    const statements = splitStatements(sql);
+    console.log(`Total statements: ${statements.length}`);
+    for (let i = 0; i < statements.length; i++) {
+      const stmt = statements[i];
       if (!stmt) continue;
-      await pool.query(stmt);
+      try {
+        await pool.query(stmt);
+      } catch (err) {
+        console.error(`❌ Statement ${i + 1} failed:`);
+        console.error(stmt.substring(0, 500));
+        console.error('---');
+        throw err;
+      }
     }
     console.log('✅ Seed completed successfully');
   } catch (err) {
     console.error('❌ Seed failed:', err);
-    process.exit(1);
+    process.exit(1)
   }
 };
 

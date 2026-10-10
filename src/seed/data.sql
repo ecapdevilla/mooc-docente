@@ -1,4 +1,4 @@
-﻿-- Seed data for MéritoDocente MOOC Platform (idempotente)
+-- Seed data for MéritoDocente MOOC Platform (idempotente)
 -- Se truncan las tablas involucradas y luego se vuelven a poblar con los mismos datos.
 
 TRUNCATE TABLE user_badges, user_progress, enrollments, badges, quiz_options, quizzes, lessons, modules, courses, users RESTART IDENTITY CASCADE;
@@ -12,11 +12,13 @@ INSERT INTO users (nombre, email, password_hash, telefono, departamento, rol, ac
 -- Courses
 INSERT INTO courses (titulo, area, nivel, descripcion, icono, activo) VALUES
 ('Fundamentos de Pedagogía y Didáctica', 'Pedagogía y Didáctica', 'Básico', 'Domina los conceptos esenciales de la pedagogía moderna y las estrategias didácticas para el aula.', 'fas fa-chalkboard-teacher', TRUE),
-('Legislación Educativa Colombiana', 'Legislación Educativa', 'Básico', 'Estudia el marco normativo de la educación en Colombia: Ley General de Educación, decretos reglamentarios.', 'fas fa-gavel', TRUE);
+('Legislación Educativa Colombiana', 'Legislación Educativa', 'Básico', 'Estudia el marco normativo de la educación en Colombia: Ley General de Educación, decretos reglamentarios.', 'fas fa-gavel', TRUE),
+('Inteligencia Artificial para Docentes', 'Tecnología Educativa', 'Intermedio', 'Domina el uso pedagógico de la IA en el aula: planificación, evaluación, personalización y ética. 48 horas, 6 módulos, proyecto final.', 'fas fa-robot', TRUE);
 
 -- Modules
 WITH pedagogia_course AS (SELECT id FROM courses WHERE titulo = 'Fundamentos de Pedagogía y Didáctica'),
-     legislacion_course AS (SELECT id FROM courses WHERE titulo = 'Legislación Educativa Colombiana')
+     legislacion_course AS (SELECT id FROM courses WHERE titulo = 'Legislación Educativa Colombiana'),
+     ia_course AS (SELECT id FROM courses WHERE titulo = 'Inteligencia Artificial para Docentes')
 INSERT INTO modules (curso_id, titulo, descripcion, orden, badge_nombre, badge_icono, badge_color, activo)
 SELECT
     (SELECT id FROM pedagogia_course),
@@ -56,6 +58,66 @@ UNION ALL
     'Legislador',
     'fas fa-scroll',
     'purple',
+    TRUE
+UNION ALL
+    SELECT
+    (SELECT id FROM ia_course),
+    'Fundamentos de IA en Educación',
+    'Conceptos básicos, tipos de IA y su aplicación pedagógica',
+    1,
+    'Explorador IA',
+    'fas fa-robot',
+    'blue',
+    TRUE
+UNION ALL
+    SELECT
+    (SELECT id FROM ia_course),
+    'Planificación con IA',
+    'Diseño de situaciones de aprendizaje asistido por IA generativa',
+    2,
+    'Planificador IA',
+    'fas fa-calendar-alt',
+    'green',
+    TRUE
+UNION ALL
+    SELECT
+    (SELECT id FROM ia_course),
+    'Evaluación y Retroalimentación con IA',
+    'Diseño de ítems, rúbricas, feedback automatizado y análisis de evidencias',
+    3,
+    'Evaluador IA',
+    'fas fa-chart-line',
+    'orange',
+    TRUE
+UNION ALL
+    SELECT
+    (SELECT id FROM ia_course),
+    'Ética, Privacidad y Ciudadanía Digital con IA',
+    'Sesgos, protección de datos, transparencia, propiedad intelectual, deepfakes',
+    4,
+    'Guardián Ético',
+    'fas fa-shield-alt',
+    'red',
+    TRUE
+UNION ALL
+    SELECT
+    (SELECT id FROM ia_course),
+    'Liderazgo Pedagógico y Escalabilidad con IA',
+    'Gestión del cambio, coaching, gobernanza, escalabilidad, investigación-acción',
+    5,
+    'Líder IA',
+    'fas fa-users-cog',
+    'purple',
+    TRUE
+UNION ALL
+    SELECT
+    (SELECT id FROM ia_course),
+    'Proyecto Integrador: IA Ética en Mi Práctica Docente',
+    'Definición de reto, diseño intervención, implementación, análisis, comunicación',
+    6,
+    'Practicante IA',
+    'fas fa-project-diagram',
+    'teal',
     TRUE;
 
 -- Lessons
@@ -68,57 +130,86 @@ legislacion_modules AS (
     SELECT m.id, m.titulo FROM modules m
     JOIN courses c ON m.curso_id = c.id
     WHERE c.titulo = 'Legislación Educativa Colombiana'
+),
+ia_modules AS (
+    SELECT m.id, m.titulo FROM modules m
+    JOIN courses c ON m.curso_id = c.id
+    WHERE c.titulo = 'Inteligencia Artificial para Docentes'
 )
-INSERT INTO lessons (modulo_id, titulo, descripcion, orden, tiene_quiz, activo)
+INSERT INTO lessons (modulo_id, titulo, descripcion, contenido, orden, tiene_quiz, activo)
 SELECT
-    m.id,
-    '¿Qué es la Pedagogía?',
-    'Conceptos básicos de pedagogía',
-    1,
-    TRUE,
-    TRUE
-FROM pedagogia_modules m
-WHERE m.titulo = 'Fundamentos de Pedagogía'
+    m.id, '¿Qué es la Pedagogía?', 'Conceptos básicos de pedagogía', NULL, 1, TRUE, TRUE
+FROM pedagogia_modules m WHERE m.titulo = 'Fundamentos de Pedagogía'
 UNION ALL
 SELECT
-    m.id,
-    'Corrientes pedagógicas contemporáneas',
-    'Estudio de las principales corrientes pedagógicas',
-    2,
-    TRUE,
-    TRUE
-FROM pedagogia_modules m
-WHERE m.titulo = 'Corrientes Pedagógicas'
+    m.id, 'Corrientes pedagógicas contemporáneas', 'Estudio de las principales corrientes pedagógicas', NULL, 2, TRUE, TRUE
+FROM pedagogia_modules m WHERE m.titulo = 'Corrientes Pedagógicas'
 UNION ALL
 SELECT
-    m.id,
-    'Ley General de Educación (Ley 115 de 1994)',
-    'Marco normativo principal del sistema educativo colombiano',
-    1,
-    TRUE,
-    TRUE
-FROM legislacion_modules m
-WHERE m.titulo = 'Marco Normativo Colombiano'
+    m.id, 'Ley General de Educación (Ley 115 de 1994)', 'Marco normativo principal del sistema educativo colombiano', NULL, 1, TRUE, TRUE
+FROM legislacion_modules m WHERE m.titulo = 'Marco Normativo Colombiano'
 UNION ALL
 SELECT
-    m.id,
-    'Constitución Política de Colombia',
-    'Principios fundamentales de la educación en la Constitución',
-    1,
-    TRUE,
-    TRUE
-FROM legislacion_modules m
-WHERE m.titulo = 'Constitución y Legislación';
+    m.id, 'Constitución Política de Colombia', 'Principios fundamentales de la educación en la Constitución', NULL, 1, TRUE, TRUE
+FROM legislacion_modules m WHERE m.titulo = 'Constitución y Legislación'
+-- Modulo 1: Fundamentos de IA
+UNION ALL SELECT m.id, '1.1 Historia de la IA', 'Evolución de la IA', $$<h2>Historia de la IA</h2><p>Breve historia y evolución de la IA en la educación.</p>$$, 1, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Fundamentos de IA en Educación'
+UNION ALL SELECT m.id, '1.2 Conceptos clave', 'Términos', $$<h2>Conceptos Clave</h2><p>Definición de Machine Learning, Redes Neuronales, etc.</p>$$, 2, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Fundamentos de IA en Educación'
+UNION ALL SELECT m.id, '1.3 IA débil vs fuerte', 'Tipos', $$<h2>Tipos de IA</h2><p>Diferencias entre IA enfocada e IA general.</p>$$, 3, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Fundamentos de IA en Educación'
+UNION ALL SELECT m.id, '1.4 IA Generativa', 'Modelos generativos', $$<h2>IA Generativa</h2><p>LLMs, generación de imágenes y texto.</p>$$, 4, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Fundamentos de IA en Educación'
+UNION ALL SELECT m.id, '1.5 Mitos de la IA', 'Realidades', $$<h2>Mitos</h2><p>Desmitificando el reemplazo docente.</p>$$, 5, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Fundamentos de IA en Educación'
+-- Modulo 2: Planificación
+UNION ALL SELECT m.id, '2.1 Prompts efectivos', 'Ingeniería de prompts', $$<h2>Prompts</h2><p>Estructura de un buen prompt.</p>$$, 1, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Planificación con IA'
+UNION ALL SELECT m.id, '2.2 Diseño de sílabo', 'Planificación', $$<h2>Sílabo</h2><p>Generación de estructuras curriculares.</p>$$, 2, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Planificación con IA'
+UNION ALL SELECT m.id, '2.3 Actividades interactivas', 'Creación', $$<h2>Actividades</h2><p>Juegos y dinámicas generadas con IA.</p>$$, 3, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Planificación con IA'
+UNION ALL SELECT m.id, '2.4 Adaptación curricular', 'Ajustes', $$<h2>Adaptación</h2><p>Personalización para DUA.</p>$$, 4, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Planificación con IA'
+UNION ALL SELECT m.id, '2.5 Recursos multimedia', 'Generación', $$<h2>Recursos</h2><p>Creación de imágenes y audio.</p>$$, 5, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Planificación con IA'
+-- Modulo 3: Evaluación
+UNION ALL SELECT m.id, '3.1 Rúbricas automatizadas', 'Creación', $$<h2>Rúbricas</h2><p>Diseño de matrices de evaluación.</p>$$, 1, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Evaluación y Retroalimentación con IA'
+UNION ALL SELECT m.id, '3.2 Feedback personalizado', 'Retroalimentación', $$<h2>Feedback</h2><p>Comentarios formativos escalables.</p>$$, 2, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Evaluación y Retroalimentación con IA'
+UNION ALL SELECT m.id, '3.3 Análisis de resultados', 'Métricas', $$<h2>Análisis</h2><p>Identificación de brechas de aprendizaje.</p>$$, 3, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Evaluación y Retroalimentación con IA'
+UNION ALL SELECT m.id, '3.4 Prevención de plagio', 'Originalidad', $$<h2>Prevención</h2><p>Uso ético y detectores (sus límites).</p>$$, 4, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Evaluación y Retroalimentación con IA'
+UNION ALL SELECT m.id, '3.5 Evaluaciones adaptativas', 'Pruebas', $$<h2>Evaluaciones</h2><p>Quizzes que cambian según el nivel.</p>$$, 5, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Evaluación y Retroalimentación con IA'
+-- Modulo 4: Ética
+UNION ALL SELECT m.id, '4.1 Privacidad de datos', 'Protección', $$<h2>Privacidad</h2><p>Leyes de protección del menor.</p>$$, 1, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Ética, Privacidad y Ciudadanía Digital con IA'
+UNION ALL SELECT m.id, '4.2 Sesgos algorítmicos', 'Equidad', $$<h2>Sesgos</h2><p>Discriminación en IA y cómo mitigarla.</p>$$, 2, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Ética, Privacidad y Ciudadanía Digital con IA'
+UNION ALL SELECT m.id, '4.3 Propiedad intelectual', 'Derechos', $$<h2>Propiedad</h2><p>Derechos de autor en obras generadas.</p>$$, 3, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Ética, Privacidad y Ciudadanía Digital con IA'
+UNION ALL SELECT m.id, '4.4 Uso responsable', 'Ciudadanía', $$<h2>Uso Responsable</h2><p>Fomentar pensamiento crítico.</p>$$, 4, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Ética, Privacidad y Ciudadanía Digital con IA'
+UNION ALL SELECT m.id, '4.5 Políticas escolares', 'Normas', $$<h2>Políticas</h2><p>Creación de manuales de convivencia sobre IA.</p>$$, 5, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Ética, Privacidad y Ciudadanía Digital con IA'
+-- Modulo 5: Liderazgo
+UNION ALL SELECT m.id, '5.1 Gestión del cambio', 'Liderazgo', $$<h2>Gestión del Cambio</h2><p>Vencer la resistencia docente.</p>$$, 1, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Liderazgo Pedagógico y Escalabilidad con IA'
+UNION ALL SELECT m.id, '5.2 Capacitación docente', 'Formación', $$<h2>Capacitación</h2><p>Modelos de formación entre pares.</p>$$, 2, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Liderazgo Pedagógico y Escalabilidad con IA'
+UNION ALL SELECT m.id, '5.3 Integración institucional', 'Escalabilidad', $$<h2>Integración</h2><p>Plataformas a nivel de colegio.</p>$$, 3, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Liderazgo Pedagógico y Escalabilidad con IA'
+UNION ALL SELECT m.id, '5.4 Casos de éxito', 'Ejemplos', $$<h2>Casos</h2><p>Estudios de colegios innovadores.</p>$$, 4, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Liderazgo Pedagógico y Escalabilidad con IA'
+UNION ALL SELECT m.id, '5.5 Futuro de la IA', 'Tendencias', $$<h2>Futuro</h2><p>Hacia dónde va la edtech.</p>$$, 5, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Liderazgo Pedagógico y Escalabilidad con IA'
+-- Modulo 6: Proyecto
+UNION ALL SELECT m.id, '6.1 Definición del reto', 'Fase 1', $$<h2>Reto</h2><p>Identificar problema áulico.</p>$$, 1, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Proyecto Integrador: IA Ética en Mi Práctica Docente'
+UNION ALL SELECT m.id, '6.2 Diseño de intervención', 'Fase 2', $$<h2>Diseño</h2><p>Plantear solución con IA.</p>$$, 2, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Proyecto Integrador: IA Ética en Mi Práctica Docente'
+UNION ALL SELECT m.id, '6.3 Implementación', 'Fase 3', $$<h2>Implementación</h2><p>Llevar al aula.</p>$$, 3, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Proyecto Integrador: IA Ética en Mi Práctica Docente'
+UNION ALL SELECT m.id, '6.4 Análisis de impacto', 'Fase 4', $$<h2>Análisis</h2><p>Medir resultados.</p>$$, 4, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Proyecto Integrador: IA Ética en Mi Práctica Docente'
+UNION ALL SELECT m.id, '6.5 Presentación final', 'Fase 5', $$<h2>Presentación</h2><p>Exponer a la comunidad.</p>$$, 5, TRUE, TRUE FROM ia_modules m WHERE m.titulo = 'Proyecto Integrador: IA Ética en Mi Práctica Docente';
 
 -- Quizzes
-WITH lessons_data AS (
+WITH base_lessons_data AS (
     SELECT l.id, l.titulo FROM lessons l
     WHERE l.titulo IN ('¿Qué es la Pedagogía?', 'Corrientes pedagógicas contemporáneas',
                        'Ley General de Educación (Ley 115 de 1994)', 'Constitución Política de Colombia')
+),
+ia_lessons_data AS (
+    SELECT l.id, l.titulo FROM lessons l
+    JOIN modules m ON l.modulo_id = m.id
+    JOIN courses c ON m.curso_id = c.id
+    WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+),
+ia_modules_data AS (
+    SELECT m.id, m.titulo FROM modules m
+    JOIN courses c ON m.curso_id = c.id
+    WHERE c.titulo = 'Inteligencia Artificial para Docentes'
 )
-INSERT INTO quizzes (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+INSERT INTO quizzes (leccion_id, modulo_id, pregunta, explicacion_correcta, explicacion_incorrecta, metadatos, estado_revision)
 SELECT
     l.id,
+    NULL::integer,
     CASE
         WHEN l.titulo = '¿Qué es la Pedagogía?' THEN '¿Cuál es la diferencia central entre pedagogía y didáctica?'
         WHEN l.titulo = 'Corrientes pedagógicas contemporáneas' THEN 'Según Ausubel, el aprendizaje significativo ocurre cuando:'
@@ -136,17 +227,66 @@ SELECT
         WHEN l.titulo = 'Corrientes pedagógicas contemporáneas' THEN 'El estudiante memoriza sin comprender.'
         WHEN l.titulo = 'Ley General de Educación (Ley 115 de 1994)' THEN 'Solo el calendario escolar.'
         WHEN l.titulo = 'Constitución Política de Colombia' THEN 'Ninguna de las anteriores.'
-    END
-FROM lessons_data l;
+    END,
+    '{"competencia": "Pedagógica", "dificultad": "baja", "tema": "Fundamentos"}'::jsonb,
+    'publicado'
+FROM base_lessons_data l
+UNION ALL
+SELECT
+    l.id,
+    NULL::integer,
+    'Pregunta de evaluación para: ' || l.titulo,
+    'Explicación correcta detallada de ' || l.titulo,
+    'Explicación del error común en ' || l.titulo,
+    jsonb_build_object(
+        'competencia', 'Uso y apropiación de IA',
+        'afirmacion', 'Aplica conceptos de ' || l.titulo,
+        'evidencia', 'Resuelve casos de uso',
+        'dificultad', 'media',
+        'tema', 'Inteligencia Artificial',
+        'fuente', 'Banco de ítems'
+    ),
+    'revision'
+FROM ia_lessons_data l
+UNION ALL
+SELECT
+    NULL::integer,
+    m.id,
+    'Pregunta integradora del módulo: ' || m.titulo,
+    'Respuesta correcta del módulo ' || m.titulo,
+    'Distractor común del módulo ' || m.titulo,
+    jsonb_build_object(
+        'competencia', 'Integración de IA',
+        'afirmacion', 'Sintetiza aprendizajes del módulo ' || m.titulo,
+        'evidencia', 'Aplica conceptos integrados',
+        'dificultad', 'alta',
+        'tema', 'Módulo de IA',
+        'fuente', 'Evaluación Módulo'
+    ),
+    'publicado'
+FROM ia_modules_data m;
 
 -- Quiz options
-WITH quiz_data AS (
+WITH base_quiz_data AS (
     SELECT q.id, q.leccion_id FROM quizzes q
     JOIN lessons l ON q.leccion_id = l.id
     WHERE l.titulo IN ('¿Qué es la Pedagogía?', 'Corrientes pedagógicas contemporáneas',
                        'Ley General de Educación (Ley 115 de 1994)', 'Constitución Política de Colombia')
+),
+ia_quiz_data AS (
+    SELECT q.id, q.leccion_id FROM quizzes q
+    JOIN lessons l ON q.leccion_id = l.id
+    JOIN modules m ON l.modulo_id = m.id
+    JOIN courses c ON m.curso_id = c.id
+    WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+),
+ia_modules_quiz_data AS (
+    SELECT q.id, q.modulo_id FROM quizzes q
+    JOIN modules m ON q.modulo_id = m.id
+    JOIN courses c ON m.curso_id = c.id
+    WHERE c.titulo = 'Inteligencia Artificial para Docentes' AND q.leccion_id IS NULL
 )
-INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden, explicacion_distractor)
 SELECT
     sub.id,
     CASE
@@ -184,16 +324,54 @@ SELECT
         WHEN sub.titulo <> 'Constitución Política de Colombia' AND sub.rn = 2 THEN TRUE
         ELSE FALSE
     END AS es_correcta,
-    sub.rn
+    sub.rn,
+    CASE
+        WHEN sub.titulo = 'Constitución Política de Colombia' AND sub.rn = 1 THEN NULL
+        WHEN sub.titulo <> 'Constitución Política de Colombia' AND sub.rn = 2 THEN NULL
+        ELSE 'Esta es una respuesta incorrecta de prueba.'
+    END AS explicacion_distractor
 FROM (
     SELECT
         q.id,
         l.titulo,
-        ROW_NUMBER() OVER (PARTITION BY q.id ORDER BY (SELECT NULL)) AS rn
-    FROM quiz_data q
+        s.rn
+    FROM base_quiz_data q
     JOIN lessons l ON q.leccion_id = l.id
+    CROSS JOIN (SELECT generate_series(1,4) as rn) s
 ) sub
-ORDER BY sub.id, sub.rn;
+UNION ALL
+SELECT
+    sub.id,
+    'Opción ' || sub.rn || ' para: ' || sub.titulo,
+    CASE WHEN sub.rn = 1 THEN TRUE ELSE FALSE END AS es_correcta,
+    sub.rn,
+    CASE WHEN sub.rn = 1 THEN NULL ELSE 'Distractor para analizar el nivel de apropiación de IA.' END AS explicacion_distractor
+FROM (
+    SELECT
+        q.id,
+        l.titulo,
+        s.rn
+    FROM ia_quiz_data q
+    JOIN lessons l ON q.leccion_id = l.id
+    CROSS JOIN (SELECT generate_series(1,4) as rn) s
+) sub
+UNION ALL
+SELECT
+    sub.id,
+    'Opción de módulo ' || sub.rn || ' para: ' || sub.titulo,
+    CASE WHEN sub.rn = 1 THEN TRUE ELSE FALSE END AS es_correcta,
+    sub.rn,
+    CASE WHEN sub.rn = 1 THEN NULL ELSE 'Distractor de módulo para analizar integración de conceptos.' END AS explicacion_distractor
+FROM (
+    SELECT
+        q.id,
+        m.titulo,
+        s.rn
+    FROM ia_modules_quiz_data q
+    JOIN modules m ON q.modulo_id = m.id
+    CROSS JOIN (SELECT generate_series(1,4) as rn) s
+) sub
+ORDER BY 1, 4;
 
 -- Badges (standalone)
 INSERT INTO badges (modulo_id, nombre, descripcion, icono, color)
