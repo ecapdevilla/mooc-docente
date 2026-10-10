@@ -74,4 +74,8 @@ class ApiClient {
 
 // Export singleton instance
 const api = new ApiClient();
-module.exports = api;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = api;
+} else {
+  window.apiClient = api;
+}

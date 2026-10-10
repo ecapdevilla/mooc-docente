@@ -384,12 +384,48 @@ SELECT DISTINCT
 FROM modules m
 WHERE m.badge_nombre IS NOT NULL;
 
--- Enrollments (re‑crear relaciones)
+-- Question Bank
+INSERT INTO question_bank (competencia, afirmacion, evidencia, dificultad, tema, fuente, estado, metadatos)
+SELECT
+    COALESCE(q.metadatos->>'competencia', 'Genérica'),
+    COALESCE(q.metadatos->>'afirmacion', 'Conoce el tema'),
+    COALESCE(q.metadatos->>'evidencia', 'Responde la pregunta'),
+    COALESCE(q.metadatos->>'dificultad', 'media'),
+    COALESCE(q.metadatos->>'tema', 'General'),
+    COALESCE(q.metadatos->>'fuente', 'Banco'),
+    'publicada',
+    q.metadatos
+FROM quizzes q
+JOIN lessons l ON q.leccion_id = l.id
+JOIN modules m ON l.modulo_id = m.id
+JOIN courses c ON m.curso_id = c.id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+UNION ALL
+SELECT
+    COALESCE(q.metadatos->>'competencia', 'Genérica'),
+    COALESCE(q.metadatos->>'afirmacion', 'Conoce el tema'),
+    COALESCE(q.metadatos->>'evidencia', 'Responde la pregunta'),
+    COALESCE(q.metadatos->>'dificultad', 'media'),
+    COALESCE(q.metadatos->>'tema', 'General'),
+    COALESCE(q.metadatos->>'fuente', 'Banco'),
+    'publicada',
+    q.metadatos
+FROM quizzes q
+JOIN modules m ON q.modulo_id = m.id
+JOIN courses c ON m.curso_id = c.id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes' AND q.leccion_id IS NULL;
+
+-- Course completion rules
+INSERT INTO course_completion_rules (course_id, regla)
+SELECT id, '{"min_lecciones_pct": 100, "min_promedio_pct": 80, "proyecto_requerido": true}'::jsonb
+FROM courses WHERE titulo = 'Inteligencia Artificial para Docentes';
+
+-- Enrollments (re-crear relaciones)
 WITH users_data AS (
     SELECT id FROM users WHERE email IN ('admin@meritodocente.com', 'prof@meritodocente.com', 'student@meritodocente.com')
 ),
 courses_data AS (
-    SELECT id FROM courses WHERE titulo IN ('Fundamentos de Pedagogía y Didáctica', 'Legislación Educativa Colombiana')
+    SELECT id FROM courses WHERE titulo IN ('Fundamentos de Pedagogía y Didáctica', 'Legislación Educativa Colombiana', 'Inteligencia Artificial para Docentes')
 )
 INSERT INTO enrollments (usuario_id, curso_id, fecha_inscripcion)
 SELECT
@@ -412,7 +448,7 @@ FROM users u
 JOIN lessons l ON l.modulo_id IN (
     SELECT m.id FROM modules m
     JOIN courses c ON m.curso_id = c.id
-    WHERE c.titulo IN ('Fundamentos de Pedagogía y Didáctica', 'Legislación Educativa Colombiana')
+    WHERE c.titulo IN ('Fundamentos de Pedagogía y Didáctica', 'Legislación Educativa Colombiana', 'Inteligencia Artificial para Docentes')
 );
 
 -- Activity progress (professor & student completed first lesson)
@@ -425,7 +461,7 @@ SELECT
     1,
     100
 FROM users u
-JOIN lessons l ON l.titulo = '¿Qué es la Pedagogía?'
+JOIN lessons l ON l.titulo IN ('¿Qué es la Pedagogía?', '1.1 Historia de la IA')
 WHERE u.email IN ('prof@meritodocente.com', 'student@meritodocente.com')
 ON CONFLICT (usuario_id, leccion_id) DO UPDATE SET completada = TRUE, fecha_completada = CURRENT_TIMESTAMP, intentos = user_progress.intentos + 1, puntaje = EXCLUDED.puntaje;
 

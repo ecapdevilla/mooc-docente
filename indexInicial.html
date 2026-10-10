@@ -965,6 +965,7 @@
 
     .cover-mod1 { background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); }
     .cover-mod2 { background: linear-gradient(135deg, #059669 0%, #10B981 100%); }
+    .cover-mod3 { background: linear-gradient(135deg, #6D28D9 0%, #A78BFA 100%); }
     .cover-locked { background: linear-gradient(135deg, #64748B 0%, #94A3B8 100%); filter: grayscale(0.5); }
 
     .module-status {
@@ -1024,6 +1025,8 @@
     }
 
     .level-basico { background: var(--accent-soft); color: var(--accent-dark); }
+    .level-intermedio { background: #FEF3C7; color: #B45309; }
+    .level-avanzado { background: #FEE2E2; color: #B91C1C; }
 
     .module-body h3 {
       font-size: 1.05rem;
@@ -2324,6 +2327,205 @@
               correct: 1,
               feedbackOk: '¡Excelente! El Decreto 1278 regula la carrera docente y el concurso de méritos.',
               feedbackKo: 'El Decreto 1278 es el Estatuto Docente: regula la carrera y el concurso de méritos.'
+            }
+          }
+        ]
+      },
+      {
+        id: 'mod3',
+        title: 'Inteligencia Artificial para Docentes',
+        area: 'Tecnología Educativa',
+        level: 'Intermedio',
+        levelClass: 'level-intermedio',
+        cover: 'cover-mod3',
+        icon: 'fas fa-robot',
+        description: 'Domina el uso pedagógico de la IA en el aula: planificación, evaluación, personalización y ética. Herramientas prácticas para transformar tu práctica docente con tecnología responsable.',
+        badge: { name: 'Explorador IA', icon: 'fas fa-robot', color: 'blue' },
+        lessons: [
+          {
+            title: '1.1 Historia y fundamentos de la IA',
+            content: `
+              <p>La <strong>Inteligencia Artificial (IA)</strong> no es nueva: lleva más de 70 años desarrollándose. Entender su evolución ayuda a los docentes a situarla críticamente y a aprovecharla con responsabilidad pedagógica.</p>
+              <h4>Hitos clave</h4>
+              <ul>
+                <li><strong>1950 – Test de Turing:</strong> Alan Turing propone la pregunta «¿Puede una máquina pensar?»</li>
+                <li><strong>1956 – Conferencia de Dartmouth:</strong> se acuña el término «Inteligencia Artificial».</li>
+                <li><strong>2012 – Deep Learning:</strong> las redes neuronales profundas superan el rendimiento humano en reconocimiento de imágenes.</li>
+                <li><strong>2022 – IA Generativa:</strong> ChatGPT y modelos similares democratizan el acceso a la IA para docentes.</li>
+              </ul>
+              <h4>Conceptos esenciales</h4>
+              <ul>
+                <li><strong>Machine Learning:</strong> la máquina aprende de datos sin ser programada explícitamente.</li>
+                <li><strong>Red neuronal:</strong> modelo matemático inspirado en el cerebro humano.</li>
+                <li><strong>IA Generativa:</strong> modelos que crean texto, imágenes y audio a partir de instrucciones.</li>
+              </ul>
+              <div class="info-box"><strong>Relevancia docente:</strong> la IA generativa ya está en manos de tus estudiantes. Comprenderla te permite orientar su uso ético y pedagógico.</div>
+            `,
+            quiz: {
+              question: '¿Qué caracteriza a la IA Generativa frente a otros tipos de IA?',
+              options: [
+                'Solo puede realizar cálculos matemáticos avanzados.',
+                'Crea contenido nuevo (texto, imágenes, audio) a partir de instrucciones del usuario.',
+                'Requiere programar cada respuesta manualmente.',
+                'Funciona únicamente con conexión física a servidores educativos.'
+              ],
+              correct: 1,
+              feedbackOk: '¡Correcto! La IA Generativa produce contenido nuevo a partir de instrucciones (prompts), lo que la hace útil para planear clases, generar recursos y dar retroalimentación.',
+              feedbackKo: 'La IA Generativa se distingue por crear contenido nuevo (texto, imagen, audio) a partir de instrucciones del usuario, no por calcular o programar manualmente.'
+            }
+          },
+          {
+            title: '2.1 Prompts efectivos para planificar clases',
+            content: `
+              <p>Un <strong>prompt</strong> es la instrucción que le das a una IA. Su calidad determina directamente la calidad de la respuesta. Los docentes que dominan el arte del prompt pueden generar planeaciones, rúbricas y materiales en minutos.</p>
+              <h4>Estructura de un prompt docente efectivo</h4>
+              <ul>
+                <li><strong>Rol:</strong> «Actúa como experto en diseño curricular para primaria colombiana…»</li>
+                <li><strong>Tarea:</strong> «…crea una secuencia didáctica de 3 sesiones sobre…»</li>
+                <li><strong>Contexto:</strong> «…para estudiantes de grado 5° con acceso limitado a tecnología…»</li>
+                <li><strong>Formato:</strong> «…presenta el resultado en tabla con columnas: objetivo, actividad, tiempo, recursos.»</li>
+              </ul>
+              <h4>Errores comunes</h4>
+              <ul>
+                <li>Prompts vagos («dame ideas para una clase»).</li>
+                <li>No especificar el nivel educativo ni el contexto.</li>
+                <li>No revisar críticamente el resultado generado.</li>
+              </ul>
+              <div class="info-box"><strong>Tip práctico:</strong> siempre verifica la información generada con fuentes confiables. La IA puede «alucinar» datos incorrectos.</div>
+            `,
+            quiz: {
+              question: 'Al diseñar un prompt para planificar una clase, ¿qué elemento es más importante incluir?',
+              options: [
+                'El nombre del docente y la institución educativa.',
+                'El rol, la tarea, el contexto del grupo y el formato deseado.',
+                'La fecha exacta y el número de estudiantes.',
+                'El nombre de la herramienta de IA que se va a usar.'
+              ],
+              correct: 1,
+              feedbackOk: '¡Excelente! Un prompt efectivo incluye rol, tarea, contexto y formato para obtener respuestas precisas y utilizables.',
+              feedbackKo: 'La clave está en la especificidad: rol (quién habla), tarea (qué necesitas), contexto (para quién) y formato (cómo lo quieres).'
+            }
+          },
+          {
+            title: '3.1 Evaluación y retroalimentación con IA',
+            content: `
+              <p>La IA puede transformar la evaluación formativa al permitir retroalimentación inmediata, personalizada y escalable. Sin embargo, el juicio pedagógico del docente sigue siendo insustituible.</p>
+              <h4>Usos prácticos de la IA en evaluación</h4>
+              <ul>
+                <li><strong>Diseño de rúbricas:</strong> genera matrices de valoración con criterios e indicadores diferenciados.</li>
+                <li><strong>Retroalimentación textual:</strong> analiza respuestas abiertas y sugiere comentarios formativos.</li>
+                <li><strong>Banco de ítems:</strong> crea preguntas de selección múltiple alineadas a los estándares.</li>
+                <li><strong>Análisis de brechas:</strong> identifica patrones de error para orientar refuerzo.</li>
+              </ul>
+              <h4>Limitaciones a considerar</h4>
+              <ul>
+                <li>La IA no evalúa contexto emocional ni relacional del estudiante.</li>
+                <li>Puede sesgar la evaluación si los datos de entrenamiento son parciales.</li>
+                <li>El docente debe validar siempre los resultados antes de compartirlos.</li>
+              </ul>
+              <div class="info-box"><strong>Principio clave:</strong> la IA apoya la evaluación formativa, pero la decisión pedagógica final siempre debe ser del docente.</div>
+            `,
+            quiz: {
+              question: '¿Cuál de los siguientes usos de la IA en evaluación es el más adecuado pedagógicamente?',
+              options: [
+                'Delegar completamente la calificación de exámenes a la IA sin revisión docente.',
+                'Usar la IA para generar rúbricas y sugerir retroalimentación, validando los resultados antes de compartirlos.',
+                'Reemplazar al docente por sistemas automatizados de evaluación.',
+                'Usar la IA solo para diseñar el formato visual de los exámenes.'
+              ],
+              correct: 1,
+              feedbackOk: '¡Muy bien! La IA es una herramienta de apoyo: genera propuestas que el docente revisa, ajusta y valida antes de usarlas.',
+              feedbackKo: 'La IA apoya el proceso evaluativo, pero siempre requiere la revisión y el juicio pedagógico del docente para garantizar equidad y pertinencia.'
+            }
+          },
+          {
+            title: '4.1 Ética, privacidad y uso responsable de la IA',
+            content: `
+              <p>El uso de IA en el aula conlleva responsabilidades éticas fundamentales. Los docentes deben proteger la privacidad de sus estudiantes y fomentar un uso crítico y responsable de la tecnología.</p>
+              <h4>Principios éticos del uso de IA en educación</h4>
+              <ul>
+                <li><strong>Privacidad:</strong> no compartir datos personales de menores con plataformas de IA sin consentimiento informado.</li>
+                <li><strong>Equidad:</strong> los sistemas de IA pueden perpetuar sesgos raciales, de género o socioeconómicos.</li>
+                <li><strong>Transparencia:</strong> informar a estudiantes y familias cuando se usa IA en el proceso educativo.</li>
+                <li><strong>Propiedad intelectual:</strong> el contenido generado con IA tiene implicaciones de derechos de autor.</li>
+              </ul>
+              <h4>Marco normativo colombiano</h4>
+              <ul>
+                <li><strong>Ley 1581 de 2012:</strong> Ley de Protección de Datos Personales (Habeas Data).</li>
+                <li><strong>Código de Infancia (Ley 1098):</strong> protección especial de datos de menores.</li>
+              </ul>
+              <div class="info-box"><strong>Reflexión docente:</strong> ¿Tus estudiantes saben que estás usando IA? La transparencia genera confianza y modela un uso ético de la tecnología.</div>
+            `,
+            quiz: {
+              question: 'Según la normatividad colombiana, ¿qué debe hacer un docente antes de usar una plataforma de IA con datos de sus estudiantes menores de edad?',
+              options: [
+                'Simplemente usar la plataforma si es gratuita y educativa.',
+                'Verificar las políticas de privacidad y obtener consentimiento informado, conforme a la Ley 1581 de 2012.',
+                'Registrar a los estudiantes con nombres falsos para proteger su identidad.',
+                'Esperar instrucciones del Ministerio de Educación para cada caso.'
+              ],
+              correct: 1,
+              feedbackOk: '¡Correcto! La Ley 1581 de 2012 exige proteger los datos personales y requerir consentimiento, especialmente tratándose de menores.',
+              feedbackKo: 'La Ley 1581 de 2012 (Habeas Data) obliga a verificar políticas de privacidad y obtener consentimiento informado antes de procesar datos de estudiantes menores.'
+            }
+          },
+          {
+            title: '5.1 Liderazgo pedagógico con IA',
+            content: `
+              <p>El docente del siglo XXI no solo usa IA: lidera su integración en la institución educativa, acompaña a sus colegas y facilita el cambio cultural necesario para aprovecharla pedagógicamente.</p>
+              <h4>Competencias del docente líder en IA</h4>
+              <ul>
+                <li><strong>Curación crítica:</strong> selecciona herramientas de IA relevantes y confiables para su contexto.</li>
+                <li><strong>Formación entre pares:</strong> comparte sus aprendizajes y genera comunidades de práctica.</li>
+                <li><strong>Gestión del cambio:</strong> identifica resistencias y acompaña la adopción gradual.</li>
+                <li><strong>Investigación-acción:</strong> evalúa el impacto real de la IA en los aprendizajes de sus estudiantes.</li>
+              </ul>
+              <h4>Niveles de integración (Marco DigComp)</h4>
+              <ul>
+                <li><strong>Nivel 1 – Explorador:</strong> usa herramientas básicas de IA.</li>
+                <li><strong>Nivel 2 – Adoptante:</strong> integra IA en su planeación regularmente.</li>
+                <li><strong>Nivel 3 – Líder:</strong> diseña estrategias institucionales e investiga su impacto.</li>
+              </ul>
+              <div class="info-box"><strong>Meta del MOOC:</strong> avanzar de nivel explorador a adoptante, con bases para convertirte en líder pedagógico de la IA en tu institución.</div>
+            `,
+            quiz: {
+              question: '¿Qué distingue a un docente "líder" en IA de uno "explorador" según el Marco DigComp?',
+              options: [
+                'El líder usa más herramientas de IA que el explorador.',
+                'El líder diseña estrategias institucionales e investiga el impacto de la IA; el explorador solo usa herramientas básicas.',
+                'El líder tiene más años de experiencia docente que el explorador.',
+                'No hay diferencia real: ambos niveles son equivalentes.'
+              ],
+              correct: 1,
+              feedbackOk: '¡Excelente! El nivel líder implica diseño estratégico, formación de pares e investigación del impacto, más allá del uso individual de herramientas.',
+              feedbackKo: 'El Marco DigComp distingue al líder por su capacidad de diseñar estrategias institucionales, formar a colegas e investigar el impacto real de la IA.'
+            }
+          },
+          {
+            title: '6.1 Proyecto integrador: IA ética en mi práctica',
+            content: `
+              <p>El proyecto integrador es la culminación del curso. Diseñarás una <strong>intervención pedagógica real</strong> que incorpore IA de forma ética, justificada y medible en tu contexto docente.</p>
+              <h4>Fases del proyecto</h4>
+              <ul>
+                <li><strong>Fase 1 – Definición del reto:</strong> identifica un problema concreto en tu aula (ej.: bajo nivel lector, escasa retroalimentación formativa).</li>
+                <li><strong>Fase 2 – Diseño de la intervención:</strong> planifica cómo usar la IA para abordar el reto, con criterios éticos explícitos.</li>
+                <li><strong>Fase 3 – Implementación:</strong> ejecuta la intervención con al menos un grupo de estudiantes.</li>
+                <li><strong>Fase 4 – Análisis de impacto:</strong> mide resultados con evidencias (registros, rúbricas, encuestas).</li>
+                <li><strong>Fase 5 – Comunicación:</strong> presenta los hallazgos a tu comunidad educativa.</li>
+              </ul>
+              <div class="info-box"><strong>Criterio de evaluación:</strong> el proyecto se valora por la coherencia pedagógica, el manejo ético de datos y la calidad de la reflexión sobre el impacto, no por la sofisticación tecnológica.</div>
+            `,
+            quiz: {
+              question: '¿Cuál es el criterio principal para evaluar el proyecto integrador de este curso?',
+              options: [
+                'El número de herramientas de IA utilizadas en la intervención.',
+                'La coherencia pedagógica, el manejo ético de datos y la reflexión sobre el impacto.',
+                'El presupuesto invertido en tecnología para la intervención.',
+                'La cantidad de estudiantes que participaron en el proyecto.'
+              ],
+              correct: 1,
+              feedbackOk: '¡Muy bien! Lo esencial es la reflexión pedagógica y ética, no la complejidad tecnológica. Un proyecto simple pero bien fundamentado es más valioso.',
+              feedbackKo: 'El proyecto integrador se evalúa por coherencia pedagógica, manejo ético de datos y reflexión sobre el impacto real en los aprendizajes, no por la cantidad de herramientas.'
             }
           }
         ]
