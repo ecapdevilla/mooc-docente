@@ -16,11 +16,7 @@ router.use((req, res, next) => {
 });
 
 const hash = (value) => crypto.createHash('sha256').update(value).digest('hex');
-const isProductionDeployment = () =>
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.VERCEL_ENV !== 'preview' && process.env.NODE_ENV === 'production');
 const isEnabled = () =>
-  !isProductionDeployment() &&
   process.env.PILOT_DIAGNOSTIC_ENABLED === 'true' &&
   typeof process.env.PILOT_ACCESS_CODE === 'string' &&
   process.env.PILOT_ACCESS_CODE.length >= 32 &&
