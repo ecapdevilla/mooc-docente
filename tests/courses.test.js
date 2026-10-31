@@ -32,7 +32,10 @@ describe('Cursos', () => {
     const options = lessonWithQuiz.quizzes[0].opciones;
     expect(Array.isArray(options)).toBe(true);
     expect(options.length).toBeGreaterThan(0);
-    expect(options[0]).toHaveProperty('es_correcta');
+    expect(lessonWithQuiz.quizzes[0]).not.toHaveProperty('explicacion_correcta');
+    expect(lessonWithQuiz.quizzes[0]).not.toHaveProperty('explicacion_incorrecta');
+    expect(options[0]).toHaveProperty('opcion');
+    expect(options[0]).not.toHaveProperty('es_correcta');
   });
 
   test('GET /api/v1/courses/:id inexistente devuelve 404', async () => {

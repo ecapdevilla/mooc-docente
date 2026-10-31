@@ -58,9 +58,9 @@ router.get('/:id', async (req, res) => {
       const lessonsWithQuiz = [];
       for (const lesson of lessons) {
         const { rows: quizzes } = await pool.query(
-          `SELECT q.*,
+          `SELECT q.id, q.pregunta,
            (SELECT json_agg(
-                     json_build_object('id', qo.id, 'opcion', qo.opcion, 'es_correcta', qo.es_correcta, 'orden', qo.orden)
+                     json_build_object('id', qo.id, 'opcion', qo.opcion, 'orden', qo.orden)
                      ORDER BY qo.orden
                    )
             FROM quiz_options qo

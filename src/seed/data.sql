@@ -257,6 +257,26 @@ AND NOT EXISTS (
     AND l.titulo = '¿Qué es la Pedagogía?'
 );
 
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Estrategias didácticas para el aula',
+    'Estrategias didácticas contextualizadas, como el aprendizaje basado en proyectos, el aula invertida, la gamificación y el debate dirigido.',
+    2,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Fundamentos de Pedagogía y Didáctica'
+AND m.titulo = 'Fundamentos de Pedagogía'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Estrategias didácticas para el aula'
+);
+
 
 INSERT INTO lessons
 (modulo_id, titulo, contenido, orden, tiene_quiz, activo)
@@ -318,6 +338,26 @@ AND NOT EXISTS (
     FROM lessons l
     WHERE l.modulo_id = m.id
     AND l.titulo = 'Constitución Política de Colombia'
+);
+
+INSERT INTO lessons
+(modulo_id, titulo, contenido, orden, tiene_quiz, activo)
+SELECT
+    m.id,
+    'Decreto 1278 de 2002: Estatuto Docente',
+    'El Decreto 1278 de 2002 regula el Estatuto de Profesionalización Docente, el ingreso por concurso de méritos, la carrera docente y la evaluación de desempeño.',
+    2,
+    TRUE,
+    TRUE
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Legislación Educativa Colombiana'
+AND m.titulo = 'Marco Normativo Colombiano'
+AND NOT EXISTS (
+    SELECT 1
+    FROM lessons l
+    WHERE l.modulo_id = m.id
+    AND l.titulo = 'Decreto 1278 de 2002: Estatuto Docente'
 );
 
 
@@ -634,6 +674,35 @@ AND NOT EXISTS (
         '¿Cuál es el artículo principal que garantiza la educación en la Constitución?'
 );
 
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    '¿Qué caracteriza al aprendizaje basado en proyectos?',
+    'El aprendizaje basado en proyectos parte de problemas reales y desarrolla competencias en los estudiantes.',
+    'El ABP se centra en resolver problemas reales y aplicar aprendizajes, no solo en memorizar o escuchar exposiciones.'
+FROM lessons l
+WHERE l.titulo = 'Estrategias didácticas para el aula'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta = '¿Qué caracteriza al aprendizaje basado en proyectos?'
+);
+
+INSERT INTO quizzes
+(leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
+SELECT
+    l.id,
+    '¿Qué regula principalmente el Decreto 1278 de 2002?',
+    'El Decreto 1278 regula la carrera docente y el concurso de méritos.',
+    'El Decreto 1278 es el Estatuto de Profesionalización Docente; no regula el calendario escolar, impuestos ni transporte.'
+FROM lessons l
+WHERE l.titulo = 'Decreto 1278 de 2002: Estatuto Docente'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes q
+    WHERE q.leccion_id = l.id
+    AND q.pregunta = '¿Qué regula principalmente el Decreto 1278 de 2002?'
+);
 
 INSERT INTO quizzes
 (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta)
@@ -1024,121 +1093,7 @@ AND NOT EXISTS (
     AND q.pregunta LIKE 'Durante el segundo período, la madre de un estudiante de quinto grado%'
 );
 
-/* Reconciliación: el seed es la fuente canónica de las opciones.
-   Se eliminan opciones obsoletas de los quizzes sembrados y luego
-   se reinserta el set completo (idempotente). */
-DELETE FROM quiz_options qo
-USING quizzes q, lessons l
-WHERE qo.quiz_id = q.id
-  AND l.id = q.leccion_id
-  AND (
-    (
-      l.titulo = '¿Qué es la Pedagogía?'
-      AND q.pregunta = '¿Cuál es la diferencia central entre pedagogía y didáctica?'
-    )
-    OR (
-      l.titulo = 'Corrientes pedagógicas contemporáneas'
-      AND q.pregunta = 'Según Ausubel, el aprendizaje significativo ocurre cuando:'
-    )
-    OR (
-      l.titulo = 'Ley General de Educación (Ley 115 de 1994)'
-      AND q.pregunta = '¿Qué establece la Ley General de Educación (Ley 115 de 1994)?'
-    )
-    OR (
-      l.titulo = 'Constitución Política de Colombia'
-      AND q.pregunta = '¿Cuál es el artículo principal que garantiza la educación en la Constitución?'
-    )
-        OR (
-            l.titulo = 'Evaluación integral y autonomía del SIEE'
-            AND q.pregunta LIKE 'Al finalizar un período, una prueba acumulativa arroja resultados bajos%'
-        )
-        OR (
-            l.titulo = 'Evaluación integral y autonomía del SIEE'
-            AND q.pregunta LIKE 'En una institución educativa oficial, el SIEE establece desde el inicio del año%'
-        )
-        OR (
-            l.titulo = 'Evaluación integral y autonomía del SIEE'
-            AND q.pregunta LIKE 'Al finalizar el tercer período, una docente de grado séptimo%'
-        )
-        OR (
-            l.titulo = 'Evaluación integral y autonomía del SIEE'
-            AND q.pregunta LIKE 'En una institución oficial, el SIEE establece que la autoevaluación es una evidencia%'
-        )
-        OR (
-            l.titulo = 'Convivencia escolar y protección frente al acoso'
-            AND q.pregunta LIKE 'Durante un proyecto de grado octavo, un estudiante recibe montajes%'
-        )
-        OR (
-            l.titulo = 'Educación inclusiva y ajustes pedagógicos'
-            AND q.pregunta LIKE 'Una estudiante de sexto grado presenta dificultades persistentes%'
-        )
-        OR (
-            l.titulo = 'PEI, currículo y autonomía institucional'
-            AND q.pregunta LIKE 'Una institución educativa oficial inicia la revisión de su Proyecto Educativo Institucional%'
-        )
-        OR (
-            l.titulo = 'Gobierno escolar y distribución de competencias'
-            AND q.pregunta LIKE 'En una institución oficial se presentan dificultades reiteradas con el cumplimiento de horarios%'
-        )
-        OR (
-            l.titulo = 'Función docente, planeación y contexto'
-            AND q.pregunta LIKE 'Una docente de Ciencias Naturales de grado sexto recibe al inicio del año%'
-        )
-        OR (
-            l.titulo = 'Familia, autonomía escolar y responsabilidad docente'
-            AND q.pregunta LIKE 'Durante el segundo período, la madre de un estudiante de quinto grado%'
-        )
-        OR (
-            l.titulo = 'Convivencia escolar y protección frente al acoso'
-            AND q.pregunta LIKE 'Durante una actividad de laboratorio en grado décimo desaparece un teléfono celular%'
-        )
-        OR (
-            l.titulo = 'Gobierno escolar y distribución de competencias'
-            AND q.pregunta LIKE 'Después de analizar los resultados institucionales de dos años consecutivos%'
-        )
-        OR (
-            l.titulo = 'Función docente, planeación y contexto'
-            AND q.pregunta LIKE 'Un docente de Ciencias Sociales de grado noveno decide reemplazar durante un período%'
-        )
-        OR (
-            l.titulo = 'Protección de derechos, confidencialidad y actuación institucional'
-            AND q.pregunta LIKE 'Una estudiante de grado octavo solicita hablar en privado%'
-        )
-        OR (
-            l.titulo = 'Evaluación integral y autonomía del SIEE'
-            AND q.pregunta LIKE 'En grado octavo, cuatro estudiantes desarrollan durante seis semanas%'
-        )
-        OR (
-            l.titulo = 'PEI, currículo y autonomía institucional'
-            AND q.pregunta LIKE 'Una institución oficial identifica un aumento sostenido de reprobación%'
-        )
-        OR (
-            l.titulo = 'Educación inclusiva y ajustes pedagógicos'
-            AND q.pregunta LIKE 'Una estudiante de séptimo grado ha trabajado durante el año%'
-        )
-        OR (
-            l.titulo = 'Convivencia escolar y protección frente al acoso'
-            AND q.pregunta LIKE 'Dos estudiantes de grado noveno mantienen desde hace meses%'
-        )
-        OR (
-            l.titulo = 'Familia, información y participación educativa'
-            AND q.pregunta LIKE 'Durante el primer período, un estudiante de cuarto grado%'
-        )
-        OR (l.titulo = 'Carrera docente, traslados y provisión de vacantes' AND q.pregunta LIKE 'En una entidad territorial certificada se produce una vacante definitiva%')
-        OR (l.titulo = 'Fondo de Servicios Educativos y contratación' AND q.pregunta LIKE 'Una institución educativa requiere adquirir equipos para reemplazar elementos dañados%')
-        OR (l.titulo = 'Competencias disciplinarias y gobierno escolar' AND q.pregunta LIKE 'Dos docentes mantienen un conflicto que comienza a afectar%')
-        OR (l.titulo = 'Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector dispone que todos los docentes permanezcan diariamente%')
-        OR (l.titulo = 'Protección de derechos, confidencialidad y actuación institucional' AND q.pregunta LIKE 'Al finalizar la jornada, el acudiente de un estudiante de primaria%')
-        OR (l.titulo = 'Convivencia escolar y protección frente al acoso' AND q.pregunta LIKE 'Un estudiante de grado décimo acumula durante el año%')
-        OR (l.titulo = 'Función docente, planeación y contexto' AND q.pregunta LIKE 'El rector solicita a los docentes registrar semanalmente%')
-        OR (l.titulo = 'Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'Durante el primer período, un estudiante demuestra desempeños superiores%')
-        OR (l.titulo = 'Evaluación integral y autonomía del SIEE' AND q.pregunta LIKE 'En septiembre, después de identificar inconsistencias%')
-        OR (l.titulo = 'Familia, información y participación educativa' AND q.pregunta LIKE 'Un estudiante de grado undécimo cumple 18 años%')
-        OR (
-            l.titulo = 'PEI, participación y autonomía institucional'
-            AND q.pregunta LIKE 'Una institución identifica cambios en su población%'
-        )
-  );
+/* Las opciones se agregan de forma idempotente. Las opciones existentes se conservan para proteger referencias históricas; las obsoletas requieren una migración revisada. */
 
 INSERT INTO quiz_options
 (quiz_id, opcion, es_correcta, orden)
@@ -1997,6 +1952,232 @@ AND u.email IN (
 AND c.titulo = 'Fundamentos de Pedagogía y Didáctica'
 AND l.titulo = '¿Qué es la Pedagogía?';
 
+/* ============================================================
+   CURSO: INTELIGENCIA ARTIFICIAL PARA DOCENTES
+   Inserciones idempotentes: no se eliminan ni reinician datos.
+   ============================================================ */
+
+INSERT INTO courses (titulo, area, nivel, descripcion, icono, activo)
+SELECT
+    'Inteligencia Artificial para Docentes',
+    'Tecnología Educativa',
+    'Intermedio',
+    'Uso pedagógico de IA para planificación, evaluación, ética y proyectos docentes.',
+    'fas fa-robot',
+    TRUE
+WHERE NOT EXISTS (
+    SELECT 1 FROM courses WHERE titulo = 'Inteligencia Artificial para Docentes'
+);
+
+WITH ia_course AS (
+    SELECT id FROM courses WHERE titulo = 'Inteligencia Artificial para Docentes'
+),
+ia_modules (titulo, descripcion, orden, badge_nombre, badge_icono, badge_color) AS (
+    VALUES
+      ('Fundamentos de IA en Educación', 'Conceptos y fundamentos de IA aplicados a la educación.', 1, 'Explorador IA', 'fas fa-robot', 'blue'),
+      ('Planificación con IA', 'Diseño de experiencias de aprendizaje con IA generativa.', 2, 'Planificador IA', 'fas fa-calendar-alt', 'green'),
+      ('Evaluación y Retroalimentación con IA', 'Uso responsable de IA para evaluación formativa.', 3, 'Evaluador IA', 'fas fa-chart-line', 'orange'),
+      ('Ética, Privacidad y Ciudadanía Digital con IA', 'Privacidad, sesgos y ciudadanía digital.', 4, 'Guardián Ético', 'fas fa-shield-alt', 'red'),
+      ('Liderazgo Pedagógico y Escalabilidad con IA', 'Liderazgo docente e integración institucional.', 5, 'Líder IA', 'fas fa-users-cog', 'purple'),
+      ('Proyecto Integrador: IA Ética en Mi Práctica Docente', 'Diseño de una intervención docente ética con IA.', 6, 'Practicante IA', 'fas fa-project-diagram', 'teal')
+)
+INSERT INTO modules
+    (curso_id, titulo, descripcion, orden, badge_nombre, badge_icono, badge_color, activo)
+SELECT
+    c.id, m.titulo, m.descripcion, m.orden, m.badge_nombre, m.badge_icono, m.badge_color, TRUE
+FROM ia_course c
+CROSS JOIN ia_modules m
+WHERE NOT EXISTS (
+    SELECT 1 FROM modules existing
+    WHERE existing.curso_id = c.id AND existing.titulo = m.titulo
+);
+
+WITH ia_lessons (module_title, lesson_title, description, content, lesson_order) AS (
+    VALUES
+      ('Fundamentos de IA en Educación', '1.1 Historia y fundamentos de la IA', 'Historia y conceptos esenciales de inteligencia artificial.', '<p>Historia de la IA, aprendizaje automático, redes neuronales e IA generativa en educación.</p>', 1),
+      ('Planificación con IA', '2.1 Prompts efectivos para planificar clases', 'Estructura de instrucciones efectivas para planificar.', '<p>Un prompt docente efectivo define rol, tarea, contexto y formato; el resultado siempre requiere revisión crítica.</p>', 1),
+      ('Evaluación y Retroalimentación con IA', '3.1 Evaluación y retroalimentación con IA', 'Apoyo de IA para evaluación formativa y retroalimentación.', '<p>La IA puede apoyar rúbricas y retroalimentación, manteniendo el juicio pedagógico del docente.</p>', 1),
+      ('Ética, Privacidad y Ciudadanía Digital con IA', '4.1 Ética, privacidad y uso responsable de la IA', 'Protección de datos, equidad y transparencia.', '<p>El uso de IA requiere proteger datos personales, considerar sesgos y actuar con transparencia.</p>', 1),
+      ('Liderazgo Pedagógico y Escalabilidad con IA', '5.1 Liderazgo pedagógico con IA', 'Liderazgo docente e integración institucional responsable.', '<p>El liderazgo pedagógico integra IA, acompaña a colegas y evalúa su impacto en el aprendizaje.</p>', 1),
+      ('Proyecto Integrador: IA Ética en Mi Práctica Docente', '6.1 Proyecto integrador: IA ética en mi práctica', 'Diseño y evaluación de una intervención docente con IA.', '<p>El proyecto integra definición del reto, diseño, implementación, análisis de impacto y comunicación.</p>', 1)
+)
+INSERT INTO lessons (modulo_id, titulo, descripcion, contenido, orden, tiene_quiz, activo)
+SELECT m.id, l.lesson_title, l.description, l.content, l.lesson_order, TRUE, TRUE
+FROM ia_lessons l
+JOIN modules m ON m.titulo = l.module_title
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+AND NOT EXISTS (
+    SELECT 1 FROM lessons existing
+    WHERE existing.modulo_id = m.id AND existing.titulo = l.lesson_title
+);
+
+WITH ia_questions (lesson_title, question, explanation_correct, explanation_incorrect, topic) AS (
+    VALUES
+      ('1.1 Historia y fundamentos de la IA', '¿Qué caracteriza a la IA Generativa frente a otros tipos de IA?', 'La IA generativa crea contenido nuevo a partir de instrucciones del usuario.', 'La IA generativa no se limita a cálculos ni requiere programar manualmente cada respuesta.', 'Fundamentos de IA'),
+      ('2.1 Prompts efectivos para planificar clases', 'Al diseñar un prompt para planificar una clase, ¿qué elemento es más importante incluir?', 'Un prompt efectivo define rol, tarea, contexto del grupo y formato deseado.', 'El nombre de la herramienta o datos secundarios no sustituyen una instrucción contextualizada.', 'Planificación con IA'),
+      ('3.1 Evaluación y retroalimentación con IA', '¿Cuál de los siguientes usos de la IA en evaluación es el más adecuado pedagógicamente?', 'La IA puede proponer rúbricas y retroalimentación, que el docente valida antes de compartir.', 'La IA no debe reemplazar el juicio docente ni decidir calificaciones sin revisión.', 'Evaluación con IA'),
+      ('4.1 Ética, privacidad y uso responsable de la IA', 'Según la normatividad colombiana, ¿qué debe hacer un docente antes de usar una plataforma de IA con datos de sus estudiantes menores de edad?', 'Debe verificar las políticas de privacidad y obtener consentimiento informado conforme a la Ley 1581 de 2012.', 'Que una plataforma sea gratuita o educativa no elimina las obligaciones de protección de datos.', 'Ética y privacidad'),
+      ('5.1 Liderazgo pedagógico con IA', '¿Qué distingue a un docente "líder" en IA de uno "explorador" según el Marco DigComp?', 'El docente líder diseña estrategias institucionales e investiga el impacto de la IA.', 'El liderazgo va más allá de usar herramientas: incluye estrategia, formación entre pares e investigación.', 'Liderazgo pedagógico'),
+      ('6.1 Proyecto integrador: IA ética en mi práctica', '¿Cuál es el criterio principal para evaluar el proyecto integrador de este curso?', 'La coherencia pedagógica, el manejo ético de datos y la reflexión sobre el impacto.', 'El proyecto se valora por su fundamento y resultados, no por cantidad de herramientas o presupuesto.', 'Proyecto integrador')
+)
+INSERT INTO quizzes
+    (leccion_id, pregunta, explicacion_correcta, explicacion_incorrecta, metadatos, estado_revision)
+SELECT
+    l.id,
+    q.question,
+    q.explanation_correct,
+    q.explanation_incorrect,
+    jsonb_build_object(
+        'competencia', 'Uso y apropiación de IA',
+        'afirmacion', q.question,
+        'evidencia', 'Resuelve una situación de aplicación pedagógica responsable.',
+        'dificultad', 'media',
+        'tema', q.topic,
+        'fuente', 'Curso Inteligencia Artificial para Docentes'
+    ),
+    'publicado'
+FROM ia_questions q
+JOIN lessons l ON l.titulo = q.lesson_title
+JOIN modules m ON m.id = l.modulo_id
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+AND NOT EXISTS (
+    SELECT 1 FROM quizzes existing
+    WHERE existing.leccion_id = l.id AND existing.pregunta = q.question
+);
+
+WITH ia_questions (lesson_title, question) AS (
+    VALUES
+      ('1.1 Historia y fundamentos de la IA', '¿Qué caracteriza a la IA Generativa frente a otros tipos de IA?'),
+      ('2.1 Prompts efectivos para planificar clases', 'Al diseñar un prompt para planificar una clase, ¿qué elemento es más importante incluir?'),
+      ('3.1 Evaluación y retroalimentación con IA', '¿Cuál de los siguientes usos de la IA en evaluación es el más adecuado pedagógicamente?'),
+      ('4.1 Ética, privacidad y uso responsable de la IA', 'Según la normatividad colombiana, ¿qué debe hacer un docente antes de usar una plataforma de IA con datos de sus estudiantes menores de edad?'),
+      ('5.1 Liderazgo pedagógico con IA', '¿Qué distingue a un docente "líder" en IA de uno "explorador" según el Marco DigComp?'),
+      ('6.1 Proyecto integrador: IA ética en mi práctica', '¿Cuál es el criterio principal para evaluar el proyecto integrador de este curso?')
+),
+ia_options (lesson_title, option_order, option_text) AS (
+    VALUES
+      ('1.1 Historia y fundamentos de la IA', 1, 'Solo puede realizar cálculos matemáticos avanzados.'),
+      ('1.1 Historia y fundamentos de la IA', 2, 'Crea contenido nuevo (texto, imágenes, audio) a partir de instrucciones del usuario.'),
+      ('1.1 Historia y fundamentos de la IA', 3, 'Requiere programar cada respuesta manualmente.'),
+      ('1.1 Historia y fundamentos de la IA', 4, 'Funciona únicamente con conexión física a servidores educativos.'),
+      ('2.1 Prompts efectivos para planificar clases', 1, 'El nombre del docente y la institución educativa.'),
+      ('2.1 Prompts efectivos para planificar clases', 2, 'El rol, la tarea, el contexto del grupo y el formato deseado.'),
+      ('2.1 Prompts efectivos para planificar clases', 3, 'La fecha exacta y el número de estudiantes.'),
+      ('2.1 Prompts efectivos para planificar clases', 4, 'El nombre de la herramienta de IA que se va a usar.'),
+      ('3.1 Evaluación y retroalimentación con IA', 1, 'Delegar completamente la calificación de exámenes a la IA sin revisión docente.'),
+      ('3.1 Evaluación y retroalimentación con IA', 2, 'Usar la IA para generar rúbricas y sugerir retroalimentación, validando los resultados antes de compartirlos.'),
+      ('3.1 Evaluación y retroalimentación con IA', 3, 'Reemplazar al docente por sistemas automatizados de evaluación.'),
+      ('3.1 Evaluación y retroalimentación con IA', 4, 'Usar la IA solo para diseñar el formato visual de los exámenes.'),
+      ('4.1 Ética, privacidad y uso responsable de la IA', 1, 'Simplemente usar la plataforma si es gratuita y educativa.'),
+      ('4.1 Ética, privacidad y uso responsable de la IA', 2, 'Verificar las políticas de privacidad y obtener consentimiento informado, conforme a la Ley 1581 de 2012.'),
+      ('4.1 Ética, privacidad y uso responsable de la IA', 3, 'Registrar a los estudiantes con nombres falsos para proteger su identidad.'),
+      ('4.1 Ética, privacidad y uso responsable de la IA', 4, 'Esperar instrucciones del Ministerio de Educación para cada caso.'),
+      ('5.1 Liderazgo pedagógico con IA', 1, 'El líder usa más herramientas de IA que el explorador.'),
+      ('5.1 Liderazgo pedagógico con IA', 2, 'El líder diseña estrategias institucionales e investiga el impacto de la IA; el explorador solo usa herramientas básicas.'),
+      ('5.1 Liderazgo pedagógico con IA', 3, 'El líder tiene más años de experiencia docente que el explorador.'),
+      ('5.1 Liderazgo pedagógico con IA', 4, 'No hay diferencia real: ambos niveles son equivalentes.'),
+      ('6.1 Proyecto integrador: IA ética en mi práctica', 1, 'El número de herramientas de IA utilizadas en la intervención.'),
+      ('6.1 Proyecto integrador: IA ética en mi práctica', 2, 'La coherencia pedagógica, el manejo ético de datos y la reflexión sobre el impacto.'),
+      ('6.1 Proyecto integrador: IA ética en mi práctica', 3, 'El presupuesto invertido en tecnología para la intervención.'),
+      ('6.1 Proyecto integrador: IA ética en mi práctica', 4, 'La cantidad de estudiantes que participaron en el proyecto.')
+)
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden, explicacion_distractor)
+SELECT
+    q.id,
+    o.option_text,
+    o.option_order = 2,
+    o.option_order,
+    CASE WHEN o.option_order = 2 THEN NULL
+         ELSE 'Revisa la explicación y el principio pedagógico asociado a esta respuesta.' END
+FROM ia_options o
+JOIN lessons l ON l.titulo = o.lesson_title
+JOIN ia_questions question_data ON question_data.lesson_title = l.titulo
+JOIN quizzes q ON q.leccion_id = l.id AND q.pregunta = question_data.question
+JOIN modules m ON m.id = l.modulo_id
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+AND NOT EXISTS (
+    SELECT 1 FROM quiz_options existing
+    WHERE existing.quiz_id = q.id AND existing.orden = o.option_order
+);
+
+INSERT INTO badges (modulo_id, nombre, descripcion, icono, color)
+SELECT m.id, m.badge_nombre, CONCAT('Badge obtenido al completar ', m.titulo), m.badge_icono, m.badge_color
+FROM modules m
+JOIN courses c ON c.id = m.curso_id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+AND m.badge_nombre IS NOT NULL
+AND NOT EXISTS (
+    SELECT 1 FROM badges existing
+    WHERE existing.modulo_id = m.id AND existing.nombre = m.badge_nombre
+);
+
+INSERT INTO course_completion_rules (course_id, regla)
+SELECT c.id, '{"min_lecciones_pct": 100, "min_promedio_pct": 80, "proyecto_requerido": true}'::jsonb
+FROM courses c
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+AND NOT EXISTS (
+    SELECT 1 FROM course_completion_rules existing WHERE existing.course_id = c.id
+);
+
+INSERT INTO enrollments (usuario_id, curso_id, fecha_inscripcion)
+SELECT u.id, c.id, CURRENT_TIMESTAMP
+FROM users u
+CROSS JOIN courses c
+WHERE u.email IN ('admin@meritodocente.com', 'prof@meritodocente.com', 'student@meritodocente.com')
+AND c.titulo = 'Inteligencia Artificial para Docentes'
+ON CONFLICT (usuario_id, curso_id) DO NOTHING;
+
+INSERT INTO user_progress (usuario_id, leccion_id, completada, fecha_completada, intentos, puntaje)
+SELECT e.usuario_id, l.id, FALSE, NULL, 0, 0
+FROM enrollments e
+JOIN courses c ON c.id = e.curso_id
+JOIN modules m ON m.curso_id = c.id
+JOIN lessons l ON l.modulo_id = m.id
+WHERE c.titulo = 'Inteligencia Artificial para Docentes'
+AND e.usuario_id IN (
+    SELECT id FROM users
+    WHERE email IN ('admin@meritodocente.com', 'prof@meritodocente.com', 'student@meritodocente.com')
+)
+ON CONFLICT (usuario_id, leccion_id) DO NOTHING;
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, option_data.opcion, option_data.es_correcta, option_data.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('Los estudiantes memorizan contenidos para el examen.', FALSE, 1),
+    ('Los estudiantes resuelven problemas reales y desarrollan competencias.', TRUE, 2),
+    ('El docente dicta la clase sin participación.', FALSE, 3),
+    ('Se evalúa solo con pruebas escritas.', FALSE, 4)
+) AS option_data(opcion, es_correcta, orden)
+WHERE l.titulo = 'Estrategias didácticas para el aula'
+AND q.pregunta = '¿Qué caracteriza al aprendizaje basado en proyectos?'
+AND NOT EXISTS (
+    SELECT 1 FROM quiz_options existing
+    WHERE existing.quiz_id = q.id
+    AND existing.opcion = option_data.opcion
+);
+
+INSERT INTO quiz_options (quiz_id, opcion, es_correcta, orden)
+SELECT q.id, option_data.opcion, option_data.es_correcta, option_data.orden
+FROM quizzes q
+JOIN lessons l ON l.id = q.leccion_id
+CROSS JOIN (VALUES
+    ('El calendario académico.', FALSE, 1),
+    ('El Estatuto de Profesionalización Docente y el concurso de méritos.', TRUE, 2),
+    ('Los impuestos de las instituciones educativas.', FALSE, 3),
+    ('El transporte escolar.', FALSE, 4)
+) AS option_data(opcion, es_correcta, orden)
+WHERE l.titulo = 'Decreto 1278 de 2002: Estatuto Docente'
+AND q.pregunta = '¿Qué regula principalmente el Decreto 1278 de 2002?'
+AND NOT EXISTS (
+    SELECT 1 FROM quiz_options existing
+    WHERE existing.quiz_id = q.id
+    AND existing.opcion = option_data.opcion
+);
 
 /* ============================================================
    14. RESULTADO

@@ -26,6 +26,7 @@ const adminRoutes = require('./routes/admin');
 // Security headers
 const app = express();
 
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
@@ -104,6 +105,11 @@ if (fs.existsSync(swaggerPath)) {
   app.get('/api-docs', (req, res) => res.redirect('/api-docs'));
 }
 
+// Serve the official SPA as entry point
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../indexInicial.html'));
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
@@ -113,9 +119,10 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
   const status = err.status || 500;
+  const isDevelopment = process.env.NODE_ENV === 'development';
   res.status(status).json({
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Error interno del servidor',
-    ...(process.env.NODE_ENV !== 'development' && { stack: err.stack }),
+    error: isDevelopment ? err.message : 'Error interno del servidor',
+    ...(isDevelopment && { stack: err.stack }),
   });
 });
 

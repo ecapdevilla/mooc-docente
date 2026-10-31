@@ -3,6 +3,9 @@ const { Pool } = require('pg');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const databaseUrl = process.env.DATABASE_URL;
+const isSupabase = databaseUrl
+  ? /aws-[a-z0-9-]+\.pooler\.supabase\.com/.test(databaseUrl)
+  : false;
 
 if (!databaseUrl) {
   console.error('❌ DATABASE_URL not defined. Check .env file.');
@@ -16,9 +19,9 @@ const pool = new Pool({
   max: isProduction ? 3 : 10,
   idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 10000,
-  ...(isProduction && {
+  ...((isProduction || isSupabase) && {
     ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
     },
   }),
 });
