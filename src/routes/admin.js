@@ -3,8 +3,33 @@ const router = express.Router();
 const { pool } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 
+router.use('/database-identity', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 router.use(authenticate);
 router.use(authorize('admin'));
+
+router.get('/database-identity', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT current_user AS current_user, rolbypassrls, rolsuper
+       FROM pg_roles
+       WHERE rolname = current_user`
+    );
+    if (rows.length !== 1) {
+      return res.status(500).json({ error: 'No fue posible verificar la identidad de la base de datos.' });
+    }
+    return res.json({
+      current_user: rows[0].current_user,
+      rolbypassrls: rows[0].rolbypassrls,
+      rolsuper: rows[0].rolsuper,
+    });
+  } catch (error) {
+    console.error('Database identity diagnostic failed.');
+    return res.status(500).json({ error: 'No fue posible verificar la identidad de la base de datos.' });
+  }
+});
 
 /**
  * @route   GET /api/v1/admin/users
