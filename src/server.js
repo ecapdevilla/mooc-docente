@@ -22,6 +22,7 @@ const progressRoutes = require('./routes/progress');
 const quizRoutes = require('./routes/quizzes');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+const pilotDiagnosticRoutes = require('./routes/diagnostico-piloto');
 
 // Security headers
 const app = express();
@@ -61,6 +62,7 @@ app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ping', require('./routes/ping'));
+app.use('/api/v1/diagnostico-piloto', pilotDiagnosticRoutes);
 
 // Verificación rápida de que la API (o la función serverless) está en línea
 app.get('/api/v1', (req, res) => {
@@ -79,6 +81,11 @@ const publicDir = path.join(__dirname, '..', 'public');
 const rootDir = path.join(__dirname, '..');
 
 app.use(express.static(publicDir));
+
+app.get('/diagnostico-piloto', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.sendFile(path.join(rootDir, 'diagnosticoPiloto.html'));
+});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(rootDir, 'indexInicial.html'));

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Diagnóstico piloto | Mérito Docente</title>
+  <link rel="stylesheet" href="/diagnosticoPiloto.css">
+  <script src="/diagnosticoPiloto.js" defer></script>
+</head>
+<body>
+  <main>
+    <article>
+      <a class="brand" href="/">Mérito Docente</a>
+      <p class="pill">PILOTO CERRADO · PRÁCTICA NO OFICIAL</p>
+      <h1>Diagnóstico de preparación</h1>
+      <p id="notice">
+        Este instrumento independiente no es una prueba oficial de la CNSC ni predice aprobación o nombramiento.
+        El banco está en revisión académica y solo se usa en este piloto privado.
+      </p>
+
+      <section id="start">
+        <p id="examInfo">Verificando disponibilidad del piloto…</p>
+        <p>El acceso es privado. Solicita el código al organizador.</p>
+        <form id="accessForm">
+          <label for="access">Código de acceso</label>
+          <input id="access" type="password" autocomplete="off" placeholder="Código del piloto">
+          <p><button id="begin" type="submit" disabled>Comenzar diagnóstico</button></p>
+        </form>
+      </section>
+
+      <section id="exam" hidden>
+        <p id="counter" class="small"></p>
+        <div class="progress" aria-hidden="true"><div id="fill" class="fill"></div></div>
+        <div id="question"></div>
+        <div class="nav">
+          <button id="prev" class="secondary" type="button">Anterior</button>
+          <button id="next" type="button">Siguiente</button>
+          <button id="submit" type="button" hidden>Entregar diagnóstico</button>
+        </div>
+        <p class="small">Tus respuestas se conservan en esta pestaña durante el intento.</p>
+      </section>
+
+      <section id="result" hidden></section>
+
+      <section id="feedback" hidden>
+        <h2>Ayúdanos a mejorar</h2>
+        <p>Califica la claridad y utilidad de este diagnóstico piloto.</p>
+        <label for="rating">Calificación</label>
+        <select id="rating">
+          <option value="5">5 — Excelente</option>
+          <option value="4">4 — Buena</option>
+          <option value="3">3 — Aceptable</option>
+          <option value="2">2 — Regular</option>
+          <option value="1">1 — Deficiente</option>
+        </select>
+        <label for="comment">¿Qué debemos mejorar?</label>
+        <textarea id="comment" maxlength="1500" placeholder="Claridad de los casos, opciones, navegación…"></textarea>
+        <p><button id="sendFeedback" type="button">Enviar opinión</button></p>
+      </section>
+
+      <p id="message" role="alert" aria-live="polite"></p>
+      <p><a href="/">Volver a Mérito Docente</a></p>
+    </article>
+  </main>
+</body>
+</html>

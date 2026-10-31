@@ -1,0 +1,189 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #172546;
+  background: #f5f7fc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 860px;
+  margin: 28px auto;
+  padding: 20px;
+}
+
+article {
+  padding: 28px;
+  border: 1px solid #dde5f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgb(21 50 89 / 8%);
+}
+
+.brand {
+  color: #163a9a;
+  font-size: 1.15rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.pill {
+  display: inline-block;
+  margin: 20px 0 8px;
+  padding: 5px 10px;
+  border-radius: 30px;
+  background: #e7f4ef;
+  color: #165a47;
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3 {
+  color: #163a9a;
+}
+
+h1 {
+  margin: 4px 0 10px;
+}
+
+p {
+  line-height: 1.65;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 650;
+}
+
+input[type="password"],
+textarea,
+select {
+  width: min(100%, 460px);
+  padding: 12px;
+  border: 1px solid #bbc5d7;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+textarea {
+  display: block;
+  min-height: 110px;
+  resize: vertical;
+}
+
+button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #173b97;
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #dfe6f3;
+  color: #1e3262;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.small {
+  color: #5c6a82;
+  font-size: .9rem;
+}
+
+.progress {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e4e9f3;
+}
+
+.fill {
+  width: 0;
+  height: 100%;
+  background: #2364cf;
+  transition: width .2s ease;
+}
+
+fieldset {
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin: 14px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 10px 0;
+  padding: 13px;
+  border: 1px solid #d8dfe8;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.option:has(input:checked) {
+  border-color: #2563eb;
+  background: #edf5ff;
+}
+
+.review {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #dde5f0;
+}
+
+#message {
+  color: #b21e36;
+}
+
+a {
+  color: #2457b0;
+}
+
+@media (max-width: 600px) {
+  main {
+    margin: 0 auto;
+    padding: 10px;
+  }
+
+  article {
+    padding: 20px;
+  }
+
+  .nav button {
+    flex: 1 1 40%;
+  }
+}
