@@ -4,48 +4,105 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#102a56">
   <title>Diagnóstico piloto | Mérito Docente</title>
   <link rel="stylesheet" href="/diagnosticoPiloto.css">
   <script src="/diagnosticoPiloto.js" defer></script>
 </head>
 <body>
-  <main>
-    <article>
-      <a class="brand" href="/">Mérito Docente</a>
-      <p class="pill">PILOTO CERRADO · PRÁCTICA NO OFICIAL</p>
-      <h1>Diagnóstico de preparación</h1>
-      <p id="notice">
-        Este instrumento independiente no es una prueba oficial de la CNSC ni predice aprobación o nombramiento.
-        El banco está en revisión académica y solo se usa en este piloto privado.
-      </p>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" id="brandPanel" href="/?vista=panel" aria-label="Mérito Docente, volver al panel">
+        <span class="brand-mark" aria-hidden="true">MD</span>
+        <span>Mérito <strong>Docente</strong></span>
+      </a>
+      <a class="back-link" id="backPanel" href="/?vista=panel">
+        <span aria-hidden="true">←</span> Volver a mi panel
+      </a>
+    </div>
+  </header>
 
-      <section id="start">
-        <p id="examInfo">Verificando disponibilidad del piloto…</p>
-        <p>El acceso es privado. Solicita el código al organizador.</p>
+  <main class="page-shell">
+    <section class="intro-card" aria-labelledby="pageTitle">
+      <p class="eyebrow"><span class="status-dot"></span> Piloto privado · Preparación no oficial</p>
+      <h1 id="pageTitle">Diagnóstico inicial de preparación</h1>
+      <p class="intro-copy">
+        Identifica fortalezas y temas que puedes reforzar con este diagnóstico de 50 preguntas.
+        No es una prueba oficial de la CNSC ni predice aprobación o nombramiento.
+      </p>
+      <div class="exam-facts" aria-label="Características del diagnóstico">
+        <span><strong>50</strong> preguntas</span>
+        <span id="durationFact">Duración sugerida: por confirmar</span>
+        <span>Acceso con código privado</span>
+      </div>
+    </section>
+
+    <section class="panel-card start-card" id="start" aria-labelledby="startTitle">
+      <div class="section-icon" aria-hidden="true">01</div>
+      <div class="section-content">
+        <h2 id="startTitle">Antes de comenzar</h2>
+        <p id="examInfo" class="muted">Verificando disponibilidad del piloto…</p>
+        <p class="muted">Solicita el código de acceso al organizador. El código no se guarda en este dispositivo.</p>
         <form id="accessForm">
           <label for="access">Código de acceso</label>
-          <input id="access" type="password" autocomplete="off" placeholder="Código del piloto">
-          <p><button id="begin" type="submit" disabled>Comenzar diagnóstico</button></p>
+          <div class="access-row">
+            <input id="access" type="password" autocomplete="off" placeholder="Ingresa el código del piloto" required>
+            <button class="button button-primary" id="begin" type="submit" disabled>Comenzar diagnóstico</button>
+          </div>
         </form>
-      </section>
+      </div>
+    </section>
 
-      <section id="exam" hidden>
-        <p id="counter" class="small"></p>
-        <div class="progress" aria-hidden="true"><div id="fill" class="fill"></div></div>
-        <div id="question"></div>
-        <div class="nav">
-          <button id="prev" class="secondary" type="button">Anterior</button>
-          <button id="next" type="button">Siguiente</button>
-          <button id="submit" type="button" hidden>Entregar diagnóstico</button>
+    <section class="panel-card exam-card" id="exam" hidden aria-labelledby="questionHeading">
+      <div class="exam-topline">
+        <div>
+          <p class="eyebrow">Diagnóstico en curso</p>
+          <h2 id="counter" aria-live="polite"></h2>
         </div>
-        <p class="small">Tus respuestas se conservan en esta pestaña durante el intento.</p>
-      </section>
+        <button class="button button-quiet" id="backPanelDuringExam" type="button">Volver a mi panel</button>
+      </div>
 
-      <section id="result" hidden></section>
+      <div class="progress-track" role="progressbar" id="progressBar" aria-label="Preguntas respondidas" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0">
+        <div id="fill" class="progress-fill"></div>
+      </div>
+      <p class="progress-summary" id="answerSummary" aria-live="polite"></p>
 
-      <section id="feedback" hidden>
-        <h2>Ayúdanos a mejorar</h2>
-        <p>Califica la claridad y utilidad de este diagnóstico piloto.</p>
+      <div class="question-layout">
+        <aside class="question-sidebar">
+          <div class="sidebar-heading">
+            <h3>Preguntas</h3>
+            <span id="reviewCount" class="review-count"></span>
+          </div>
+          <nav id="questionNav" class="question-grid" aria-label="Navegación por preguntas"></nav>
+          <div class="legend" aria-label="Estados de pregunta">
+            <span><i class="legend-dot answered"></i> Respondida</span>
+            <span><i class="legend-dot pending"></i> Pendiente</span>
+            <span><i class="legend-dot flagged"></i> Revisar</span>
+          </div>
+        </aside>
+
+        <div class="question-main">
+          <div id="question" class="question-content"></div>
+          <div class="question-tools">
+            <button class="button button-quiet" id="markReview" type="button" aria-pressed="false">Marcar para revisar</button>
+            <span class="autosave-note"><span aria-hidden="true">✓</span> Respuestas guardadas en esta pestaña</span>
+          </div>
+          <div class="nav">
+            <button class="button button-secondary" id="prev" type="button">← Anterior</button>
+            <button class="button button-primary" id="next" type="button">Siguiente →</button>
+            <button class="button button-primary" id="submit" type="button" hidden>Revisar y entregar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel-card result-card" id="result" hidden tabindex="-1" aria-labelledby="resultTitle"></section>
+
+    <section class="panel-card feedback-card" id="feedback" hidden aria-labelledby="feedbackTitle">
+      <div class="section-icon" aria-hidden="true">+</div>
+      <div class="section-content">
+        <h2 id="feedbackTitle">Ayúdanos a mejorar</h2>
+        <p class="muted">Califica la claridad y utilidad de este diagnóstico piloto.</p>
         <label for="rating">Calificación</label>
         <select id="rating">
           <option value="5">5 — Excelente</option>
@@ -56,12 +113,12 @@
         </select>
         <label for="comment">¿Qué debemos mejorar?</label>
         <textarea id="comment" maxlength="1500" placeholder="Claridad de los casos, opciones, navegación…"></textarea>
-        <p><button id="sendFeedback" type="button">Enviar opinión</button></p>
-      </section>
+        <button class="button button-primary" id="sendFeedback" type="button">Enviar opinión</button>
+      </div>
+    </section>
 
-      <p id="message" role="alert" aria-live="polite"></p>
-      <p><a href="/">Volver a Mérito Docente</a></p>
-    </article>
+    <p id="message" class="message" role="alert" aria-live="assertive"></p>
+    <p class="footer-note">MÉRITO DOCENTE · Preparación independiente para concursos de mérito docente.</p>
   </main>
 </body>
 </html>

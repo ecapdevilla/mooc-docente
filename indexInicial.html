@@ -1260,6 +1260,8 @@
 
       .diagnostic-launch h3 { margin: 0 0 0.35rem; color: var(--dark); }
       .diagnostic-launch p { margin: 0; color: var(--text-soft); line-height: 1.5; }
+      .diagnostic-launch .diagnostic-duration { margin-top: 0.45rem; color: var(--primary); font-size: 0.85rem; font-weight: 650; }
+      .diagnostic-launch .btn[hidden] { display: none; }
 
     .lesson-nav {
       display: flex;
@@ -2020,14 +2022,15 @@
 
         <div class="diagnostic-launch" id="diagnosticLaunch">
           <div>
-            <h3><i class="fas fa-clipboard-check"></i> Simulacro diagnóstico</h3>
-            <p>Responde el banco avanzado cuando quieras y conoce tus áreas por reforzar.</p>
+            <h3><i class="fas fa-clipboard-check"></i> Diagnóstico inicial de preparación</h3>
+            <p>Responde 50 preguntas, identifica fortalezas y encuentra temas para reforzar. Diagnóstico piloto privado, no oficial.</p>
+            <p class="diagnostic-duration" id="pilotDuration">Duración sugerida: consultando disponibilidad…</p>
           </div>
           <div class="diagnostic-actions">
             <a class="btn btn-outline btn-sm" href="/diagnostico-piloto">
-              <i class="fas fa-clipboard-list"></i> Realizar diagnóstico inicial — 50 preguntas
+              <i class="fas fa-clipboard-list"></i> Comenzar diagnóstico
             </a>
-            <button class="btn btn-secondary btn-sm" type="button" onclick="openDiagnosticQuiz()">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="openDiagnosticQuiz()" hidden>
               <i class="fas fa-play"></i> Iniciar simulacro
             </button>
           </div>
@@ -2706,6 +2709,21 @@
       }
 
       return data;
+    }
+
+    async function loadPilotDuration() {
+      const duration = document.getElementById('pilotDuration');
+      if (!duration) return;
+
+      try {
+        const info = await apiFetch('/diagnostico-piloto/info');
+        const minutes = info.examen?.duracion_min;
+        duration.textContent = Number.isInteger(minutes) && minutes > 0
+          ? `50 preguntas · duración sugerida: ${minutes} minutos`
+          : '50 preguntas · tiempo sugerido informado al comenzar';
+      } catch (error) {
+        duration.textContent = '50 preguntas · duración y disponibilidad se confirman al comenzar';
+      }
     }
 
     function saveSession(token, user) {
@@ -3561,6 +3579,8 @@
     (function init() {
       loadState();
       updateNavbar();
+      loadPilotDuration();
+      const returnToDashboard = new URLSearchParams(window.location.search).get('vista') === 'panel';
 
       // Restaurar la sesión y el progreso reales desde la API.
       refreshSession().then((restored) => {
@@ -3568,7 +3588,8 @@
 
         updateNavbar();
         if (state.user) {
-          renderDashboard();
+          if (returnToDashboard) showView('dashboard');
+          else renderDashboard();
         }
       });
 
