@@ -1252,6 +1252,12 @@
         box-shadow: var(--shadow-sm);
       }
 
+      .diagnostic-actions {
+        display: flex;
+        flex-shrink: 0;
+        gap: 0.75rem;
+      }
+
       .diagnostic-launch h3 { margin: 0 0 0.35rem; color: var(--dark); }
       .diagnostic-launch p { margin: 0; color: var(--text-soft); line-height: 1.5; }
 
@@ -1751,8 +1757,9 @@
       .welcome-progress { width: 100%; }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .diagnostic-launch { align-items: stretch; flex-direction: column; }
+      .diagnostic-actions { flex-direction: column; }
       .diagnostic-launch .btn { width: 100%; }
     }
 
@@ -2016,9 +2023,14 @@
             <h3><i class="fas fa-clipboard-check"></i> Simulacro diagnóstico</h3>
             <p>Responde el banco avanzado cuando quieras y conoce tus áreas por reforzar.</p>
           </div>
-          <button class="btn btn-secondary btn-sm" type="button" onclick="openDiagnosticQuiz()">
-            <i class="fas fa-play"></i> Iniciar simulacro
-          </button>
+          <div class="diagnostic-actions">
+            <a class="btn btn-outline btn-sm" href="/diagnostico-piloto">
+              <i class="fas fa-clipboard-list"></i> Realizar diagnóstico inicial — 50 preguntas
+            </a>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="openDiagnosticQuiz()">
+              <i class="fas fa-play"></i> Iniciar simulacro
+            </button>
+          </div>
         </div>
 
         <section class="quiz post-login-quiz hidden" id="postLoginQuizPanel" aria-labelledby="postLoginQuizTitle"></section>
