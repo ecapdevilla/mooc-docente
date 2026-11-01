@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#1E3A8A">
+  <meta name="theme-color" content="#14284B">
   <title>MéritoDocente | Prepárate para el Concurso de Méritos Docentes</title>
   <meta name="description" content="Plataforma de preparación para el concurso de méritos docentes. Cursos por área, evaluaciones tipo prueba y seguimiento de progreso.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,40 +18,40 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --primary: #FCD34D;
-      --primary-dark: #F59E0B;
-      --primary-soft: #FEF3C7;
-      --secondary: #1E3A8A;
-      --secondary-light: #3B82F6;
-      --secondary-soft: #DBEAFE;
-      --accent: #10B981;
-      --accent-dark: #059669;
-      --accent-soft: #D1FAE5;
-      --danger: #EF4444;
-      --danger-soft: #FEE2E2;
+      --primary: #0D9488;
+      --primary-dark: #0F766E;
+      --primary-soft: #CCFBF1;
+      --secondary: #14284B;
+      --secondary-light: #2563EB;
+      --secondary-soft: #EFF6FF;
+      --accent: #0D9488;
+      --accent-dark: #0F766E;
+      --accent-soft: #CCFBF1;
+      --danger: #B42318;
+      --danger-soft: #FEF3F2;
 
-      --dark: #0F172A;
-      --text-dark: #1E293B;
+      --dark: #14284B;
+      --text-dark: #17243B;
       --text-mid: #475569;
       --text-soft: #64748B;
-      --gray-100: #F1F5F9;
-      --gray-200: #E2E8F0;
+      --gray-100: #F5F7FA;
+      --gray-200: #E5EAF1;
       --gray-300: #CBD5E1;
-      --light: #F8FAFC;
+      --light: #F6F8FB;
       --white: #FFFFFF;
 
-      --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-      --shadow-sm: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
-      --shadow-lg: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
-      --shadow-glow: 0 15px 30px -8px rgba(245, 158, 11, 0.45);
+      --shadow-xs: 0 1px 2px rgba(20, 40, 75, 0.04);
+      --shadow-sm: 0 4px 14px -3px rgba(20, 40, 75, 0.08);
+      --shadow-md: 0 12px 28px -8px rgba(20, 40, 75, 0.12);
+      --shadow-lg: 0 24px 56px -18px rgba(20, 40, 75, 0.2);
+      --shadow-glow: 0 12px 28px -8px rgba(37, 99, 235, 0.28);
 
       --r-sm: 0.75rem;
-      --r-md: 1.25rem;
-      --r-lg: 2rem;
+      --r-md: 1rem;
+      --r-lg: 1.5rem;
       --r-pill: 999px;
 
-      --t: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --t: all 0.18s ease;
     }
 
     html { scroll-behavior: smooth; }
@@ -1372,7 +1372,7 @@
       z-index: 2000;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
+      transition: opacity 0.18s ease, visibility 0s;
     }
 
     .modal-overlay.show { opacity: 1; visibility: visible; }
@@ -1880,17 +1880,342 @@
       .admin-form-grid { grid-template-columns: 1fr; }
       .admin-editor-actions .btn { width: 100%; }
     }
+    /* UX 2.0 tokens and shared component refinements */
+    html { scroll-padding-top: 6rem; }
+
+    body {
+      background:
+        radial-gradient(ellipse at 86% 0, rgba(37, 99, 235, .06), transparent 34rem),
+        var(--light);
+      color: var(--text-dark);
+    }
+
+    .skip-link {
+      position: fixed;
+      top: .75rem;
+      left: .75rem;
+      z-index: 2000;
+      padding: .75rem 1rem;
+      transform: translateY(-160%);
+      border-radius: .75rem;
+      background: var(--secondary);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+    #mainContent:focus { outline: none; }
+
+    .navbar {
+      border-bottom-color: rgba(203, 213, 225, .72);
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 2px 12px rgba(20, 40, 75, .035);
+    }
+
+    .nav-inner { min-height: 76px; }
+    .logo { color: var(--secondary); }
+    .logo-mark {
+      background: linear-gradient(140deg, var(--secondary), #244a80);
+      color: #fff;
+      box-shadow: 0 7px 16px rgba(20, 40, 75, .2);
+    }
+
+    .logo-text {
+      background: none;
+      color: var(--secondary);
+      -webkit-text-fill-color: currentColor;
+    }
+
+    .nav-links { gap: clamp(.85rem, 2vw, 1.65rem); }
+    .nav-links a { color: #42526b; font-weight: 600; }
+    .nav-links a::after { background: var(--primary); }
+    .nav-links a:hover { color: var(--secondary-light); }
+    .user-chip { background: #f5f7fa; border-color: var(--gray-200); }
+    .user-avatar { background: linear-gradient(140deg, var(--secondary), var(--secondary-light)); }
+
+    .btn {
+      min-height: 44px;
+      border-radius: .75rem;
+      font-weight: 700;
+      box-shadow: none;
+      transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    .btn-primary {
+      background: var(--secondary-light);
+      box-shadow: 0 5px 12px rgba(37, 99, 235, .16);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 8px 18px rgba(37, 99, 235, .22); }
+    .btn-secondary { background: var(--secondary); }
+    .btn-secondary:hover { background: #1d3966; }
+    .welcome-progress .value { color: #fff; }
+    .cta-box h2 .accent { color: #CCFBF1; }
+    .cta-box .btn {
+      background: #0F766E;
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(20, 40, 75, .22);
+    }
+    .cta-box .btn:hover { background: #115E59; color: #fff; }
+    .btn-outline { border-color: #cbd5e1; color: var(--secondary); }
+    .btn-outline:hover { border-color: var(--secondary-light); background: #eff6ff; color: var(--secondary-light); }
+    .btn-ghost { color: var(--secondary); }
+    .btn:focus-visible, .icon-btn:focus-visible { outline: 3px solid #0D9488; outline-offset: 3px; }
+
+    .hero {
+      padding: clamp(3rem, 7vw, 6.25rem) 0;
+      background: linear-gradient(135deg, #f8fbff 0%, #f2f6fc 58%, #edf5f5 100%);
+    }
+
+    .hero::before {
+      top: -19rem;
+      right: -9rem;
+      width: 42rem;
+      height: 42rem;
+      background: radial-gradient(circle, rgba(37, 99, 235, .12), transparent 68%);
+    }
+
+    .hero::after {
+      bottom: -25rem;
+      left: -16rem;
+      width: 45rem;
+      height: 45rem;
+      background: radial-gradient(circle, rgba(13, 148, 136, .09), transparent 68%);
+    }
+
+    .hero-grid { grid-template-columns: minmax(0, 1.12fr) minmax(340px, .88fr); gap: clamp(2rem, 6vw, 5rem); }
+    .hero-content, .hero-visual { animation: none; }
+    .badge { background: #eaf2ff; border-color: #d7e5ff; color: var(--secondary); }
+    .badge i { color: var(--secondary-light); }
+    .hero h1 { max-width: 700px; font-size: clamp(2.5rem, 5.3vw, 4.25rem); letter-spacing: -.045em; }
+    .hero h1 .accent {
+      background: linear-gradient(110deg, var(--secondary-light), var(--primary-dark));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .hero-lead { max-width: 600px; color: #526179; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.75; }
+    .cta-group { margin-bottom: 1.5rem; }
+    .pilot-diagnostic-link { margin: 0 0 1.4rem; color: var(--primary-dark); }
+    .hero-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+    .stat {
+      min-height: 84px;
+      display: grid;
+      align-content: center;
+      padding: .8rem;
+      border-color: #e1e8f1;
+      border-radius: 1rem;
+      text-align: left;
+      box-shadow: 0 4px 14px rgba(20, 40, 75, .045);
+    }
+    .stat:hover { transform: none; border-color: #cbdaf0; box-shadow: var(--shadow-sm); }
+    .stat-num { margin: 0 0 .25rem; color: var(--secondary); font-size: .94rem; line-height: 1.25; }
+    .stat-label { color: var(--text-soft); font-size: .74rem; line-height: 1.4; }
+
+    .register-card {
+      max-width: 460px;
+      padding: clamp(1.35rem, 3vw, 2.25rem);
+      border: 1px solid rgba(203, 213, 225, .8);
+      border-radius: 1.35rem;
+      box-shadow: 0 22px 58px rgba(20, 40, 75, .13);
+      animation: none;
+    }
+
+    .register-card::before { background: radial-gradient(circle, rgba(37, 99, 235, .08), transparent 70%); }
+    .card-head h3 { color: var(--secondary); }
+    .form-field input, .form-field select {
+      min-height: 48px;
+      border: 1px solid #cbd5e1;
+      border-radius: .75rem;
+      background-color: #fff;
+    }
+    .form-field input:focus, .form-field select:focus {
+      border-color: var(--secondary-light);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+    }
+    .form-field input:focus-visible, .form-field select:focus-visible { outline: 2px solid transparent; }
+
+    .features { padding: clamp(3.5rem, 7vw, 5.5rem) 0; background: #fff; }
+    .section-header { max-width: 720px; }
+    .section-header h2 { color: var(--secondary); letter-spacing: -.035em; }
+    .eyebrow { background: #edf4ff; color: var(--secondary-light); letter-spacing: .08em; }
+    .features-grid { gap: 1rem; }
+    .feature-card {
+      padding: 1.5rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 1rem;
+      box-shadow: 0 4px 14px rgba(20, 40, 75, .04);
+    }
+    .feature-card::before { background: var(--secondary-light); }
+    .feature-card:hover { transform: translateY(-2px); border-color: #cbdaf0; box-shadow: var(--shadow-md); }
+    .feature-icon { background: #edf4ff; color: var(--secondary-light); }
+    .feature-card h4 { color: var(--secondary); }
+    .areas { background: linear-gradient(180deg, #f6f8fb, #fff); }
+    .area-card {
+      border-color: #e1e8f1;
+      border-radius: .95rem;
+      background: #fff;
+      box-shadow: 0 3px 12px rgba(20, 40, 75, .035);
+    }
+    .area-card:hover { border-color: #b8cbed; box-shadow: var(--shadow-sm); }
+    .area-num { color: var(--secondary-light); }
+    .area-arrow { color: var(--secondary-light); }
+
+    .dashboard { padding: clamp(1.5rem, 4vw, 3.25rem) 0 4rem; background: var(--light); }
+    .welcome-banner {
+      min-height: 180px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 1.35rem;
+      background: linear-gradient(115deg, #14284B 0%, #1c3e73 62%, #245899 100%);
+      box-shadow: 0 18px 38px rgba(20, 40, 75, .16);
+    }
+    .welcome-banner::before { background: radial-gradient(circle, rgba(13, 148, 136, .18), transparent 70%); }
+    .welcome-progress { min-width: 190px; background: rgba(255,255,255,.1); }
+    .diagnostic-launch, .admin-dashboard-shortcut {
+      border: 1px solid var(--gray-200);
+      border-radius: 1rem;
+      box-shadow: 0 5px 16px rgba(20, 40, 75, .045);
+    }
+    .diagnostic-launch { padding: 1.35rem 1.5rem; }
+    .diagnostic-launch h3, .admin-dashboard-shortcut h3 { color: var(--secondary); }
+    .diagnostic-launch .diagnostic-duration { color: var(--primary-dark); }
+    .admin-dashboard-shortcut { border-color: #d8e3f2; background: linear-gradient(110deg, #f1f6ff, #fff); }
+    .dash-stats { gap: 1rem; margin-bottom: 2.4rem; }
+    .dash-stat {
+      min-height: 94px;
+      border: 1px solid var(--gray-200);
+      border-radius: 1rem;
+      box-shadow: 0 4px 14px rgba(20, 40, 75, .04);
+    }
+    .dash-stat:hover { transform: translateY(-2px); }
+    .dash-stat-icon.yellow { background: #eaf2ff; color: var(--secondary-light); }
+    .modules-grid { gap: 1rem; }
+    .module-card {
+      border: 1px solid var(--gray-200);
+      border-radius: 1rem;
+      box-shadow: 0 5px 16px rgba(20, 40, 75, .045);
+    }
+    .module-card:hover { border-color: #bed0ea; box-shadow: var(--shadow-md); }
+    .badges-section, .admin-browser, .admin-question-editor {
+      border-radius: 1rem;
+      box-shadow: 0 5px 16px rgba(20, 40, 75, .045);
+    }
+    .lesson-view { border: 1px solid var(--gray-200); border-radius: 1.15rem; box-shadow: var(--shadow-sm); }
+    .lesson-header { background: linear-gradient(115deg, var(--secondary), #244a80); }
+    .lesson-content { max-width: 82ch; margin-inline: auto; line-height: 1.8; }
+    .lesson-content p, .lesson-content li { color: #394960; }
+    .quiz { border-color: #dbe5f1; border-radius: 1rem; background: #f8faff; }
+    .quiz-option { border-color: #d8e1ed; border-radius: .8rem; }
+    .quiz-option.selected { border-color: var(--secondary-light); background: #eff6ff; }
+
+    .admin-editor { padding-top: 2rem; }
+    .admin-editor-heading h1 { color: var(--secondary); letter-spacing: -.035em; }
+    .admin-workspace { gap: 1rem; grid-template-columns: minmax(280px, .78fr) minmax(0, 1.65fr); }
+    .admin-browser, .admin-question-editor { padding: clamp(1rem, 2vw, 1.5rem); }
+    .admin-import { padding: 1rem; border-color: #dce5ef; border-radius: .9rem; background: #f7f9fc; }
+    .admin-question-list { scrollbar-color: #aab9cf #f4f6f9; }
+    .admin-question-item { border-radius: .75rem; }
+    .admin-question-item:hover, .admin-question-item.active { border-color: #8eb3ec; background: #f1f6ff; }
+    .admin-status { background: #fff7e6; color: #785313; }
+    .admin-option-row { border-color: #e0e7f0; border-radius: .8rem; }
+    .admin-preview, .admin-history { border-color: #dfe7f1; border-radius: .85rem; background: #f8fafd; }
+
+    .footer { background: #101f3a; }
+    .footer-bottom { border-top-color: rgba(255, 255, 255, .12); }
+    .modal-overlay { padding: 1rem; transition: none; }
+    .badge-modal { border-radius: 1.25rem; }
+    .modal-overlay.show .badge-modal { animation: none; transform: none; }
+    .badge-icon { animation: none; }
+
+    input, select, textarea { accent-color: var(--secondary-light); }
+    :where(a, button, input, select, textarea, summary):focus-visible {
+      outline: 3px solid #0D9488;
+      outline-offset: 3px;
+    }
+    :disabled { cursor: not-allowed; }
+
+    @media (max-width: 992px) {
+      .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr); gap: 2rem; }
+      .hero-content { text-align: left; }
+      .hero-lead { margin-left: 0; margin-right: 0; }
+      .cta-group { justify-content: flex-start; }
+      .hero-stats { margin: 0; }
+      .hero-visual { justify-content: flex-end; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-inner { min-height: 0; flex-wrap: wrap; gap: .45rem .75rem; padding: .65rem 5%; }
+      .logo { font-size: 1.08rem; }
+      .nav-links {
+        order: 3;
+        display: flex;
+        width: 100%;
+        gap: .4rem;
+        padding: .35rem 0 .15rem;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+      }
+      .nav-links li { flex: 0 0 auto; }
+      .nav-links a { display: block; padding: .48rem .7rem; border-radius: .6rem; background: #f5f7fa; font-size: .83rem; }
+      .nav-links a::after { display: none; }
+      .nav-user { margin-left: auto; gap: .4rem; }
+      .user-chip { padding-right: .55rem; }
+      .icon-btn { min-width: 42px; min-height: 42px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+      .hero-visual { justify-content: flex-start; }
+      .register-card { max-width: none; }
+      .admin-workspace { grid-template-columns: 1fr; }
+      .admin-question-list { max-height: 360px; }
+      .lesson-content { max-width: none; }
+    }
+
+    @media (max-width: 540px) {
+      .container { padding-inline: 1.1rem; }
+      .section { padding: 3.5rem 0; }
+      .hero { padding: 2rem 0 2.75rem; }
+      .hero h1 { font-size: clamp(2.25rem, 11vw, 3.2rem); }
+      .hero-stats { grid-template-columns: 1fr; }
+      .stat { min-height: 68px; }
+      .stat-num { font-size: .92rem; }
+      .logo { font-size: .98rem; }
+      .nav-user .btn { width: auto; min-width: 0; margin-right: 0 !important; padding: .5rem .7rem; font-size: .8rem; }
+      .cta-group { align-items: stretch; }
+      .cta-group .btn { width: 100%; }
+      .register-card { padding: 1.2rem; border-radius: 1rem; }
+      .welcome-banner { padding: 1.4rem; text-align: left; }
+      .welcome-progress { width: 100%; }
+      .dash-stats { grid-template-columns: 1fr; }
+      .diagnostic-actions { width: 100%; }
+      .admin-editor-heading, .admin-question-heading { align-items: flex-start; }
+      .admin-form-grid { grid-template-columns: 1fr; gap: .25rem; }
+      .admin-editor-actions { display: grid; grid-template-columns: 1fr; }
+      .lesson-content { padding: 1.15rem; }
+      .lesson-nav { flex-direction: column-reverse; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Saltar al contenido principal</a>
 
   <!-- ============================================================
        NAVBAR
   ============================================================ -->
-  <nav class="navbar">
+  <nav class="navbar" aria-label="Navegación principal">
     <div class="nav-inner">
-      <a href="#" class="logo" onclick="showView('landing'); return false;">
-        <span class="logo-mark"><i class="fas fa-graduation-cap"></i></span>
+      <a href="#" class="logo" aria-label="Mérito Docente, inicio" onclick="showView('landing'); return false;">
+        <span class="logo-mark" aria-hidden="true"><i class="fas fa-graduation-cap"></i></span>
         <span class="logo-text">MéritoDocente</span>
       </a>
 
@@ -1919,6 +2244,7 @@
     </div>
   </nav>
 
+  <main id="mainContent" tabindex="-1">
   <!-- ============================================================
        VISTA 1: LANDING + REGISTRO
   ============================================================ -->
@@ -1929,35 +2255,34 @@
 
           <div class="hero-content">
             <div class="badge">
-              <i class="fas fa-star"></i> Convocatoria 2026 · Cupos limitados
+              <i class="fas fa-graduation-cap" aria-hidden="true"></i> Formación para docentes aspirantes
             </div>
 
             <h1>
-              Tu plaza docente <br>
-              <span class="accent">empieza aquí</span>
+              Prepárate con claridad <br>
+              <span class="accent">avanza con propósito</span>
             </h1>
 
             <p class="hero-lead">
-              Prepárate para el examen del concurso de méritos con cursos estructurados por área,
-              evaluaciones tipo prueba y seguimiento de tu progreso. Todo en un solo lugar.
+              Explora cursos, estudia por lecciones y realiza un diagnóstico piloto para orientar
+              tu preparación para los concursos de méritos docentes.
             </p>
 
             <div class="cta-group">
               <a href="#registro" class="btn btn-primary">
-                <i class="fas fa-rocket"></i> Quiero matricularme
+                <i class="fas fa-user-plus" aria-hidden="true"></i> Crear cuenta gratuita
               </a>
               <a href="#modulos" class="btn btn-outline" onclick="showView('dashboard'); return false;">
-                <i class="fas fa-compass"></i> Explorar cursos
+                <i class="fas fa-compass" aria-hidden="true"></i> Explorar cursos
               </a>
             </div>
 
             <a class="pilot-diagnostic-link" href="/diagnostico-piloto">Realizar diagnóstico piloto</a>
 
-            <div class="hero-stats">
-              <div class="stat"><div class="stat-num">8</div><div class="stat-label">Áreas del examen</div></div>
-              <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Lecciones</div></div>
-              <div class="stat"><div class="stat-num">100%</div><div class="stat-label">En línea</div></div>
-              <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Disponible</div></div>
+            <div class="hero-stats" aria-label="Recursos disponibles">
+              <div class="stat"><div class="stat-num">Cursos y lecciones</div><div class="stat-label">Aprendizaje organizado por temas</div></div>
+              <div class="stat"><div class="stat-num">Seguimiento</div><div class="stat-label">Retoma tu avance de formación</div></div>
+              <div class="stat"><div class="stat-num">Diagnóstico piloto</div><div class="stat-label">Práctica privada, no oficial</div></div>
             </div>
           </div>
 
@@ -1965,33 +2290,33 @@
             <div class="register-card">
               <div class="card-head">
                 <h3>Inscripción gratuita</h3>
-                <p>Empieza en menos de 1 minuto</p>
+                <p>Crea tu acceso para comenzar.</p>
               </div>
 
               <form id="registroForm" onsubmit="handleRegister(event)">
                 <div class="form-field">
                   <i class="fas fa-user"></i>
-                  <input type="text" id="nombre" placeholder="Nombre completo" required>
+                  <input type="text" id="nombre" aria-label="Nombre completo" autocomplete="name" placeholder="Nombre completo" required>
                 </div>
 
                 <div class="form-field">
                   <i class="fas fa-envelope"></i>
-                  <input type="email" id="email" placeholder="Correo electrónico" required>
+                  <input type="email" id="email" aria-label="Correo electrónico" autocomplete="email" placeholder="Correo electrónico" required>
                 </div>
 
                 <div class="form-field">
                   <i class="fas fa-lock"></i>
-                  <input type="password" id="password" placeholder="Contraseña (mínimo 8 caracteres)" minlength="8" required>
+                  <input type="password" id="password" aria-label="Contraseña (mínimo 8 caracteres)" autocomplete="new-password" placeholder="Contraseña (mínimo 8 caracteres)" minlength="8" required>
                 </div>
 
                 <div class="form-field">
                   <i class="fas fa-phone-alt"></i>
-                  <input type="tel" id="celular" placeholder="Celular (WhatsApp)" required>
+                  <input type="tel" id="celular" aria-label="Celular (WhatsApp)" autocomplete="tel" placeholder="Celular (WhatsApp)" required>
                 </div>
 
                 <div class="form-field">
                   <i class="fas fa-map-marker-alt"></i>
-                  <select id="departamento" required>
+                  <select id="departamento" aria-label="Departamento" autocomplete="address-level1" required>
                     <option value="" disabled selected>Selecciona tu departamento</option>
                     <option>Antioquia</option><option>Atlántico</option><option>Bogotá D.C.</option>
                     <option>Bolívar</option><option>Boyacá</option><option>Caldas</option>
@@ -2010,7 +2335,7 @@
                 </button>
 
                 <div class="privacy-note">
-                  <i class="fas fa-lock"></i> Tus datos están seguros. Sin spam.
+                  <i class="fas fa-envelope"></i> Usa un correo al que tengas acceso.
                 </div>
               </form>
             </div>
@@ -2025,8 +2350,8 @@
       <div class="container">
         <div class="section-header">
           <span class="eyebrow">¿Por qué elegirnos?</span>
-          <h2>Todo lo que necesitas para aprobar</h2>
-          <p>Una plataforma diseñada específicamente para docentes que aspiran a una plaza en el concurso de méritos.</p>
+          <h2>Una ruta de preparación en un solo lugar</h2>
+          <p>Consulta los recursos formativos disponibles y avanza con una secuencia clara de estudio y práctica.</p>
         </div>
 
         <div class="features-grid">
@@ -2037,8 +2362,8 @@
           </article>
           <article class="feature-card">
             <div class="feature-icon"><i class="fas fa-clipboard-check"></i></div>
-            <h4>Evaluación enfocada</h4>
-            <p>Cada lección incluye autoevaluaciones que replican el formato del concurso.</p>
+            <h4>Práctica para reflexionar</h4>
+            <p>Utiliza las evaluaciones y el diagnóstico disponibles para identificar temas que quieras reforzar.</p>
           </article>
           <article class="feature-card">
             <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
@@ -2059,8 +2384,8 @@
       <div class="container">
         <div class="section-header">
           <span class="eyebrow">Áreas evaluadas</span>
-          <h2>Cubrimos todas las áreas del examen</h2>
-          <p>Estudia por área y enfócate en lo que más necesitas reforzar.</p>
+          <h2>Explora los temas de preparación</h2>
+          <p>Consulta los cursos y contenidos disponibles para orientar tu recorrido de aprendizaje.</p>
         </div>
 
         <div class="areas-grid">
@@ -2080,8 +2405,8 @@
     <section class="final-cta">
       <div class="container">
         <div class="cta-box">
-          <h2>Tu momento es ahora<br><span class="accent">Da el primer paso hacia tu plaza docente</span></h2>
-          <p>Únete a los docentes que se están preparando con la mejor plataforma de estudio para el concurso de méritos.</p>
+          <h2>Avanza en tu preparación<br><span class="accent">a tu ritmo y con propósito</span></h2>
+          <p>Explora los recursos formativos disponibles y continúa tu recorrido de aprendizaje.</p>
           <a href="#registro" class="btn"><i class="fas fa-play-circle"></i> Continuar estudiando</a>
         </div>
       </div>
@@ -2098,7 +2423,7 @@
         <div class="welcome-banner">
           <div>
             <h2 id="welcomeTitle">¡Hola de nuevo!</h2>
-            <p>Continúa tu preparación para el concurso de méritos. Cada lección te acerca a tu plaza.</p>
+            <p>Retoma tus lecciones y avanza a tu ritmo en la preparación docente.</p>
           </div>
           <div class="welcome-progress">
             <div class="label">Progreso total</div>
@@ -2158,7 +2483,7 @@
 
         <div class="section-header" style="text-align:left; margin: 0 0 1.5rem;">
           <span class="eyebrow">Módulos disponibles</span>
-          <h2 style="font-size:1.6rem;">Continúa tu aprendizaje</h2>
+          <h2 style="font-size:1.6rem;">Cursos y lecciones</h2>
         </div>
 
         <div class="modules-grid" id="modulesGrid"></div>
@@ -2305,21 +2630,22 @@
       <div class="container">
         <div class="lesson-view" id="lessonView"></div>
       </div>
+      </main>
     </section>
   </div>
 
   <!-- ============================================================
        MODAL DE INSIGNIA
   ============================================================ -->
-  <div class="modal-overlay" id="badgeModal">
+  <div class="modal-overlay" id="badgeModal" role="dialog" aria-modal="true" aria-labelledby="badgeDialogTitle">
     <div class="badge-modal">
       <div class="badge-icon-wrapper">
         <div class="badge-icon"><i class="fas fa-award" id="badgeModalIcon"></i></div>
       </div>
-      <h3>¡Insignia desbloqueada!</h3>
+      <h3 id="badgeDialogTitle">¡Insignia desbloqueada!</h3>
       <p>Has completado satisfactoriamente el módulo</p>
       <div class="badge-name" id="badgeModalName">Nombre de insignia</div>
-      <button class="btn btn-primary" onclick="closeBadgeModal()">
+      <button class="btn btn-primary" id="badgeModalClose" onclick="closeBadgeModal()">
         <i class="fas fa-check"></i> ¡Genial!
       </button>
     </div>
@@ -2328,20 +2654,20 @@
   <!-- ============================================================
        MODAL DE SESIÓN
   ============================================================ -->
-  <div class="modal-overlay" id="loginModal">
+  <div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginDialogTitle">
     <div class="badge-modal auth-modal">
-      <h3>Inicia sesión</h3>
+      <h3 id="loginDialogTitle">Inicia sesión</h3>
       <p>Retoma tu progreso desde cualquier dispositivo</p>
 
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-field">
           <i class="fas fa-envelope"></i>
-          <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+          <input type="email" id="loginEmail" aria-label="Correo electrónico" autocomplete="email" placeholder="Correo electrónico" required>
         </div>
 
         <div class="form-field">
           <i class="fas fa-lock"></i>
-          <input type="password" id="loginPassword" placeholder="Contraseña" required>
+          <input type="password" id="loginPassword" aria-label="Contraseña" autocomplete="current-password" placeholder="Contraseña" required>
         </div>
 
         <div class="auth-error" id="loginError" style="display:none;"></div>
@@ -2789,6 +3115,7 @@
         categories: [],
         listenersReady: false
     };
+    let modalReturnFocus = null;
 
     function loadState() {
       try {
@@ -4183,11 +4510,16 @@
       if (errorBox) errorBox.style.display = 'none';
 
       document.getElementById('loginForm').reset();
-      document.getElementById('loginModal').classList.add('show');
+      modalReturnFocus = document.activeElement;
+      const modal = document.getElementById('loginModal');
+      modal.classList.add('show');
+      window.getComputedStyle(modal).visibility;
+      document.getElementById('loginEmail').focus();
     };
 
     window.closeLogin = function () {
       document.getElementById('loginModal').classList.remove('show');
+      restoreModalFocus();
     };
 
     window.handleLogin = async function (event) {
@@ -4521,12 +4853,65 @@
     function showBadgeModal(mod) {
       document.getElementById('badgeModalIcon').className = mod.badge.icon;
       document.getElementById('badgeModalName').textContent = mod.badge.name;
-      document.getElementById('badgeModal').classList.add('show');
+      modalReturnFocus = document.activeElement;
+      const modal = document.getElementById('badgeModal');
+      modal.classList.add('show');
+      window.getComputedStyle(modal).visibility;
+      document.getElementById('badgeModalClose').focus();
     }
 
     window.closeBadgeModal = function () {
       document.getElementById('badgeModal').classList.remove('show');
+      restoreModalFocus();
     };
+
+    function restoreModalFocus() {
+      const target = modalReturnFocus;
+      modalReturnFocus = null;
+      if (
+        target?.isConnected &&
+        !target.disabled &&
+        !target.closest('.hidden') &&
+        window.getComputedStyle(target).display !== 'none'
+      ) {
+        target.focus();
+      }
+    }
+
+    function handleModalKeyboard(event) {
+      const modal = document.querySelector('.modal-overlay.show');
+      if (!modal) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (modal.id === 'loginModal') closeLogin();
+        else closeBadgeModal();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = [...modal.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter((element) =>
+        !element.closest('[hidden]') &&
+        window.getComputedStyle(element).display !== 'none'
+      );
+      if (!focusable.length) {
+        event.preventDefault();
+        modal.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
 
     /* ============================================================
        INICIALIZACIÓN
@@ -4565,6 +4950,7 @@
       document.getElementById('loginModal').addEventListener('click', (e) => {
         if (e.target.id === 'loginModal') closeLogin();
       });
+      document.addEventListener('keydown', handleModalKeyboard);
 
       console.log('🚀 MéritoDocente v1.0 · listo');
     })();
