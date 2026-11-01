@@ -1263,6 +1263,71 @@
       .diagnostic-launch .diagnostic-duration { margin-top: 0.45rem; color: var(--primary); font-size: 0.85rem; font-weight: 650; }
       .diagnostic-launch .btn[hidden] { display: none; }
 
+      .admin-editor-heading,
+      .admin-question-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .admin-editor-heading h1 { margin: 0.35rem 0; color: var(--dark); }
+      .admin-editor-heading p { max-width: 700px; margin: 0; color: var(--text-soft); line-height: 1.6; }
+      .admin-workspace { display: grid; grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.7fr); gap: 1.25rem; align-items: start; }
+      .admin-dashboard-shortcut { display: none; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 1.25rem; padding: 1.25rem 1.5rem; border: 1px solid #c9d7ed; border-radius: var(--r-md); background: linear-gradient(110deg, #f3f7ff, #fff); }
+      .admin-dashboard-shortcut h3 { margin: 0 0 0.3rem; color: var(--dark); }
+      .admin-dashboard-shortcut p { margin: 0; color: var(--text-soft); }
+      .admin-browser,
+      .admin-question-editor { min-width: 0; padding: 1.35rem; border: 1px solid var(--gray-200); border-radius: var(--r-md); background: white; box-shadow: var(--shadow-sm); }
+      .admin-browser label,
+      .admin-question-editor label { display: block; margin: 0.8rem 0 0.4rem; color: var(--dark); font-size: 0.88rem; font-weight: 700; }
+      .admin-browser input,
+      .admin-browser select,
+      .admin-question-editor input,
+      .admin-question-editor select,
+      .admin-question-editor textarea { width: 100%; min-height: 42px; padding: 0.65rem 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--r-sm); color: var(--text); font: inherit; }
+      .admin-question-editor textarea { resize: vertical; line-height: 1.55; }
+      .admin-new-version { margin: 1rem 0; padding: 0.9rem; border-radius: var(--r-sm); background: var(--gray-100); }
+      .admin-new-version .btn { margin-top: 0.65rem; }
+      .admin-filter-row { margin-top: 0.5rem; }
+      .admin-question-list-heading { display: flex; justify-content: space-between; margin: 1.25rem 0 0.6rem; color: var(--dark); }
+      .admin-question-list { display: grid; max-height: 560px; gap: 0.45rem; margin: 0; padding: 0; overflow: auto; list-style: none; }
+      .admin-question-item { width: 100%; padding: 0.75rem; border: 1px solid var(--gray-200); border-radius: var(--r-sm); background: white; color: var(--text); cursor: pointer; text-align: left; }
+      .admin-question-item:hover,
+      .admin-question-item.active { border-color: var(--primary); background: #f0f5ff; }
+      .admin-question-item strong,
+      .admin-question-item span { display: block; }
+      .admin-question-item span { margin-top: 0.25rem; color: var(--text-soft); font-size: 0.8rem; }
+      .admin-question-heading { align-items: flex-start; }
+      .admin-question-heading h2 { margin: 0.45rem 0 0; color: var(--dark); }
+      .admin-status { display: inline-block; padding: 0.3rem 0.6rem; border-radius: 999px; background: #fff4dc; color: #825308; font-size: 0.75rem; font-weight: 750; }
+      .admin-review-guidance { margin: 0.75rem 0; color: var(--text-soft); font-size: 0.88rem; line-height: 1.55; }
+      .admin-review-notes { margin: 0 0 1rem; padding: 0 0 0 1.2rem; color: #825308; font-size: 0.85rem; }
+      .admin-review-notes:empty { display: none; }
+      .admin-review-notes li + li { margin-top: 0.25rem; }
+      .admin-question-editor fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+      .admin-form-grid { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 1rem; }
+      .admin-options-fieldset { margin: 1rem 0 !important; }
+      .admin-options-fieldset legend { margin-bottom: 0.5rem; color: var(--dark); font-weight: 750; }
+      .admin-option-fields { display: grid; gap: 0.75rem; }
+      .admin-option-row { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 0.65rem; padding: 0.85rem; border: 1px solid var(--gray-200); border-radius: var(--r-sm); }
+      .admin-option-row > label:first-child { margin: 0; }
+      .admin-option-code { display: flex; align-items: center; gap: 0.3rem; color: var(--dark); font-weight: 800; }
+      .admin-option-row textarea { margin-top: 0.45rem; }
+      .admin-editor-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.2rem; }
+      .admin-empty-state { padding: 3rem 1rem; color: var(--text-soft); text-align: center; }
+      .admin-empty-state > i { color: var(--primary); font-size: 2rem; }
+      .admin-empty-state h2 { margin: 0.7rem 0 0.35rem; color: var(--dark); }
+      .admin-notice { margin-bottom: 1rem; color: var(--danger); font-weight: 650; }
+      .admin-notice:empty { display: none; }
+      .admin-preview,
+      .admin-history { margin-top: 1.2rem; padding: 1rem; border: 1px solid var(--gray-200); border-radius: var(--r-sm); background: #f8fafd; }
+      .admin-preview-option { padding: 0.65rem 0; border-top: 1px solid var(--gray-200); line-height: 1.5; }
+      .admin-history-entry { padding: 0.8rem 0; border-bottom: 1px solid var(--gray-200); }
+      .admin-history-entry:last-child { border-bottom: 0; }
+      .admin-history-entry pre { max-height: 260px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+
     .lesson-nav {
       display: flex;
       justify-content: space-between;
@@ -1763,6 +1828,13 @@
       .diagnostic-launch { align-items: stretch; flex-direction: column; }
       .diagnostic-actions { flex-direction: column; }
       .diagnostic-launch .btn { width: 100%; }
+      .admin-workspace { grid-template-columns: 1fr; }
+      .admin-editor-heading,
+      .admin-question-heading { align-items: stretch; flex-direction: column; }
+      .admin-editor-heading > .btn,
+      .admin-question-heading > .btn { width: 100%; }
+      .admin-dashboard-shortcut { align-items: stretch; flex-direction: column; }
+      .admin-dashboard-shortcut .btn { width: 100%; }
     }
 
     @media (max-width: 768px) {
@@ -1794,6 +1866,8 @@
       .area-num { font-size: 1.2rem; min-width: 34px; }
       .badges-grid { grid-template-columns: repeat(2, 1fr); }
       .dash-stats { grid-template-columns: 1fr; }
+      .admin-form-grid { grid-template-columns: 1fr; }
+      .admin-editor-actions .btn { width: 100%; }
     }
   </style>
 </head>
@@ -1813,6 +1887,7 @@
         <li><a href="#" onclick="showView('landing'); return false;">Inicio</a></li>
         <li><a href="#modulos" onclick="showView('dashboard'); return false;">Cursos</a></li>
         <li><a href="#mi-aprendizaje" onclick="showView('dashboard'); return false;">Mi aprendizaje</a></li>
+        <li><a href="#" id="adminDiagnosticNav" onclick="showView('admin-diagnostic'); return false;" style="display:none;">Administrar preguntas</a></li>
       </ul>
 
       <div class="nav-user">
@@ -2036,6 +2111,14 @@
           </div>
         </div>
 
+        <div class="admin-dashboard-shortcut" id="adminDashboardShortcut">
+          <div>
+            <h3><i class="fas fa-list-check"></i> Revisión académica del diagnóstico</h3>
+            <p>Gestiona borradores independientes sin alterar el examen publicado.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" onclick="showView('admin-diagnostic')">Abrir administrador</button>
+        </div>
+
         <section class="quiz post-login-quiz hidden" id="postLoginQuizPanel" aria-labelledby="postLoginQuizTitle"></section>
 
         <div class="dash-stats">
@@ -2074,6 +2157,107 @@
           <div class="badges-grid" id="badgesGrid"></div>
         </div>
 
+      </div>
+    </section>
+  </div>
+
+  <div id="view-admin-diagnostic" class="hidden">
+    <section class="section admin-editor">
+      <div class="container">
+        <div class="admin-editor-heading">
+          <div>
+            <span class="eyebrow">Administración académica</span>
+            <h1>Banco del diagnóstico piloto</h1>
+            <p>Trabaja sobre borradores aislados. Los cambios aquí no modifican el examen ni los intentos publicados.</p>
+          </div>
+          <button class="btn btn-ghost" type="button" onclick="showView('dashboard')">
+            <i class="fas fa-arrow-left"></i> Volver al panel
+          </button>
+        </div>
+        <div id="adminDiagnosticNotice" class="admin-notice" role="status" aria-live="polite"></div>
+        <div class="admin-workspace">
+          <aside class="admin-browser">
+            <label for="adminExamSelect">Examen de origen</label>
+            <select id="adminExamSelect"></select>
+            <div class="admin-new-version">
+              <label for="adminVersionName">Nombre del nuevo borrador</label>
+              <input id="adminVersionName" type="text" maxlength="80" placeholder="Ej. revisión académica 2">
+              <button class="btn btn-primary btn-sm btn-block" id="adminCreateVersion" type="button">Crear borrador desde el examen actual</button>
+            </div>
+            <label for="adminVersionSelect">Versiones editoriales</label>
+            <select id="adminVersionSelect"></select>
+            <div class="admin-filter-row">
+              <label for="adminCategoryFilter">Categoría</label>
+              <select id="adminCategoryFilter"><option value="">Todas</option></select>
+            </div>
+            <label for="adminQuestionSearch">Buscar enunciado o evidencia</label>
+            <input id="adminQuestionSearch" type="search" placeholder="Escribe para filtrar">
+            <div class="admin-question-list-heading">
+              <strong>Preguntas</strong>
+              <span id="adminQuestionCount">0</span>
+            </div>
+            <button class="btn btn-outline btn-sm btn-block" id="adminAddQuestion" type="button" disabled>
+              <i class="fas fa-plus"></i> Añadir pregunta al borrador
+            </button>
+            <ul id="adminQuestionList" class="admin-question-list" aria-label="Preguntas del borrador"></ul>
+          </aside>
+
+          <div class="admin-question-editor">
+            <div id="adminEmptyState" class="admin-empty-state">
+              <i class="fas fa-file-circle-check" aria-hidden="true"></i>
+              <h2>Selecciona un borrador</h2>
+              <p>Elige una pregunta para revisar su contenido o crea un borrador nuevo a partir del banco actual.</p>
+            </div>
+            <form id="adminQuestionForm" hidden>
+              <div class="admin-question-heading">
+                <div>
+                  <span class="admin-status" id="adminQuestionStatus">Pendiente de revisión</span>
+                  <h2 id="adminQuestionTitle">Editar pregunta</h2>
+                </div>
+                <button class="btn btn-primary" type="submit"><i class="fas fa-floppy-disk"></i> Guardar borrador</button>
+              </div>
+              <p class="admin-review-guidance">
+                Revisa contexto y realismo del caso, claridad de la evidencia, plausibilidad de los distractores y que solo una respuesta sea defendible. Las alertas automáticas son orientativas y no sustituyen la revisión académica.
+              </p>
+              <ul id="adminQuestionReviewNotes" class="admin-review-notes" aria-live="polite"></ul>
+              <fieldset id="adminQuestionFields" disabled>
+                <div class="admin-form-grid">
+                  <div class="form-field">
+                    <label for="adminQuestionOrder">Número</label>
+                    <input id="adminQuestionOrder" type="number" min="1" required>
+                  </div>
+                  <div class="form-field">
+                    <label for="adminQuestionCategory">Competencia / categoría</label>
+                    <select id="adminQuestionCategory" required></select>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="adminQuestionEvidence">Evidencia evaluada</label>
+                  <textarea id="adminQuestionEvidence" rows="2" required></textarea>
+                </div>
+                <div class="form-field">
+                  <label for="adminQuestionPrompt">Enunciado situacional</label>
+                  <textarea id="adminQuestionPrompt" rows="7" required></textarea>
+                </div>
+                <fieldset class="admin-options-fieldset">
+                  <legend>Alternativas y clave correcta</legend>
+                  <div id="adminOptionFields" class="admin-option-fields"></div>
+                </fieldset>
+                <div class="form-field">
+                  <label for="adminQuestionJustification">Justificación de la respuesta correcta</label>
+                  <textarea id="adminQuestionJustification" rows="5" required></textarea>
+                </div>
+              </fieldset>
+              <div class="admin-editor-actions">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-floppy-disk"></i> Guardar borrador</button>
+                <button class="btn btn-ghost" id="adminPreviewButton" type="button">Vista previa del participante</button>
+                <button class="btn btn-ghost" id="adminHistoryButton" type="button">Historial de cambios</button>
+              </div>
+              <section id="adminQuestionPreview" class="admin-preview" hidden aria-live="polite"></section>
+              <section id="adminQuestionHistory" class="admin-history" hidden aria-live="polite"></section>
+            </form>
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -2555,6 +2739,18 @@
         courseMap: {}, // { mod1: { courseId, moduloIds: [], lessons: [{ id, moduloId }] } }
         postLoginAnswers: {}
     };
+    let adminDiagnosticState = {
+        exams: [],
+        versions: [],
+        questions: [],
+        selectedExam: '',
+        selectedVersion: '',
+        selectedQuestion: '',
+        nextQuestionOrder: 1,
+        saving: false,
+        categories: [],
+        listenersReady: false
+    };
 
     function loadState() {
       try {
@@ -2586,6 +2782,16 @@
        HELPERS
     ============================================================ */
     function showView(view) {
+      if (view === 'admin-diagnostic') {
+        if (!state.user) {
+          openLogin();
+          return;
+        }
+        if (state.user.rol !== 'admin') {
+          view = 'dashboard';
+        }
+      }
+
       // Un usuario con sesión no necesita volver a la landing de matrícula:
       // se le mantiene en su área de aprendizaje.
       if (view === 'landing' && state.user) {
@@ -2595,6 +2801,7 @@
       document.getElementById('view-landing').classList.add('hidden');
       document.getElementById('view-dashboard').classList.add('hidden');
       document.getElementById('view-lesson').classList.add('hidden');
+      document.getElementById('view-admin-diagnostic').classList.add('hidden');
 
       if (view === 'landing') {
         document.getElementById('view-landing').classList.remove('hidden');
@@ -2612,6 +2819,12 @@
       } else if (view === 'lesson') {
         document.getElementById('view-lesson').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (view === 'admin-diagnostic') {
+        document.getElementById('view-admin-diagnostic').classList.remove('hidden');
+        loadAdminDiagnostic().catch((error) => {
+          setAdminDiagnosticNotice(error.message || 'No se pudo cargar el módulo administrativo.');
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       updateNavbar();
     }
@@ -2620,6 +2833,11 @@
       const chip = document.getElementById('userChip');
       const logoutBtn = document.getElementById('logoutBtn');
       const loginBtn = document.getElementById('loginBtn');
+      const adminNav = document.getElementById('adminDiagnosticNav');
+      const adminShortcut = document.getElementById('adminDashboardShortcut');
+      const isAdmin = state.user?.rol === 'admin';
+      if (adminNav) adminNav.style.display = isAdmin ? '' : 'none';
+      if (adminShortcut) adminShortcut.style.display = isAdmin ? 'flex' : 'none';
 
       if (state.user) {
         chip.style.display = 'flex';
@@ -2709,6 +2927,447 @@
       }
 
       return data;
+    }
+
+    function setAdminDiagnosticNotice(message, isSuccess = false) {
+      const notice = document.getElementById('adminDiagnosticNotice');
+      if (!notice) return;
+      notice.textContent = message || '';
+      notice.style.color = isSuccess ? 'var(--accent-dark)' : 'var(--danger)';
+    }
+
+    function setAdminSelectOptions(select, options, value, placeholder) {
+      select.replaceChildren();
+      if (!options.length) {
+        const empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = placeholder;
+        select.append(empty);
+        select.disabled = true;
+        return;
+      }
+      select.disabled = false;
+      for (const option of options) {
+        const item = document.createElement('option');
+        item.value = option.value;
+        item.textContent = option.label;
+        select.append(item);
+      }
+      if (options.some((option) => option.value === value)) select.value = value;
+    }
+
+    function renderAdminQuestionList() {
+      const list = document.getElementById('adminQuestionList');
+      list.replaceChildren();
+      document.getElementById('adminQuestionCount').textContent = String(adminDiagnosticState.questions.length);
+      for (const question of adminDiagnosticState.questions) {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `admin-question-item${question.id === adminDiagnosticState.selectedQuestion ? ' active' : ''}`;
+        button.setAttribute('aria-pressed', String(question.id === adminDiagnosticState.selectedQuestion));
+        const title = document.createElement('strong');
+        title.textContent = `Pregunta ${question.orden} · ${question.categoria}`;
+        const status = document.createElement('span');
+        const noteCount = question.observaciones_revision?.length || 0;
+        status.textContent = `${question.estado_revision || 'Pendiente de revisión'}${noteCount ? ` · ${noteCount} alertas` : ''}`;
+        const excerpt = document.createElement('span');
+        excerpt.textContent = question.enunciado;
+        button.append(title, status, excerpt);
+        button.addEventListener('click', () => {
+          loadAdminQuestion(question.id, question.observaciones_revision)
+            .catch((error) => setAdminDiagnosticNotice(error.message));
+        });
+        item.append(button);
+        list.append(item);
+      }
+    }
+
+    function renderAdminCategories() {
+      const categories = adminDiagnosticState.exams.find(
+        (exam) => exam.codigo === adminDiagnosticState.selectedExam
+      )?.categorias || [];
+      adminDiagnosticState.categories = categories;
+      const options = categories.map((category) => ({ value: category, label: category }));
+      setAdminSelectOptions(
+        document.getElementById('adminCategoryFilter'),
+        [{ value: '', label: 'Todas las categorías' }, ...options],
+        '',
+        'Sin categorías'
+      );
+      document.getElementById('adminCategoryFilter').disabled = categories.length === 0;
+      setAdminSelectOptions(
+        document.getElementById('adminQuestionCategory'),
+        options,
+        options[0]?.value || '',
+        'No hay categorías en el examen'
+      );
+    }
+
+    function setAdminEditorEnabled(enabled) {
+      document.getElementById('adminEmptyState').hidden = enabled;
+      document.getElementById('adminQuestionForm').hidden = !enabled;
+      document.getElementById('adminQuestionFields').disabled = !enabled;
+      document.querySelectorAll('#adminQuestionForm .admin-editor-actions button').forEach((button) => {
+        button.disabled = !enabled;
+      });
+    }
+
+    async function loadAdminDiagnostic() {
+      if (state.user?.rol !== 'admin') {
+        throw new Error('Solo una cuenta administradora puede acceder a la gestión académica.');
+      }
+      setAdminDiagnosticNotice('');
+      const [examData, versionData] = await Promise.all([
+        apiFetch('/admin/pilot-diagnostic/exams'),
+        apiFetch('/admin/pilot-diagnostic/versions')
+      ]);
+      adminDiagnosticState.exams = examData.exams || [];
+      adminDiagnosticState.versions = versionData.versions || [];
+      if (!adminDiagnosticState.exams.length) {
+        setAdminDiagnosticNotice('No hay exámenes piloto disponibles para crear borradores.');
+        return;
+      }
+
+      if (!adminDiagnosticState.exams.some((exam) => exam.codigo === adminDiagnosticState.selectedExam)) {
+        adminDiagnosticState.selectedExam = adminDiagnosticState.exams[0].codigo;
+      }
+      setAdminSelectOptions(
+        document.getElementById('adminExamSelect'),
+        adminDiagnosticState.exams.map((exam) => ({
+          value: exam.codigo,
+          label: `${exam.titulo} · v${exam.version} · ${exam.total_preguntas} preguntas`
+        })),
+        adminDiagnosticState.selectedExam,
+        'No hay exámenes'
+      );
+      renderAdminCategories();
+      const versions = adminDiagnosticState.versions.filter(
+        (version) => version.codigo === adminDiagnosticState.selectedExam
+      );
+      if (!versions.some((version) => version.id === adminDiagnosticState.selectedVersion)) {
+        adminDiagnosticState.selectedVersion = versions.find((version) => version.estado === 'borrador')?.id || '';
+      }
+      setAdminSelectOptions(
+        document.getElementById('adminVersionSelect'),
+        versions.map((version) => ({
+          value: version.id,
+          label: `${version.version} · ${version.estado} · ${version.total_preguntas} preguntas`
+        })),
+        adminDiagnosticState.selectedVersion,
+        'Aún no hay borradores'
+      );
+      const selectedVersion = versions.find((version) => version.id === adminDiagnosticState.selectedVersion);
+      document.getElementById('adminAddQuestion').disabled = selectedVersion?.estado !== 'borrador';
+      if (!adminDiagnosticState.selectedVersion) {
+        adminDiagnosticState.questions = [];
+        adminDiagnosticState.selectedQuestion = '';
+        adminDiagnosticState.nextQuestionOrder = 1;
+        renderAdminQuestionList();
+        setAdminEditorEnabled(false);
+        return;
+      }
+      await loadAdminQuestions();
+    }
+
+    async function loadAdminQuestions(preferredQuestionId = adminDiagnosticState.selectedQuestion) {
+      const versionId = document.getElementById('adminVersionSelect').value;
+      if (!versionId) return;
+      adminDiagnosticState.selectedVersion = versionId;
+      const params = new URLSearchParams();
+      const category = document.getElementById('adminCategoryFilter').value;
+      const search = document.getElementById('adminQuestionSearch').value.trim();
+      if (category) params.set('categoria', category);
+      if (search) params.set('buscar', search);
+      const suffix = params.toString() ? `?${params.toString()}` : '';
+      const data = await apiFetch(`/admin/pilot-diagnostic/versions/${encodeURIComponent(versionId)}/questions${suffix}`);
+      adminDiagnosticState.questions = data.questions || [];
+      adminDiagnosticState.nextQuestionOrder = Number(data.siguiente_orden) || 1;
+      const selected = adminDiagnosticState.questions.find((question) => question.id === preferredQuestionId) ||
+        adminDiagnosticState.questions[0];
+      adminDiagnosticState.selectedQuestion = selected?.id || '';
+      renderAdminQuestionList();
+      if (selected) await loadAdminQuestion(selected.id, selected.observaciones_revision);
+      else setAdminEditorEnabled(false);
+    }
+
+    function renderAdminQuestionReviewNotes(notes) {
+      const container = document.getElementById('adminQuestionReviewNotes');
+      container.replaceChildren();
+      for (const note of notes || []) {
+        const item = document.createElement('li');
+        item.textContent = note;
+        container.append(item);
+      }
+    }
+
+    function beginAdminNewQuestion() {
+      const versionId = document.getElementById('adminVersionSelect').value;
+      const version = adminDiagnosticState.versions.find((item) => item.id === versionId);
+      if (state.user?.rol !== 'admin' || !version || version.estado !== 'borrador') {
+        setAdminDiagnosticNotice('Selecciona una versión borrador para añadir una pregunta.');
+        return;
+      }
+
+      const form = document.getElementById('adminQuestionForm');
+      form.dataset.questionId = '';
+      form.dataset.isNew = 'true';
+      document.getElementById('adminQuestionTitle').textContent = 'Nueva pregunta';
+      document.getElementById('adminQuestionStatus').textContent = 'Pendiente de revisión';
+      document.getElementById('adminQuestionOrder').value = adminDiagnosticState.nextQuestionOrder;
+      document.getElementById('adminQuestionCategory').value = adminDiagnosticState.categories[0] || '';
+      document.getElementById('adminQuestionEvidence').value = '';
+      document.getElementById('adminQuestionPrompt').value = '';
+      document.getElementById('adminQuestionJustification').value = '';
+      renderAdminOptionFields([], '');
+      renderAdminQuestionReviewNotes([
+        'Pregunta nueva: confirmar contexto situacional, alineación con la competencia, una sola respuesta defendible y retroalimentación útil para cada alternativa.',
+      ]);
+      document.getElementById('adminQuestionPreview').hidden = true;
+      document.getElementById('adminQuestionHistory').hidden = true;
+      setAdminEditorEnabled(true);
+      document.getElementById('adminHistoryButton').disabled = true;
+      document.getElementById('adminQuestionOrder').focus();
+    }
+
+    function renderAdminOptionFields(options, correctCode) {
+      const container = document.getElementById('adminOptionFields');
+      container.replaceChildren();
+      for (const code of ['A', 'B', 'C', 'D']) {
+        const option = options.find((item) => item.codigo === code) || {
+          codigo: code,
+          texto: '',
+          retroalimentacion: ''
+        };
+        const row = document.createElement('div');
+        row.className = 'admin-option-row';
+        const codeLabel = document.createElement('label');
+        codeLabel.className = 'admin-option-code';
+        codeLabel.htmlFor = `adminOptionText${code}`;
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'adminCorrectKey';
+        radio.value = code;
+        radio.checked = code === correctCode;
+        radio.setAttribute('aria-label', `Marcar opción ${code} como correcta`);
+        const codeText = document.createElement('span');
+        codeText.textContent = code;
+        codeLabel.append(radio, codeText);
+
+        const fields = document.createElement('div');
+        const textLabel = document.createElement('label');
+        textLabel.htmlFor = `adminOptionText${code}`;
+        textLabel.textContent = `Texto de la opción ${code}`;
+        const text = document.createElement('textarea');
+        text.id = `adminOptionText${code}`;
+        text.rows = 3;
+        text.required = true;
+        text.maxLength = 5000;
+        text.value = option.texto || '';
+        const feedbackLabel = document.createElement('label');
+        feedbackLabel.htmlFor = `adminOptionFeedback${code}`;
+        feedbackLabel.textContent = 'Retroalimentación para esta alternativa';
+        const feedback = document.createElement('textarea');
+        feedback.id = `adminOptionFeedback${code}`;
+        feedback.rows = 2;
+        feedback.maxLength = 5000;
+        feedback.minLength = 20;
+        feedback.required = true;
+        feedback.value = option.retroalimentacion || '';
+        feedback.placeholder = 'Explica por qué esta alternativa es adecuada o qué razonamiento debe revisarse (mínimo 20 caracteres).';
+        fields.append(textLabel, text, feedbackLabel, feedback);
+        row.append(codeLabel, fields);
+        container.append(row);
+      }
+    }
+
+    async function loadAdminQuestion(questionId, listReviewNotes = []) {
+      const versionId = document.getElementById('adminVersionSelect').value;
+      if (!versionId || !questionId) return;
+      const data = await apiFetch(
+        `/admin/pilot-diagnostic/versions/${encodeURIComponent(versionId)}/questions/${encodeURIComponent(questionId)}`
+      );
+      const question = data.question;
+      adminDiagnosticState.selectedQuestion = question.id;
+      renderAdminQuestionList();
+      document.getElementById('adminQuestionTitle').textContent = `Pregunta ${question.orden}`;
+      document.getElementById('adminQuestionStatus').textContent =
+        question.version.estado === 'borrador' ? 'Pendiente de revisión' : question.version.estado;
+      document.getElementById('adminQuestionOrder').value = question.orden;
+      document.getElementById('adminQuestionCategory').value = question.categoria;
+      document.getElementById('adminQuestionEvidence').value = question.evidencia;
+      document.getElementById('adminQuestionPrompt').value = question.enunciado;
+      document.getElementById('adminQuestionJustification').value = question.justificacion;
+      renderAdminOptionFields(question.opciones, question.clave);
+      renderAdminQuestionReviewNotes([
+        ...(question.observaciones_revision || []),
+        ...listReviewNotes.filter((note) => !(question.observaciones_revision || []).includes(note)),
+      ]);
+      document.getElementById('adminQuestionPreview').hidden = true;
+      document.getElementById('adminQuestionHistory').hidden = true;
+      document.getElementById('adminHistoryButton').disabled = false;
+      setAdminEditorEnabled(question.version.estado === 'borrador');
+      document.getElementById('adminQuestionForm').dataset.questionId = question.id;
+      document.getElementById('adminQuestionForm').dataset.isNew = 'false';
+    }
+
+    async function createAdminDraft() {
+      const button = document.getElementById('adminCreateVersion');
+      const version = document.getElementById('adminVersionName').value.trim();
+      if (!version) {
+        setAdminDiagnosticNotice('Escribe un nombre para la nueva versión borrador.');
+        document.getElementById('adminVersionName').focus();
+        return;
+      }
+      button.disabled = true;
+      setAdminDiagnosticNotice('');
+      try {
+        const data = await apiFetch('/admin/pilot-diagnostic/versions', {
+          method: 'POST',
+          body: { codigo: adminDiagnosticState.selectedExam, version }
+        });
+        adminDiagnosticState.selectedVersion = data.version.id;
+        document.getElementById('adminVersionName').value = '';
+        setAdminDiagnosticNotice('Borrador creado desde el examen actual. La versión publicada permanece intacta.', true);
+        await loadAdminDiagnostic();
+        document.getElementById('adminVersionSelect').value = data.version.id;
+        adminDiagnosticState.selectedVersion = data.version.id;
+        await loadAdminQuestions();
+      } catch (error) {
+        setAdminDiagnosticNotice(error.message);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function saveAdminQuestion(event) {
+      event.preventDefault();
+      if (adminDiagnosticState.saving) return;
+      const form = document.getElementById('adminQuestionForm');
+      const questionId = form.dataset.questionId;
+      const isNew = form.dataset.isNew === 'true';
+      const versionId = document.getElementById('adminVersionSelect').value;
+      const correct = document.querySelector('input[name="adminCorrectKey"]:checked');
+      if (!correct) {
+        setAdminDiagnosticNotice('Selecciona una única respuesta correcta.');
+        return;
+      }
+      const payload = {
+        orden: Number(document.getElementById('adminQuestionOrder').value),
+        categoria: document.getElementById('adminQuestionCategory').value,
+        evidencia: document.getElementById('adminQuestionEvidence').value,
+        enunciado: document.getElementById('adminQuestionPrompt').value,
+        clave: correct.value,
+        justificacion: document.getElementById('adminQuestionJustification').value,
+        opciones: ['A', 'B', 'C', 'D'].map((code) => ({
+          codigo: code,
+          texto: document.getElementById(`adminOptionText${code}`).value,
+          retroalimentacion: document.getElementById(`adminOptionFeedback${code}`).value
+        }))
+      };
+      setAdminDiagnosticNotice('');
+      adminDiagnosticState.saving = true;
+      form.querySelectorAll('button[type="submit"]').forEach((button) => {
+        button.disabled = true;
+      });
+      try {
+        const endpoint = `/admin/pilot-diagnostic/versions/${encodeURIComponent(versionId)}/questions`;
+        const data = await apiFetch(
+          isNew ? endpoint : `${endpoint}/${encodeURIComponent(questionId)}`,
+          { method: isNew ? 'POST' : 'PUT', body: payload }
+        );
+        setAdminDiagnosticNotice(isNew ? 'Pregunta añadida al borrador.' : 'Cambios guardados en el borrador.', true);
+        await loadAdminQuestions(data.question.id);
+      } catch (error) {
+        setAdminDiagnosticNotice(error.message);
+      } finally {
+        adminDiagnosticState.saving = false;
+        const fieldsDisabled = document.getElementById('adminQuestionFields').disabled;
+        form.querySelectorAll('button[type="submit"]').forEach((button) => {
+          button.disabled = fieldsDisabled;
+        });
+      }
+    }
+
+    function showAdminQuestionPreview() {
+      const preview = document.getElementById('adminQuestionPreview');
+      preview.replaceChildren();
+      const heading = document.createElement('h3');
+      heading.textContent = 'Vista previa del participante';
+      const evidence = document.createElement('p');
+      evidence.textContent = document.getElementById('adminQuestionEvidence').value;
+      const prompt = document.createElement('p');
+      prompt.textContent = document.getElementById('adminQuestionPrompt').value;
+      preview.append(heading, evidence, prompt);
+      for (const code of ['A', 'B', 'C', 'D']) {
+        const option = document.createElement('p');
+        option.className = 'admin-preview-option';
+        option.textContent = `${code}. ${document.getElementById(`adminOptionText${code}`).value}`;
+        preview.append(option);
+      }
+      preview.hidden = false;
+    }
+
+    async function showAdminQuestionHistory() {
+      const versionId = document.getElementById('adminVersionSelect').value;
+      const questionId = document.getElementById('adminQuestionForm').dataset.questionId;
+      const section = document.getElementById('adminQuestionHistory');
+      section.replaceChildren();
+      const heading = document.createElement('h3');
+      heading.textContent = 'Historial editorial';
+      section.append(heading);
+      try {
+        const data = await apiFetch(
+          `/admin/pilot-diagnostic/versions/${encodeURIComponent(versionId)}/questions/${encodeURIComponent(questionId)}/history`
+        );
+        if (!data.history.length) {
+          const empty = document.createElement('p');
+          empty.textContent = 'Todavía no hay cambios registrados para esta pregunta.';
+          section.append(empty);
+        }
+        for (const entry of data.history) {
+          const item = document.createElement('article');
+          item.className = 'admin-history-entry';
+          const title = document.createElement('strong');
+          title.textContent = `${entry.accion} · ${entry.actor_nombre || 'Administrador'} · ${new Date(entry.creado_en).toLocaleString()}`;
+          const snapshot = document.createElement('pre');
+          snapshot.textContent = JSON.stringify({ antes: entry.antes, despues: entry.despues }, null, 2);
+          item.append(title, snapshot);
+          section.append(item);
+        }
+        section.hidden = false;
+      } catch (error) {
+        setAdminDiagnosticNotice(error.message);
+      }
+    }
+
+    function initializeAdminDiagnostic() {
+      if (adminDiagnosticState.listenersReady) return;
+      adminDiagnosticState.listenersReady = true;
+      document.getElementById('adminExamSelect').addEventListener('change', async (event) => {
+        adminDiagnosticState.selectedExam = event.target.value;
+        adminDiagnosticState.selectedVersion = '';
+        renderAdminCategories();
+        try {
+          await loadAdminDiagnostic();
+        } catch (error) {
+          setAdminDiagnosticNotice(error.message);
+        }
+      });
+      document.getElementById('adminVersionSelect').addEventListener('change', () => loadAdminQuestions('').catch((error) => setAdminDiagnosticNotice(error.message)));
+      document.getElementById('adminCategoryFilter').addEventListener('change', () => loadAdminQuestions('').catch((error) => setAdminDiagnosticNotice(error.message)));
+      let searchTimer;
+      document.getElementById('adminQuestionSearch').addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => loadAdminQuestions('').catch((error) => setAdminDiagnosticNotice(error.message)), 250);
+      });
+      document.getElementById('adminCreateVersion').addEventListener('click', createAdminDraft);
+      document.getElementById('adminQuestionForm').addEventListener('submit', saveAdminQuestion);
+      document.getElementById('adminPreviewButton').addEventListener('click', showAdminQuestionPreview);
+      document.getElementById('adminHistoryButton').addEventListener('click', () => {
+        showAdminQuestionHistory().catch((error) => setAdminDiagnosticNotice(error.message));
+      });
+      document.getElementById('adminAddQuestion').addEventListener('click', beginAdminNewQuestion);
     }
 
     async function loadPilotDuration() {
@@ -3579,6 +4238,7 @@
     (function init() {
       loadState();
       updateNavbar();
+      initializeAdminDiagnostic();
       loadPilotDuration();
       const returnToDashboard = new URLSearchParams(window.location.search).get('vista') === 'panel';
 

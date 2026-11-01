@@ -22,6 +22,7 @@ const progressRoutes = require('./routes/progress');
 const quizRoutes = require('./routes/quizzes');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+const adminPilotDiagnosticRoutes = require('./routes/admin-pilot-diagnostic');
 const pilotDiagnosticRoutes = require('./routes/diagnostico-piloto');
 
 // Security headers
@@ -60,6 +61,7 @@ app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/progress', progressRoutes);
 app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/admin/pilot-diagnostic', adminPilotDiagnosticRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ping', require('./routes/ping'));
 app.use('/api/v1/diagnostico-piloto', pilotDiagnosticRoutes);
