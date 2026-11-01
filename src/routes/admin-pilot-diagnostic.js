@@ -1,12 +1,22 @@
 'use strict';
 
 const express = require('express');
+const crypto = require('crypto');
 const { pool } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
+const {
+  MAX_FILE_BYTES,
+  XLSX_MIME_TYPE,
+  buildTemplateBuffer,
+  parseXlsxImport,
+  questionReviewNotes,
+  validateQuestionPayload,
+} = require('../services/pilot-editorial-import');
 
 const router = express.Router();
 const OPTION_CODES = ['A', 'B', 'C', 'D'];
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const IMPORT_TOKEN_TTL_MS = 15 * 60 * 1000;
 
 router.use(authenticate, authorize('admin'));
 
@@ -17,121 +27,201 @@ const cleanString = (value, maxLength) =>
     ? value.trim()
     : null;
 
-const normalizeForReview = (value) => value
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .toLocaleLowerCase('es')
-  .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-  .replace(/\s+/g, ' ')
-  .trim();
+const parseXlsxBody = express.raw({
+  type: () => true,
+  limit: MAX_FILE_BYTES,
+});
 
-const reviewTokens = (value) => new Set(
-  normalizeForReview(value)
-    .split(' ')
-    .filter((token) => token.length > 2)
-);
-
-const jaccardSimilarity = (left, right) => {
-  const leftTokens = reviewTokens(left);
-  const rightTokens = reviewTokens(right);
-  if (leftTokens.size < 5 || rightTokens.size < 5) return 0;
-  const intersection = [...leftTokens].filter((token) => rightTokens.has(token)).length;
-  return intersection / (leftTokens.size + rightTokens.size - intersection);
+const requireXlsxBody = (req, res, next) => {
+  const contentType = (req.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
+  const contentEncoding = (req.get('Content-Encoding') || 'identity').toLowerCase();
+  const filename = req.get('X-Upload-Filename') || '';
+  if (contentType !== XLSX_MIME_TYPE) {
+    return res.status(415).json({ error: 'El tipo del archivo debe ser XLSX.' });
+  }
+  if (contentEncoding !== 'identity') {
+    return res.status(415).json({ error: 'El archivo debe enviarse sin compresión HTTP.' });
+  }
+  if (filename.length > 255 || !/^[^\\/:*?"<>|]+\.xlsx$/i.test(filename)) {
+    return res.status(415).json({ error: 'El nombre debe corresponder a un archivo .xlsx sin macros.' });
+  }
+  return parseXlsxBody(req, res, (error) => {
+    if (error) {
+      const status = error.type === 'entity.too.large' ? 413 : 400;
+      return res.status(status).json({
+        error: status === 413 ? 'El archivo supera el límite de 2 MB.' : 'No fue posible leer el archivo XLSX.',
+      });
+    }
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+      return res.status(400).json({ error: 'Selecciona un archivo XLSX no vacío.' });
+    }
+    return next();
+  });
 };
 
-const questionReviewNotes = (question, otherQuestions = []) => {
-  const notes = [];
-  const prompt = typeof question.enunciado === 'string' ? question.enunciado.trim() : '';
-  const scenarioCue = /\b(docente|estudiante|aula|instituci[oó]n|caso|situaci[oó]n|familia|grupo|curso|aprendizaje|comunidad)\b/i;
-  if (prompt.length < 120) {
-    notes.push('Enunciado breve: revisar si presenta contexto, reto y decisión pedagógica suficientes.');
-  } else if (!scenarioCue.test(prompt)) {
-    notes.push('No se detecta un contexto situacional explícito; confirmar que el caso sea realista.');
-  }
+const digestQuestions = (questions) =>
+  crypto.createHash('sha256').update(JSON.stringify(questions)).digest('base64url');
 
-  const normalizedPrompt = normalizeForReview(prompt);
-  for (const other of otherQuestions) {
-    if (other.id === question.id) continue;
-    const otherPrompt = normalizeForReview(other.enunciado || '');
-    if (normalizedPrompt && normalizedPrompt === otherPrompt) {
-      notes.push(`Posible duplicado exacto de la pregunta ${other.orden}.`);
-      break;
-    }
-    if (jaccardSimilarity(prompt, other.enunciado || '') >= 0.8) {
-      notes.push(`Enunciado muy similar a la pregunta ${other.orden}; revisión editorial recomendada.`);
-      break;
-    }
-  }
-
-  if (Array.isArray(question.opciones)) {
-    if (question.opciones.some((option) => !cleanString(option.retroalimentacion, 5000))) {
-      notes.push('Falta retroalimentación explicativa en una o más alternativas.');
-    }
-    for (let index = 0; index < question.opciones.length; index += 1) {
-      const option = question.opciones[index];
-      if (question.opciones.some((other, otherIndex) =>
-        otherIndex > index && jaccardSimilarity(option.texto || '', other.texto || '') >= 0.8
-      )) {
-        notes.push('Hay alternativas muy similares; comprobar que cada distractor sea plausible y distinto.');
-        break;
-      }
-    }
-  }
-  return notes;
+const signImportPreview = (payload) => {
+  if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required to sign editorial import previews.');
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', process.env.JWT_SECRET).update(encoded).digest('base64url');
+  return `${encoded}.${signature}`;
 };
 
-const validateQuestionPayload = (body) => {
-  const order = Number(body.orden);
-  const payload = {
-    orden: order,
-    enunciado: cleanString(body.enunciado, 12000),
-    categoria: cleanString(body.categoria, 100),
-    evidencia: cleanString(body.evidencia, 5000),
-    justificacion: cleanString(body.justificacion, 10000),
-    clave: typeof body.clave === 'string' ? body.clave : '',
-  };
-  const options = body.opciones;
+const verifyImportPreview = (token, expected) => {
+  if (!process.env.JWT_SECRET || typeof token !== 'string') return false;
+  const [encoded, suppliedSignature, extra] = token.split('.');
+  if (!encoded || !suppliedSignature || extra) return false;
+  const expectedSignature = crypto.createHmac('sha256', process.env.JWT_SECRET).update(encoded).digest();
+  let actualSignature;
+  try {
+    actualSignature = Buffer.from(suppliedSignature, 'base64url');
+  } catch {
+    return false;
+  }
   if (
-    !Number.isInteger(order) || order < 1 ||
-    !payload.enunciado || !payload.categoria || !payload.evidencia || !payload.justificacion ||
-    !OPTION_CODES.includes(payload.clave) ||
-    !Array.isArray(options) || options.length !== 4
+    actualSignature.length !== expectedSignature.length ||
+    !crypto.timingSafeEqual(actualSignature, expectedSignature)
   ) {
-    return { error: 'Completa enunciado, evidencia, categoría, justificación, orden y las cuatro opciones A-D.' };
+    return false;
+  }
+  try {
+    const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'));
+    return payload.userId === expected.userId &&
+      payload.codigo === expected.codigo &&
+      payload.versionName === expected.versionName &&
+      payload.digest === expected.digest &&
+      Number.isFinite(payload.expiresAt) &&
+      payload.expiresAt > Date.now();
+  } catch {
+    return false;
+  }
+};
+
+const validateImportRequest = async (req) => {
+  const codigo = cleanString(req.get('X-Exam-Code'), 120);
+  const versionName = cleanString(req.get('X-Editorial-Version'), 80);
+  if (!codigo || !versionName) {
+    const message = 'Indica el examen de origen y un nombre único para la nueva versión borrador.';
+    return {
+      error: message,
+      errors: [{ fila: null, mensaje: message }],
+      detected: 0,
+      validQuestions: [],
+      previewQuestions: [],
+      duplicates: [],
+    };
   }
 
-  const optionByCode = new Map();
-  const normalizedTexts = new Set();
-  for (const option of options) {
-    if (!option || !OPTION_CODES.includes(option.codigo) || optionByCode.has(option.codigo)) {
-      return { error: 'Debes enviar una sola opción para cada código A, B, C y D.' };
+  let parsed;
+  try {
+    parsed = await parseXlsxImport(req.body);
+  } catch (error) {
+    return {
+      error: error.message,
+      errors: [{ fila: null, mensaje: error.message }],
+      detected: 0,
+      validQuestions: [],
+      previewQuestions: [],
+      duplicates: [],
+    };
+  }
+
+  const errors = [...parsed.errors];
+  const invalidRows = new Set(
+    parsed.errors.filter((error) => Number.isInteger(error.fila)).map((error) => error.fila)
+  );
+  const { rows: categoryRows } = await pool.query(
+    `SELECT DISTINCT categoria
+     FROM md_pilot_questions
+     WHERE codigo = $1 AND categoria IS NOT NULL AND length(btrim(categoria)) > 0`,
+    [codigo]
+  );
+  const categories = new Set(categoryRows.map((row) => row.categoria));
+  const validQuestions = [];
+  const validatedQuestions = [];
+  const previewQuestions = [];
+  for (const item of parsed.questions) {
+    const validation = validateQuestionPayload(item.question);
+    if (validation.error) {
+      errors.push({ fila: item.fila, mensaje: validation.error });
+      continue;
     }
-    const text = cleanString(option.texto, 5000);
-    if (!text) return { error: `La opción ${option.codigo} no puede estar vacía.` };
-    const normalized = normalizeForReview(text);
-    if (normalizedTexts.has(normalized)) {
-      return { error: 'Las cuatro opciones deben tener textos diferentes.' };
+    if (!categories.has(validation.value.categoria)) {
+      errors.push({
+        fila: item.fila,
+        mensaje: `La categoría "${validation.value.categoria}" no existe en el examen seleccionado.`,
+      });
+      continue;
     }
-    normalizedTexts.add(normalized);
-    const feedback = cleanString(option.retroalimentacion, 5000);
-    if (!feedback || feedback.length < 20) {
-      return { error: `La retroalimentación de la opción ${option.codigo} debe explicar el razonamiento (mínimo 20 caracteres).` };
+    validatedQuestions.push({ fila: item.fila, question: validation.value });
+    if (!invalidRows.has(item.fila)) {
+      validQuestions.push({ fila: item.fila, question: validation.value });
     }
-    optionByCode.set(option.codigo, {
-      codigo: option.codigo,
-      texto: text,
-      retroalimentacion: feedback,
+  }
+
+  const { rows: existingVersion } = await pool.query(
+    `SELECT 1
+     FROM md_pilot_editorial_versions
+     WHERE codigo = $1 AND version = $2
+     LIMIT 1`,
+    [codigo, versionName]
+  );
+  if (existingVersion.length) {
+    errors.push({
+      fila: null,
+      mensaje: 'Ya existe una versión con ese nombre; elige otro para evitar duplicar una importación.',
     });
   }
-  if (optionByCode.size !== OPTION_CODES.length || !optionByCode.has(payload.clave)) {
-    return { error: 'La clave correcta debe corresponder a una de las cuatro opciones.' };
+
+  const { rows: existingQuestions } = await pool.query(
+    `SELECT id::text, orden, enunciado
+     FROM md_pilot_questions
+     WHERE codigo = $1
+     UNION ALL
+     SELECT q.id::text, q.orden, q.enunciado
+     FROM md_pilot_editorial_questions q
+     JOIN md_pilot_editorial_versions v ON v.id = q.version_id
+     WHERE v.codigo = $1`,
+    [codigo]
+  );
+  const comparisonQuestions = [
+    ...existingQuestions,
+    ...validatedQuestions.map(({ fila, question }) => ({
+      id: `import-${fila}`,
+      orden: question.orden,
+      enunciado: question.enunciado,
+    })),
+  ];
+  const duplicates = [];
+  for (const { fila, question } of validatedQuestions) {
+    const reviewNotes = questionReviewNotes(
+      { ...question, id: `import-${fila}` },
+      comparisonQuestions
+    ).filter((note) => note.includes('Posible duplicado') || note.includes('muy similar'));
+    if (reviewNotes.length) {
+      duplicates.push({ fila, numero: question.orden, observaciones: reviewNotes });
+    }
+    previewQuestions.push({
+      fila,
+      ...question,
+      observaciones_revision: questionReviewNotes(
+        { ...question, id: `import-${fila}` },
+        comparisonQuestions
+      ),
+    });
   }
 
   return {
-    value: {
-      ...payload,
-      opciones: OPTION_CODES.map((code) => optionByCode.get(code)),
-    },
+    codigo,
+    versionName,
+    errors,
+    detected: parsed.detected,
+    validQuestions: validQuestions.map(({ question }) => question),
+    validCount: validQuestions.length,
+    previewQuestions,
+    duplicates,
   };
 };
 
@@ -155,7 +245,7 @@ const reportError = (res, error, message = 'No fue posible procesar la solicitud
 const loadQuestionSnapshot = async (client, versionId, questionId, lock = false) => {
   const { rows } = await client.query(
     `SELECT q.id, q.version_id, q.source_question_id, q.orden, q.categoria,
-            q.evidencia, q.enunciado, q.clave, q.justificacion,
+            q.evidencia, q.enunciado, q.clave, q.justificacion, q.fuente_url,
             v.codigo, v.version, v.estado
      FROM md_pilot_editorial_questions q
      JOIN md_pilot_editorial_versions v ON v.id = q.version_id
@@ -186,6 +276,191 @@ const publicEditorialQuestion = (question) => {
   const { _version, ...details } = question;
   return { ...details, version: _version };
 };
+
+router.get('/import-template', async (req, res) => {
+  try {
+    const template = await buildTemplateBuffer();
+    res.set('Content-Type', XLSX_MIME_TYPE);
+    res.set('Content-Disposition', 'attachment; filename="plantilla-importacion-preguntas.xlsx"');
+    res.set('Cache-Control', 'no-store');
+    return res.send(template);
+  } catch (error) {
+    return reportError(res, error, 'No fue posible generar la plantilla XLSX.');
+  }
+});
+
+router.post('/imports/preview', requireXlsxBody, async (req, res) => {
+  try {
+    const result = await validateImportRequest(req);
+    const errors = [...result.errors];
+    if (result.detected === 0 && !errors.length) {
+      errors.push({ fila: null, mensaje: 'No se detectaron preguntas para importar.' });
+    }
+
+    let confirmationToken = null;
+    if (!errors.length && result.validQuestions.length > 0) {
+      confirmationToken = signImportPreview({
+        userId: req.user.id,
+        codigo: result.codigo,
+        versionName: result.versionName,
+        digest: digestQuestions(result.validQuestions),
+        expiresAt: Date.now() + IMPORT_TOKEN_TTL_MS,
+      });
+    }
+
+    return res.json({
+      version: { codigo: result.codigo, nombre: result.versionName },
+      preguntas_detectadas: result.detected,
+      preguntas_validas: result.validQuestions.length,
+      preguntas_con_errores: new Set(
+        errors.filter((error) => Number.isInteger(error.fila) && error.fila >= 5).map((error) => error.fila)
+      ).size,
+      errores: errors,
+      posibles_duplicados: result.duplicates,
+      preguntas: result.previewQuestions,
+      confirmable: Boolean(confirmationToken),
+      confirmation_token: confirmationToken,
+    });
+  } catch (error) {
+    return reportError(res, error);
+  }
+});
+
+router.post('/imports/confirm', requireXlsxBody, async (req, res) => {
+  let client;
+  try {
+    const result = await validateImportRequest(req);
+    if (result.errors.length || result.validQuestions.length === 0) {
+      return res.status(409).json({
+        error: 'El archivo no supera la validación actual. Genera una nueva vista previa.',
+        errores: result.errors,
+      });
+    }
+    const token = req.get('X-Import-Token');
+    const digest = digestQuestions(result.validQuestions);
+    if (!verifyImportPreview(token, {
+      userId: req.user.id,
+      codigo: result.codigo,
+      versionName: result.versionName,
+      digest,
+    })) {
+      return res.status(409).json({
+        error: 'La confirmación venció o el archivo, el examen o el nombre cambiaron. Vuelve a previsualizar.',
+      });
+    }
+
+    client = await pool.connect();
+    await client.query('BEGIN');
+    const { rows: exams } = await client.query(
+      `SELECT codigo, version
+       FROM md_pilot_exams
+       WHERE codigo = $1
+       FOR SHARE`,
+      [result.codigo]
+    );
+    if (!exams.length) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'No se encontró el examen de origen.' });
+    }
+    const sourceVersion = cleanString(exams[0].version, 80);
+    if (!sourceVersion) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({ error: 'El examen de origen no tiene una versión válida.' });
+    }
+
+    const { rows: categories } = await client.query(
+      `SELECT DISTINCT categoria
+       FROM md_pilot_questions
+       WHERE codigo = $1 AND categoria IS NOT NULL AND length(btrim(categoria)) > 0`,
+      [result.codigo]
+    );
+    const existingCategories = new Set(categories.map((row) => row.categoria));
+    if (result.validQuestions.some((question) => !existingCategories.has(question.categoria))) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({
+        error: 'Las categorías del examen cambiaron desde la vista previa. Vuelve a validar el archivo.',
+      });
+    }
+
+    const { rows: versions } = await client.query(
+      `INSERT INTO md_pilot_editorial_versions
+         (codigo, version, source_version, estado, creado_por)
+       VALUES ($1, $2, $3, 'borrador', $4)
+       RETURNING id, codigo, version, source_version, estado, creado_por, creado_en`,
+      [result.codigo, result.versionName, sourceVersion, req.user.id]
+    );
+    const version = versions[0];
+    const questions = result.validQuestions.map((question) => ({
+      id: crypto.randomUUID(),
+      ...question,
+    }));
+
+    await client.query(
+      `INSERT INTO md_pilot_editorial_questions
+         (id, version_id, source_question_id, orden, categoria, evidencia, enunciado,
+          clave, justificacion, fuente_url)
+       SELECT item.id, $1, NULL, item.orden, item.categoria, item.evidencia, item.enunciado,
+              item.clave, item.justificacion, item.fuente_url
+       FROM jsonb_to_recordset($2::jsonb) AS item(
+         id uuid, orden integer, categoria text, evidencia text, enunciado text,
+         clave text, justificacion text, fuente_url text
+       )`,
+      [version.id, JSON.stringify(questions)]
+    );
+    const optionRows = questions.flatMap((question) =>
+      question.opciones.map((option) => ({ question_id: question.id, ...option }))
+    );
+    await client.query(
+      `INSERT INTO md_pilot_editorial_options (question_id, codigo, texto, retroalimentacion)
+       SELECT item.question_id, item.codigo, item.texto, item.retroalimentacion
+       FROM jsonb_to_recordset($1::jsonb) AS item(
+         question_id uuid, codigo text, texto text, retroalimentacion text
+       )`,
+      [JSON.stringify(optionRows)]
+    );
+    await client.query(
+      `INSERT INTO md_pilot_editorial_audit
+         (version_id, actor_user_id, accion, despues)
+       VALUES ($1, $2, 'version_creada', $3::jsonb)`,
+      [version.id, req.user.id, JSON.stringify({
+        codigo: result.codigo,
+        version: result.versionName,
+        source_version: sourceVersion,
+        total_preguntas: questions.length,
+        origen: 'importacion_xlsx',
+      })]
+    );
+    const auditRows = questions.map((question) => ({
+      question_id: question.id,
+      actor_user_id: req.user.id,
+      despues: question,
+    }));
+    await client.query(
+      `INSERT INTO md_pilot_editorial_audit
+         (version_id, question_id, actor_user_id, accion, despues)
+       SELECT $1, item.question_id, item.actor_user_id, 'pregunta_creada', item.despues
+       FROM jsonb_to_recordset($2::jsonb) AS item(
+         question_id uuid, actor_user_id integer, despues jsonb
+       )`,
+      [version.id, JSON.stringify(auditRows)]
+    );
+    await client.query('COMMIT');
+    return res.status(201).json({
+      version: { ...version, total_preguntas: questions.length },
+    });
+  } catch (error) {
+    if (client) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Pilot editorial import rollback error:', rollbackError.code || rollbackError.name);
+      }
+    }
+    return reportError(res, error, 'No fue posible guardar el borrador importado.');
+  } finally {
+    if (client) client.release();
+  }
+});
 
 router.get('/exams', async (req, res) => {
   try {
@@ -437,8 +712,8 @@ router.post('/versions/:versionId/questions', async (req, res) => {
 
     const { rows: createdQuestions } = await client.query(
       `INSERT INTO md_pilot_editorial_questions
-         (version_id, source_question_id, orden, categoria, evidencia, enunciado, clave, justificacion)
-       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7)
+         (version_id, source_question_id, orden, categoria, evidencia, enunciado, clave, justificacion, fuente_url)
+       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8)
        RETURNING id`,
       [
         versionId,
@@ -448,6 +723,7 @@ router.post('/versions/:versionId/questions', async (req, res) => {
         question.enunciado,
         question.clave,
         question.justificacion,
+        question.fuente_url,
       ]
     );
     const questionId = createdQuestions[0].id;
@@ -508,7 +784,7 @@ router.put('/versions/:versionId/questions/:questionId', async (req, res) => {
 
   const validation = validateQuestionPayload(req.body || {});
   if (validation.error) return res.status(400).json({ error: validation.error });
-  const { orden, categoria, evidencia, enunciado, clave, justificacion, opciones } = validation.value;
+  const { orden, categoria, evidencia, enunciado, clave, justificacion, fuente_url, opciones } = validation.value;
 
   let client;
   try {
@@ -538,9 +814,9 @@ router.put('/versions/:versionId/questions/:questionId', async (req, res) => {
     await client.query(
       `UPDATE md_pilot_editorial_questions
        SET orden = $1, categoria = $2, evidencia = $3, enunciado = $4,
-           clave = $5, justificacion = $6, actualizado_en = now()
-       WHERE id = $7 AND version_id = $8`,
-      [orden, categoria, evidencia, enunciado, clave, justificacion, questionId, versionId]
+           clave = $5, justificacion = $6, fuente_url = $7, actualizado_en = now()
+       WHERE id = $8 AND version_id = $9`,
+      [orden, categoria, evidencia, enunciado, clave, justificacion, fuente_url, questionId, versionId]
     );
     await client.query(
       'DELETE FROM md_pilot_editorial_options WHERE question_id = $1',
@@ -562,6 +838,7 @@ router.put('/versions/:versionId/questions/:questionId', async (req, res) => {
       enunciado,
       clave,
       justificacion,
+      fuente_url,
       opciones,
     };
     await client.query(

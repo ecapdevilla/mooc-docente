@@ -5,6 +5,7 @@ const { JSDOM } = require('jsdom');
 const HTML_PATH = path.join(__dirname, '..', 'indexInicial.html');
 const VERSION_ID = 'eeb7b88c-1d3c-4a2d-8a15-4f4a98261111';
 const QUESTION_ID = 'dab5fdf0-20a1-4e51-9bf7-d4034f001111';
+const IMPORTED_VERSION_ID = 'eeb7b88c-1d3c-4a2d-8a15-4f4a98262222';
 const EXAM_CODE = 'MD-DIA-2026-PILOTO-001';
 
 const waitFor = async (condition, timeout = 3000) => {
@@ -18,6 +19,7 @@ const waitFor = async (condition, timeout = 3000) => {
 const createMockApi = (role) => {
   const requests = [];
   let version = null;
+  let importedVersion = null;
   let question = {
     id: QUESTION_ID,
     version_id: VERSION_ID,
@@ -54,7 +56,7 @@ const createMockApi = (role) => {
     const requestUrl = new URL(url);
     const endpoint = requestUrl.pathname.replace('/api/v1', '');
     const method = options.method || 'GET';
-    const body = options.body ? JSON.parse(options.body) : null;
+    const body = typeof options.body === 'string' ? JSON.parse(options.body) : null;
     requests.push({ endpoint, method, body, headers: options.headers || {} });
 
     let data = {};
@@ -79,9 +81,68 @@ const createMockApi = (role) => {
         };
         data = { version };
       } else {
-        data = { versions: version ? [version] : [] };
+        data = { versions: [importedVersion, version].filter(Boolean) };
       }
-    } else if (endpoint.endsWith(`/versions/${VERSION_ID}/questions`)) {
+    } else if (endpoint === '/admin/pilot-diagnostic/import-template') {
+      return {
+        ok: true,
+        status: 200,
+        blob: async () => ({}),
+        json: async () => ({}),
+      };
+    } else if (endpoint === '/admin/pilot-diagnostic/imports/preview') {
+      data = {
+        version: { codigo: EXAM_CODE, nombre: 'Importación JSDOM' },
+        preguntas_detectadas: 1,
+        preguntas_validas: 1,
+        preguntas_con_errores: 0,
+        errores: [],
+        posibles_duplicados: [],
+        confirmable: true,
+        confirmation_token: 'signed-preview-token',
+        preguntas: [{
+          fila: 6,
+          orden: 1,
+          categoria: 'Pedagogía',
+          evidencia: 'Analiza evidencias del aprendizaje.',
+          enunciado: 'Una docente analiza evidencias de aprendizaje y decide cómo ajustar la estrategia pedagógica.',
+          clave: 'A',
+          justificacion: 'La decisión se basa en evidencias y permite seguimiento formativo.',
+          fuente_url: null,
+          opciones: ['A', 'B', 'C', 'D'].map((codigo) => ({
+            codigo,
+            texto: `Alternativa ${codigo}`,
+            retroalimentacion: `Explicación pedagógica para la alternativa ${codigo}.`,
+          })),
+          observaciones_revision: [],
+        }],
+      };
+    } else if (endpoint === '/admin/pilot-diagnostic/imports/confirm') {
+      importedVersion = {
+        id: IMPORTED_VERSION_ID,
+        codigo: EXAM_CODE,
+        version: 'Importación JSDOM',
+        estado: 'borrador',
+        total_preguntas: 1,
+      };
+      version = null;
+      questions = [{
+        id: QUESTION_ID,
+        orden: 1,
+        categoria: 'Pedagogía',
+        enunciado: 'Una docente analiza evidencias de aprendizaje y decide cómo ajustar la estrategia pedagógica.',
+        estado_revision: 'pendiente de revisión',
+      }];
+      question = {
+        ...question,
+        version_id: IMPORTED_VERSION_ID,
+        version: { estado: 'borrador' },
+      };
+      data = { version: importedVersion };
+    } else if (
+      endpoint.endsWith(`/versions/${VERSION_ID}/questions`) ||
+      endpoint.endsWith(`/versions/${IMPORTED_VERSION_ID}/questions`)
+    ) {
       if (method === 'POST') {
         const id = '00000000-0000-4000-8000-000000000051';
         question = { ...body, id, version_id: VERSION_ID, version: { estado: 'borrador' } };
@@ -96,9 +157,16 @@ const createMockApi = (role) => {
       } else {
         data = { questions, siguiente_orden: questions.length + 1 };
       }
-    } else if (endpoint.endsWith(`/versions/${VERSION_ID}/questions/${QUESTION_ID}/history`)) {
+    } else if (
+      endpoint.endsWith(`/versions/${VERSION_ID}/questions/${QUESTION_ID}/history`) ||
+      endpoint.endsWith(`/versions/${IMPORTED_VERSION_ID}/questions/${QUESTION_ID}/history`)
+    ) {
       data = { history: [] };
-    } else if (endpoint.includes(`/versions/${VERSION_ID}/questions/`) && !endpoint.endsWith('/history')) {
+    } else if (
+      (endpoint.includes(`/versions/${VERSION_ID}/questions/`) ||
+        endpoint.includes(`/versions/${IMPORTED_VERSION_ID}/questions/`)) &&
+      !endpoint.endsWith('/history')
+    ) {
       if (method === 'PUT') {
         question = { ...question, ...body, opciones: body.opciones };
         data = { question };
@@ -154,6 +222,8 @@ describe('Interfaz administrativa del diagnóstico piloto', () => {
       await waitFor(() => !document.getElementById('adminQuestionForm').hidden);
       await waitFor(() => document.getElementById('adminQuestionList').children.length === 50);
       expect(document.getElementById('adminQuestionList').children).toHaveLength(50);
+      expect(document.getElementById('adminDownloadTemplate')).toBeTruthy();
+      expect(document.getElementById('adminImportFile').accept).toContain('.xlsx');
       expect(requests.some((request) =>
         request.endpoint === '/admin/pilot-diagnostic/versions' &&
         request.method === 'POST'
@@ -203,6 +273,33 @@ describe('Interfaz administrativa del diagnóstico piloto', () => {
         request.method === 'POST' &&
         request.body.orden === 51 &&
         request.body.opciones.every((option) => option.retroalimentacion.length >= 20)
+      )).toBe(true);
+
+      document.getElementById('adminImportVersionName').value = 'Importación JSDOM';
+      const fileInput = document.getElementById('adminImportFile');
+      Object.defineProperty(fileInput, 'files', {
+        configurable: true,
+        value: [new window.File(['mock xlsx content'], 'preguntas.xlsx', {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        })],
+      });
+      fileInput.dispatchEvent(new window.Event('change', { bubbles: true }));
+      document.getElementById('adminPreviewImport').click();
+      await waitFor(() => !document.getElementById('adminImportPreview').hidden);
+      await waitFor(() => document.getElementById('adminImportProgress').hidden);
+      expect(document.getElementById('adminImportPreview').textContent).toContain('Detectadas: 1');
+      expect(requests.some((request) =>
+        request.endpoint === '/admin/pilot-diagnostic/imports/preview' &&
+        request.method === 'POST' &&
+        request.body === null
+      )).toBe(true);
+      document.getElementById('adminImportConfirmCheck').click();
+      expect(document.getElementById('adminConfirmImport').disabled).toBe(false);
+      document.getElementById('adminConfirmImport').click();
+      await waitFor(() => document.getElementById('adminDiagnosticNotice').textContent.includes('Se creó el borrador'));
+      expect(requests.some((request) =>
+        request.endpoint === '/admin/pilot-diagnostic/imports/confirm' &&
+        request.headers['X-Import-Token'] === 'signed-preview-token'
       )).toBe(true);
     } finally {
       window.close();

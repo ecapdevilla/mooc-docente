@@ -1290,6 +1290,17 @@
       .admin-question-editor textarea { resize: vertical; line-height: 1.55; }
       .admin-new-version { margin: 1rem 0; padding: 0.9rem; border-radius: var(--r-sm); background: var(--gray-100); }
       .admin-new-version .btn { margin-top: 0.65rem; }
+      .admin-import { margin: 1rem 0; padding: 0.9rem; border: 1px solid var(--gray-200); border-radius: var(--r-sm); background: #f8fafd; }
+      .admin-import p { margin: 0.45rem 0; color: var(--text-soft); font-size: 0.82rem; line-height: 1.45; }
+      .admin-import .btn { width: 100%; margin-top: 0.55rem; }
+      .admin-import-status { margin-top: 0.65rem; color: var(--text-soft); font-size: 0.85rem; }
+      .admin-import-preview { max-height: 420px; margin-top: 0.75rem; overflow: auto; }
+      .admin-import-preview details { padding: 0.65rem 0; border-top: 1px solid var(--gray-200); }
+      .admin-import-preview summary { color: var(--dark); font-weight: 700; cursor: pointer; }
+      .admin-import-errors { color: var(--danger); }
+      .admin-import-duplicates { color: #825308; }
+      .admin-import-confirm { display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 0.8rem; color: var(--dark); font-size: 0.85rem; }
+      .admin-import-confirm input { width: auto; min-height: auto; margin-top: 0.2rem; }
       .admin-filter-row { margin-top: 0.5rem; }
       .admin-question-list-heading { display: flex; justify-content: space-between; margin: 1.25rem 0 0.6rem; color: var(--dark); }
       .admin-question-list { display: grid; max-height: 560px; gap: 0.45rem; margin: 0; padding: 0; overflow: auto; list-style: none; }
@@ -2184,6 +2195,26 @@
               <input id="adminVersionName" type="text" maxlength="80" placeholder="Ej. revisión académica 2">
               <button class="btn btn-primary btn-sm btn-block" id="adminCreateVersion" type="button">Crear borrador desde el examen actual</button>
             </div>
+            <section class="admin-import" aria-labelledby="adminImportHeading">
+              <strong id="adminImportHeading">Importar preguntas desde Excel</strong>
+              <p>La importación crea una versión nueva en borrador. Admite .xlsx sin macros, máximo 200 preguntas y 2 MB.</p>
+              <button class="btn btn-outline btn-sm" id="adminDownloadTemplate" type="button">Descargar plantilla Excel</button>
+              <label for="adminImportVersionName">Nombre de la nueva versión</label>
+              <input id="adminImportVersionName" type="text" maxlength="80" placeholder="Ej. importación revisión noviembre">
+              <label for="adminImportFile">Archivo .xlsx</label>
+              <input id="adminImportFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+              <button class="btn btn-primary btn-sm" id="adminPreviewImport" type="button" disabled>Analizar y previsualizar</button>
+              <div id="adminImportProgress" class="admin-import-status" hidden aria-live="polite">
+                <progress aria-label="Procesando importación"></progress>
+                <span id="adminImportProgressText">Analizando archivo…</span>
+              </div>
+              <section id="adminImportPreview" class="admin-import-preview" hidden aria-live="polite"></section>
+              <label class="admin-import-confirm" id="adminImportConfirmLabel" hidden>
+                <input id="adminImportConfirmCheck" type="checkbox">
+                <span>Confirmo crear una nueva versión en borrador; no se modificará el examen activo.</span>
+              </label>
+              <button class="btn btn-primary btn-sm" id="adminConfirmImport" type="button" disabled>Confirmar importación</button>
+            </section>
             <label for="adminVersionSelect">Versiones editoriales</label>
             <select id="adminVersionSelect"></select>
             <div class="admin-filter-row">
@@ -2246,6 +2277,10 @@
                 <div class="form-field">
                   <label for="adminQuestionJustification">Justificación de la respuesta correcta</label>
                   <textarea id="adminQuestionJustification" rows="5" required></textarea>
+                </div>
+                <div class="form-field">
+                  <label for="adminQuestionSourceUrl">Fuente URL (opcional)</label>
+                  <input id="adminQuestionSourceUrl" type="url" maxlength="2048" placeholder="https://...">
                 </div>
               </fieldset>
               <div class="admin-editor-actions">
@@ -2748,6 +2783,9 @@
         selectedQuestion: '',
         nextQuestionOrder: 1,
         saving: false,
+        importing: false,
+        importFile: null,
+        importPreview: null,
         categories: [],
         listenersReady: false
     };
@@ -3119,6 +3157,7 @@
       document.getElementById('adminQuestionEvidence').value = '';
       document.getElementById('adminQuestionPrompt').value = '';
       document.getElementById('adminQuestionJustification').value = '';
+      document.getElementById('adminQuestionSourceUrl').value = '';
       renderAdminOptionFields([], '');
       renderAdminQuestionReviewNotes([
         'Pregunta nueva: confirmar contexto situacional, alineación con la competencia, una sola respuesta defendible y retroalimentación útil para cada alternativa.',
@@ -3198,6 +3237,7 @@
       document.getElementById('adminQuestionEvidence').value = question.evidencia;
       document.getElementById('adminQuestionPrompt').value = question.enunciado;
       document.getElementById('adminQuestionJustification').value = question.justificacion;
+      document.getElementById('adminQuestionSourceUrl').value = question.fuente_url || '';
       renderAdminOptionFields(question.opciones, question.clave);
       renderAdminQuestionReviewNotes([
         ...(question.observaciones_revision || []),
@@ -3240,6 +3280,242 @@
       }
     }
 
+    function resetAdminImportPreview() {
+      adminDiagnosticState.importPreview = null;
+      document.getElementById('adminImportPreview').replaceChildren();
+      document.getElementById('adminImportPreview').hidden = true;
+      document.getElementById('adminImportConfirmLabel').hidden = true;
+      document.getElementById('adminImportConfirmCheck').checked = false;
+      document.getElementById('adminConfirmImport').disabled = true;
+    }
+
+    function updateAdminImportControls() {
+      const fileInput = document.getElementById('adminImportFile');
+      const versionName = document.getElementById('adminImportVersionName').value.trim();
+      const file = fileInput.files && fileInput.files[0];
+      adminDiagnosticState.importFile = file || null;
+      document.getElementById('adminPreviewImport').disabled =
+        adminDiagnosticState.importing ||
+        state.user?.rol !== 'admin' ||
+        !file ||
+        !versionName ||
+        !adminDiagnosticState.selectedExam;
+    }
+
+    function renderAdminImportPreview(preview) {
+      const section = document.getElementById('adminImportPreview');
+      section.replaceChildren();
+      const summary = document.createElement('p');
+      summary.textContent =
+        `Detectadas: ${preview.preguntas_detectadas} · Válidas: ${preview.preguntas_validas} · ` +
+        `Con errores: ${preview.preguntas_con_errores} · Posibles duplicados: ${preview.posibles_duplicados.length}.`;
+      section.append(summary);
+
+      if (preview.errores.length) {
+        const heading = document.createElement('strong');
+        heading.textContent = 'Errores que bloquean la confirmación';
+        const errors = document.createElement('ul');
+        errors.className = 'admin-import-errors';
+        for (const error of preview.errores) {
+          const item = document.createElement('li');
+          item.textContent = `${error.fila ? `Fila ${error.fila}: ` : ''}${error.mensaje}`;
+          errors.append(item);
+        }
+        section.append(heading, errors);
+      }
+
+      if (preview.posibles_duplicados.length) {
+        const heading = document.createElement('strong');
+        heading.textContent = 'Posibles preguntas duplicadas o similares (revisión orientativa)';
+        const duplicates = document.createElement('ul');
+        duplicates.className = 'admin-import-duplicates';
+        for (const duplicate of preview.posibles_duplicados) {
+          const item = document.createElement('li');
+          item.textContent = `Fila ${duplicate.fila} · pregunta ${duplicate.numero}: ${duplicate.observaciones.join(' ')}`;
+          duplicates.append(item);
+        }
+        section.append(heading, duplicates);
+      }
+
+      const questionsHeading = document.createElement('strong');
+      questionsHeading.textContent = 'Vista previa del contenido';
+      section.append(questionsHeading);
+      for (const question of preview.preguntas) {
+        const details = document.createElement('details');
+        const summaryItem = document.createElement('summary');
+        summaryItem.textContent = `Fila ${question.fila} · Pregunta ${question.orden} · ${question.categoria}`;
+        details.append(summaryItem);
+        for (const [label, value] of [
+          ['Evidencia', question.evidencia],
+          ['Enunciado', question.enunciado],
+          ['Justificación', question.justificacion],
+          ['Clave correcta', question.clave],
+          ['Fuente URL', question.fuente_url || 'No indicada'],
+        ]) {
+          const paragraph = document.createElement('p');
+          paragraph.textContent = `${label}: ${value}`;
+          details.append(paragraph);
+        }
+        for (const option of question.opciones) {
+          const paragraph = document.createElement('p');
+          paragraph.className = 'admin-preview-option';
+          paragraph.textContent =
+            `${option.codigo}. ${option.texto} · Retroalimentación: ${option.retroalimentacion}`;
+          details.append(paragraph);
+        }
+        for (const note of question.observaciones_revision || []) {
+          const paragraph = document.createElement('p');
+          paragraph.className = 'admin-import-duplicates';
+          paragraph.textContent = note;
+          details.append(paragraph);
+        }
+        section.append(details);
+      }
+      section.hidden = false;
+      const canConfirm = preview.confirmable && preview.preguntas_con_errores === 0;
+      document.getElementById('adminImportConfirmLabel').hidden = !canConfirm;
+      document.getElementById('adminConfirmImport').disabled = !canConfirm || adminDiagnosticState.importing;
+    }
+
+    async function sendAdminImportRequest(endpoint, file, confirmationToken = '') {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const headers = {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'X-Upload-Filename': encodeURIComponent(file.name),
+        'X-Exam-Code': adminDiagnosticState.selectedExam,
+        'X-Editorial-Version': document.getElementById('adminImportVersionName').value.trim(),
+      };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      if (confirmationToken) headers['X-Import-Token'] = confirmationToken;
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: file,
+      });
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+      if (!response.ok) {
+        throw new Error(data?.error || `No fue posible procesar el archivo (HTTP ${response.status}).`);
+      }
+      return data;
+    }
+
+    async function previewAdminImport() {
+      if (adminDiagnosticState.importing) return;
+      const fileInput = document.getElementById('adminImportFile');
+      const file = fileInput.files && fileInput.files[0];
+      if (state.user?.rol !== 'admin' || !file) {
+        setAdminDiagnosticNotice('Selecciona un archivo .xlsx para analizar.');
+        return;
+      }
+      if (!/\.xlsx$/i.test(file.name)) {
+        setAdminDiagnosticNotice('Solo se admite un archivo .xlsx sin macros.');
+        return;
+      }
+
+      adminDiagnosticState.importing = true;
+      resetAdminImportPreview();
+      document.getElementById('adminImportProgress').hidden = false;
+      document.getElementById('adminImportProgressText').textContent = 'Analizando archivo sin guardar preguntas…';
+      document.getElementById('adminPreviewImport').disabled = true;
+      document.getElementById('adminConfirmImport').disabled = true;
+      setAdminDiagnosticNotice('');
+      try {
+        const preview = await sendAdminImportRequest('/admin/pilot-diagnostic/imports/preview', file);
+        adminDiagnosticState.importPreview = preview;
+        renderAdminImportPreview(preview);
+        setAdminDiagnosticNotice(
+          `Análisis completo: ${preview.preguntas_detectadas} detectadas, ` +
+          `${preview.preguntas_validas} válidas y ${preview.preguntas_con_errores} con errores.`,
+          preview.confirmable
+        );
+      } catch (error) {
+        setAdminDiagnosticNotice(error.message);
+      } finally {
+        adminDiagnosticState.importing = false;
+        document.getElementById('adminImportProgress').hidden = true;
+        updateAdminImportControls();
+        if (adminDiagnosticState.importPreview?.confirmable) {
+          document.getElementById('adminConfirmImport').disabled =
+            !document.getElementById('adminImportConfirmCheck').checked;
+        }
+      }
+    }
+
+    async function downloadAdminImportTemplate() {
+      try {
+        const headers = {};
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const response = await fetch(`${API_BASE}/admin/pilot-diagnostic/import-template`, { headers });
+        if (!response.ok) throw new Error(`No fue posible descargar la plantilla (HTTP ${response.status}).`);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'plantilla-importacion-preguntas.xlsx';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        setAdminDiagnosticNotice(error.message);
+      }
+    }
+
+    async function confirmAdminImport() {
+      const preview = adminDiagnosticState.importPreview;
+      const file = adminDiagnosticState.importFile;
+      if (
+        adminDiagnosticState.importing ||
+        state.user?.rol !== 'admin' ||
+        !file ||
+        !preview?.confirmable ||
+        !document.getElementById('adminImportConfirmCheck').checked
+      ) {
+        return;
+      }
+
+      adminDiagnosticState.importing = true;
+      document.getElementById('adminImportProgress').hidden = false;
+      document.getElementById('adminImportProgressText').textContent = 'Guardando versión borrador en una transacción…';
+      document.getElementById('adminConfirmImport').disabled = true;
+      document.getElementById('adminPreviewImport').disabled = true;
+      setAdminDiagnosticNotice('');
+      try {
+        const data = await sendAdminImportRequest(
+          '/admin/pilot-diagnostic/imports/confirm',
+          file,
+          preview.confirmation_token
+        );
+        adminDiagnosticState.selectedVersion = data.version.id;
+        adminDiagnosticState.importPreview = null;
+        adminDiagnosticState.importFile = null;
+        document.getElementById('adminImportFile').value = '';
+        document.getElementById('adminImportVersionName').value = '';
+        document.getElementById('adminImportConfirmCheck').checked = false;
+        resetAdminImportPreview();
+        await loadAdminDiagnostic();
+        setAdminDiagnosticNotice(
+          `Se creó el borrador "${data.version.version}" con ${data.version.total_preguntas} preguntas. El examen activo y sus resultados no se modificaron.`,
+          true
+        );
+      } catch (error) {
+        setAdminDiagnosticNotice(error.message);
+      } finally {
+        adminDiagnosticState.importing = false;
+        document.getElementById('adminImportProgress').hidden = true;
+        updateAdminImportControls();
+        document.getElementById('adminConfirmImport').disabled =
+          !adminDiagnosticState.importPreview?.confirmable ||
+          !document.getElementById('adminImportConfirmCheck').checked;
+      }
+    }
+
     async function saveAdminQuestion(event) {
       event.preventDefault();
       if (adminDiagnosticState.saving) return;
@@ -3259,6 +3535,7 @@
         enunciado: document.getElementById('adminQuestionPrompt').value,
         clave: correct.value,
         justificacion: document.getElementById('adminQuestionJustification').value,
+        fuente_url: document.getElementById('adminQuestionSourceUrl').value,
         opciones: ['A', 'B', 'C', 'D'].map((code) => ({
           codigo: code,
           texto: document.getElementById(`adminOptionText${code}`).value,
@@ -3298,7 +3575,9 @@
       evidence.textContent = document.getElementById('adminQuestionEvidence').value;
       const prompt = document.createElement('p');
       prompt.textContent = document.getElementById('adminQuestionPrompt').value;
-      preview.append(heading, evidence, prompt);
+      const sourceUrl = document.createElement('p');
+      sourceUrl.textContent = `Fuente URL: ${document.getElementById('adminQuestionSourceUrl').value || 'No indicada'}`;
+      preview.append(heading, evidence, prompt, sourceUrl);
       for (const code of ['A', 'B', 'C', 'D']) {
         const option = document.createElement('p');
         option.className = 'admin-preview-option';
@@ -3347,6 +3626,8 @@
       document.getElementById('adminExamSelect').addEventListener('change', async (event) => {
         adminDiagnosticState.selectedExam = event.target.value;
         adminDiagnosticState.selectedVersion = '';
+        resetAdminImportPreview();
+        updateAdminImportControls();
         renderAdminCategories();
         try {
           await loadAdminDiagnostic();
@@ -3362,6 +3643,21 @@
         searchTimer = setTimeout(() => loadAdminQuestions('').catch((error) => setAdminDiagnosticNotice(error.message)), 250);
       });
       document.getElementById('adminCreateVersion').addEventListener('click', createAdminDraft);
+      document.getElementById('adminDownloadTemplate').addEventListener('click', downloadAdminImportTemplate);
+      document.getElementById('adminImportFile').addEventListener('change', () => {
+        resetAdminImportPreview();
+        updateAdminImportControls();
+      });
+      document.getElementById('adminImportVersionName').addEventListener('input', () => {
+        resetAdminImportPreview();
+        updateAdminImportControls();
+      });
+      document.getElementById('adminPreviewImport').addEventListener('click', previewAdminImport);
+      document.getElementById('adminImportConfirmCheck').addEventListener('change', (event) => {
+        document.getElementById('adminConfirmImport').disabled =
+          !adminDiagnosticState.importPreview?.confirmable || !event.target.checked;
+      });
+      document.getElementById('adminConfirmImport').addEventListener('click', confirmAdminImport);
       document.getElementById('adminQuestionForm').addEventListener('submit', saveAdminQuestion);
       document.getElementById('adminPreviewButton').addEventListener('click', showAdminQuestionPreview);
       document.getElementById('adminHistoryButton').addEventListener('click', () => {

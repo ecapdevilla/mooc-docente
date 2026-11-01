@@ -411,4 +411,18 @@ La rama publica Production automáticamente según la configuración reportada p
 - La visibilidad del enlace y el acceso a la vista se condicionan al rol de administrador en [`../indexInicial.html`](../indexInicial.html); esto es solo UX, la autorización efectiva permanece en backend.
 - Pruebas API/UI locales y pruebas PostgreSQL aisladas están descritas en el informe de entrega. No se ejecutó el conjunto de pruebas de autenticación que crea y elimina usuarios mediante `.env`, porque el destino local de esa configuración no se debe asumir aislado de Production.
 - El equipo confirmó que el pool de Vercel usa `postgres` con `BYPASSRLS`; la ruta temporal se elimina del próximo despliegue del administrador.
-- No se modificaron Vercel, variables de entorno ni la rama; no se hizo commit/push y no se ejecutó DDL en Supabase.
+- El código no modifica configuración de Vercel ni variables de entorno. La migración de `fuente_url` ya está instalada en Production según la consulta de solo lectura descrita abajo; esta preparación no ejecuta DDL.
+
+## Importación XLSX: requisito adicional de esquema
+
+La importación conserva `fuente_url` en cada borrador editorial. Antes de preparar el despliegue, el responsable confirmó mediante una consulta de solo lectura en Supabase Production (proyecto `yzpsjoshubgpganhqdqu`) que `public.md_pilot_editorial_questions.fuente_url` existe como `text` nullable y que la restricción permite únicamente `NULL` o valores cuyo texto recortado tenga entre 1 y 2048 caracteres. La definición reportada coincide con la migración [`../database/migrations/20261101_add_pilot_editorial_source_url.sql`](../database/migrations/20261101_add_pilot_editorial_source_url.sql).
+
+La migración ya está instalada en Production: **no volver a ejecutarla**. El archivo SQL se conserva como registro de la modificación y para instalaciones nuevas. En otra base, verificar primero la columna y ejecutar la migración solo si aún no existe y se cuenta con autorización, respaldo y destino confirmado; la migración aborta si la columna ya existe.
+
+Para este despliegue, publicar únicamente el código, pruebas y documentación del importador. No hay DDL pendiente en Production. Tras el deployment, probar descarga de plantilla y previsualización autenticada; la primera confirmación de importación debe realizarla manualmente el administrador y crear una nueva versión en borrador. No editar ni publicar la versión activa.
+
+Si el código desplegado presenta errores, volver al deployment anterior; no retirar la columna ni borrar datos como rollback. La importación no modifica preguntas activas, intentos ni respuestas, y no cambia los requisitos RLS/permisos de las cuatro tablas editoriales.
+
+### Puerta de seguridad de dependencias
+
+La auditoría inicial de producción reportó 15 entradas vulnerables: seis ya estaban en el lockfile base y nueve correspondían al árbol de ExcelJS (`archiver`, `glob`, `minimatch` y dependencias relacionadas). ExcelJS se retiró a favor de `fflate` y `saxes`; se actualizaron las dependencias runtime afectadas dentro de rangos compatibles y se quitó `uuid`, que no tenía usos en el código. La validación final local de `npm audit --omit=dev` reportó cero vulnerabilidades. Antes de publicar, repetir la auditoría con el lockfile del commit a desplegar; no usar `npm audit fix --force`.

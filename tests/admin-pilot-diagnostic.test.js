@@ -273,6 +273,8 @@ describe('API editorial del diagnóstico piloto', () => {
 
   test('crea una pregunta nueva sin origen en una transacción con cuatro opciones e historial', async () => {
     const newQuestionId = 'c19b9db2-1c2a-4f4a-9c2a-0b2f6af71111';
+    const newQuestion = newQuestionPayload();
+    newQuestion.fuente_url = 'https://example.test/nueva';
     client.query.mockImplementation(async (sql, params = []) => {
       if (sql.includes('FROM md_pilot_editorial_versions') && sql.includes('FOR UPDATE')) {
         return { rows: [{ id: VERSION_ID, codigo: EXAM_CODE, estado: 'borrador' }] };
@@ -289,6 +291,7 @@ describe('API editorial del diagnóstico piloto', () => {
           'Una situación nueva de prueba plantea una decisión pedagógica.',
           'B',
           'La respuesta integra el contexto y la evidencia del aprendizaje.',
+          'https://example.test/nueva',
         ]);
         return { rows: [{ id: newQuestionId }] };
       }
@@ -298,10 +301,11 @@ describe('API editorial del diagnóstico piloto', () => {
     const response = await request(app)
       .post(`${BASE}/versions/${VERSION_ID}/questions`)
       .set('Authorization', `Bearer ${accessToken()}`)
-      .send(newQuestionPayload());
+      .send(newQuestion);
 
     expect(response.status).toBe(201);
     expect(response.body.question.source_question_id).toBeNull();
+    expect(response.body.question.fuente_url).toBe('https://example.test/nueva');
     const statements = client.query.mock.calls.map(([sql]) => sql);
     expect(statements.filter((sql) => sql.includes('INSERT INTO md_pilot_editorial_options'))).toHaveLength(4);
     expect(statements.some((sql) => sql.includes('INSERT INTO md_pilot_editorial_audit'))).toBe(true);
@@ -321,6 +325,20 @@ describe('API editorial del diagnóstico piloto', () => {
       .send(invalidPayload);
 
     expect(response.status).toBe(400);
+    expect(pool.connect).not.toHaveBeenCalled();
+  });
+
+  test('rechaza esquemas no HTTP para la fuente antes de abrir una transacción', async () => {
+    const invalidPayload = newQuestionPayload();
+    invalidPayload.fuente_url = 'javascript:alert(1)';
+
+    const response = await request(app)
+      .post(`${BASE}/versions/${VERSION_ID}/questions`)
+      .set('Authorization', `Bearer ${accessToken()}`)
+      .send(invalidPayload);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain('http o https');
     expect(pool.connect).not.toHaveBeenCalled();
   });
 
@@ -429,8 +447,8 @@ describe('API editorial del diagnóstico piloto', () => {
         return { rows: [{ categoria: 'Pedagogía' }] };
       }
       if (sql.includes('UPDATE md_pilot_editorial_questions')) {
-        const [orden, categoria, evidencia, enunciado, clave, justificacion] = params;
-        savedQuestion = { ...savedQuestion, orden, categoria, evidencia, enunciado, clave, justificacion };
+        const [orden, categoria, evidencia, enunciado, clave, justificacion, fuente_url] = params;
+        savedQuestion = { ...savedQuestion, orden, categoria, evidencia, enunciado, clave, justificacion, fuente_url };
       }
       if (sql.includes('INSERT INTO md_pilot_editorial_options')) {
         const [, codigo, texto, retroalimentacion] = params;
@@ -439,13 +457,16 @@ describe('API editorial del diagnóstico piloto', () => {
       return { rows: [], rowCount: 1 };
     });
 
+    const updatePayload = draftPayload();
+    updatePayload.fuente_url = 'https://example.test/actualizada';
     const response = await request(app)
       .put(`${BASE}/versions/${VERSION_ID}/questions/${QUESTION_ID}`)
       .set('Authorization', `Bearer ${accessToken()}`)
-      .send(draftPayload());
+      .send(updatePayload);
 
     expect(response.status).toBe(200);
     expect(response.body.question.clave).toBe('B');
+    expect(response.body.question.fuente_url).toBe('https://example.test/actualizada');
     expect(response.body.question.opciones).toHaveLength(4);
     expect(client.query).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO md_pilot_editorial_audit'),
