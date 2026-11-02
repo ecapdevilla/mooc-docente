@@ -101,7 +101,14 @@ Hallazgo adicional del despliegue: el `400` ya no llega con el mensaje
 `JSON inválido en el cuerpo de la solicitud`, sino con el genérico
 `Error interno del servidor`. Motivo: en el runtime serverless de Vercel el
 error no trae `type = 'entity.parse.failed'` y el `SyntaxError` se crea en otro
-contexto, así que la comprobación con `instanceof` falla. La detección se movió
-a `src/utils/httpErrors.js` y ahora reconoce las tres formas (tipo de
-`body-parser`, `SyntaxError` de otro contexto con status 400 y error 400 con
-`body`). Cubierto por `tests/http-errors.test.js` (6 casos).
+contexto, así que la comprobación con `instanceof` falla.
+
+Corrección definitiva: `src/server.js` envuelve `express.json()` y marca
+`req.cuerpoJsonInvalido` cuando ese middleware rechaza el cuerpo; el manejador
+global usa la marca antes de inspeccionar el error. `src/utils/httpErrors.js`
+queda como red de seguridad para errores que no pasan por ese middleware y está
+cubierto por `tests/http-errors.test.js` (6 casos). Esta detección ya no depende
+de la forma del error.
+
+Para verificar qué versión está en línea sin abrir el panel, `GET /health`
+devuelve `commit` (SHA corto de `VERCEL_GIT_COMMIT_SHA` o `local` en desarrollo).

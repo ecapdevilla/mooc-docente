@@ -9,6 +9,9 @@ describe('Salud del sistema', () => {
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('ok');
     expect(typeof res.body.timestamp).toBe('string');
+    // Permite verificar qué versión está desplegada (SHA de Vercel o 'local').
+    expect(typeof res.body.commit).toBe('string');
+    expect(res.body.commit.length).toBeGreaterThan(0);
   });
 
   test('GET /api/v1/ping/health confirma la conexión a la base de datos', async () => {

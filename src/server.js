@@ -35,7 +35,27 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
 }));
-app.use(express.json({ limit: '10kb' }));
+
+/**
+ * `express.json()` envuelto para marcar en la petición cualquier fallo de
+ * análisis del cuerpo. El manejador global no puede depender de la forma del
+ * error: en local llega como `SyntaxError` con `entity.parse.failed`, pero el
+ * runtime serverless de Vercel lo entrega con otra forma (sin `type` y con un
+ * `SyntaxError` creado en otro contexto). Si el middleware falla, el cuerpo no
+ * es un JSON válido por definición.
+ */
+const analizarJson = express.json({ limit: '10kb' });
+
+app.use((req, res, next) => {
+  analizarJson(req, res, (error) => {
+    if (error) {
+      req.cuerpoJsonInvalido = true;
+    }
+
+    next(error);
+  });
+});
+
 app.use(express.urlencoded({ extended: true }));
 
 // Trust proxy para Vercel serverless (resolución correcta de IP en rate limiter)
@@ -73,8 +93,14 @@ app.get('/api/v1', (req, res) => {
 });
 
 // Health check
+// `commit` permite verificar qué versión está desplegada sin abrir el panel de
+// Vercel: el runtime serverless expone el SHA de la compilación en esa variable.
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    commit: (process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT || 'local').slice(0, 7),
+  });
 });
 
 // Frontend estático
@@ -130,9 +156,10 @@ app.use((err, req, res, next) => {
   // Un cuerpo JSON malformado lo reporta body-parser como SyntaxError con
   // type 'entity.parse.failed'. Ese caso es un 400 del cliente, nunca un 500,
   // y aplica a cualquier ruta (por eso no se diagnostica como fallo de login).
-  // El runtime de Vercel entrega el mismo caso sin `type`, así que la
-  // detección vive en `src/utils/httpErrors.js`.
-  const esCuerpoInvalido = esCuerpoJsonInvalido(err);
+  // El marcador lo pone el middleware `analizarJson` cuando `express.json()`
+  // rechaza el cuerpo. El clasificador cubre el caso en que el error llega sin
+  // pasar por ese middleware (por ejemplo, desde otra capa de análisis).
+  const esCuerpoInvalido = req.cuerpoJsonInvalido === true || esCuerpoJsonInvalido(err);
 
   const status = esCuerpoInvalido ? 400 : err.status || err.statusCode || 500;
   const isDevelopment = process.env.NODE_ENV === 'development';

@@ -249,8 +249,9 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   inexistente con JSON roto, log sin cuerpo ni contraseña, 404 sin cuerpo y 401
   con credenciales inválidas) y `tests/http-errors.test.js` (6 casos del
   clasificador). En local el error llega como `entity.parse.failed`; en Vercel
-  llega sin `type` y con `SyntaxError` de otro contexto, por eso la detección
-  vive en `src/utils/httpErrors.js`.
+  llega con otra forma, así que `src/server.js` marca `req.cuerpoJsonInvalido`
+  al envolver `express.json()` y `src/utils/httpErrors.js` queda como red de
+  seguridad. `GET /health` devuelve `commit` con el SHA desplegado.
 - Carga del catálogo implementada en `scripts/generar-carga-catalogo.js`
   (`npm run carga:catalogo`): extrae `const MODULES` de `indexInicial.html`,
   valida títulos normalizados y emite cinco SQL en `database/loads/`
