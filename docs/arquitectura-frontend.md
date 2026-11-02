@@ -413,3 +413,10 @@ Pendiente (no bloquea nada de lo anterior):
 - Nota de entorno: el PostgreSQL de `127.0.0.1:5432` estaba en modo de
   recuperación; la suite se ejecutó contra `merito_test_local` en
   `127.0.0.1:5433`, sin tocar Supabase ni Production.
+- **Despliegue verificado en Production (commit `fe7770c`)**: `GET
+  https://mooc-docente.vercel.app/` → 200 con **18** `<script src>` (incluye
+  `/js/nucleo/ruta.js` antes de `principal.js`) y **0** manejadores en línea;
+  `/js/nucleo/ruta.js` → 200 `application/javascript`; `/js/principal.js` → 200
+  `application/javascript`; `/styles/app.css` → 200 `text/css`; `/health` reporta
+  `commit: fe7770c`. El HTML, `ruta.js` y `principal.js` servidos tienen el mismo
+  SHA-256 que el repositorio al normalizar CRLF.
