@@ -233,3 +233,12 @@ Pendiente (no bloquea nada de lo anterior):
 - `npm run contenido:catalogo`: 3 cursos, 9 módulos, 11 lecciones, 11
   cuestionarios, 44 opciones y 12.254 caracteres, idéntico al baseline medido
   antes de la extracción.
+- **Despliegue verificado (commits `6d17a44` + `ac831c6`, rama
+  `recovery/integracion-20261031`)**: `GET https://mooc-docente.vercel.app/` → 200,
+  16 `<script src>`, 0 `<style>` en línea y referencia a `/styles/app.css`;
+  `/styles/app.css` → 200 `text/css` con `Cache-Control: public, max-age=0,
+  must-revalidate`; `/js/principal.js`, `/js/datos/modulos.js` y
+  `/js/nucleo/sesion.js` → 200 `application/javascript`; `/api/v1/courses` → 200 y
+  `/health` → 200 con `commit: ac831c6`. El HTML, el CSS y tres módulos servidos
+  coinciden con el repositorio (mismo SHA-256 al normalizar CRLF), así que el
+  despliegue no altera el contenido.
