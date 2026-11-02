@@ -215,6 +215,12 @@ aparecen por separado, con números de línea reales.
   atributos `on*`. `script-src 'self'` se mantiene: tampoco hay `<script>` en
   línea. Si alguien reintroduce un `onclick`, el navegador lo bloquea y fallan
   `tests/spa-modular.test.js` y `tests/spa-acciones.test.js`.
+- **Alcance real de la cabecera**: en Production el HTML lo sirve la capa estática
+  de Vercel, que **no** añade CSP; la directiva se aplica en las respuestas de la
+  función Express (`/health`, `/api/v1/**`), en `npm run dev` y en `vercel dev`.
+  Para forzarla también en el HTML publicado hay que declararla en
+  `vercel.json` (`headers`); queda como tarea propia, con verificación de que los
+  CDN de Font Awesome y Google Fonts siguen permitidos.
 - Consecuencia práctica: cualquier control nuevo debe declarar `data-action` y su
   entrada en `nucleo/acciones.js`; no existe atajo por atributo.
 
@@ -310,3 +316,13 @@ Pendiente (no bloquea nada de lo anterior):
 - Nota de entorno: este checkout no incluye `.env`; la suite se ejecutó contra el
   PostgreSQL local documentado en la sección 8 (`merito_test_local`), sin tocar la
   base de Supabase ni Production.
+- **Despliegue verificado en Production (commit `833e8f6`)**: `GET
+  https://mooc-docente.vercel.app/` → 200 con **17** `<script src>` (incluye
+  `/js/nucleo/acciones.js`) y **0** manejadores en línea; `/js/nucleo/acciones.js`
+  → 200 `application/javascript`; `/styles/app.css` → 200 `text/css`;
+  `/health` reporta `commit: 833e8f6`. El HTML, `acciones.js` y `principal.js`
+  servidos tienen el mismo SHA-256 que el repositorio al normalizar CRLF.
+- Matiz del despliegue: la CSP `script-src-attr 'none'` aparece en las respuestas
+  de la función Express, no en `/` ni en `/js/**`, que Vercel sirve desde su capa
+  estática. El SPA ya no depende de esa cabecera para funcionar: no hay atributos
+  `on*` que bloquear.
