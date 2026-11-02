@@ -2,10 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 
+const { cargarSpa, RUTA_CSS } = require('./spa-dom');
+
 const root = path.join(__dirname, '..');
 const spaHtml = fs.readFileSync(path.join(root, 'indexInicial.html'), 'utf8');
 const diagnosticHtml = fs.readFileSync(path.join(root, 'diagnosticoPiloto.html'), 'utf8');
 const diagnosticCss = fs.readFileSync(path.join(root, 'public', 'diagnosticoPiloto.css'), 'utf8');
+// La hoja de estilos del SPA vive en public/styles/app.css desde la Etapa 1.
+const spaCss = fs.readFileSync(RUTA_CSS, 'utf8');
 
 const spaDocument = new JSDOM(spaHtml).window.document;
 const diagnosticDocument = new JSDOM(diagnosticHtml).window.document;
@@ -34,7 +38,7 @@ describe('Sistema visual UX/UI 2.0', () => {
   });
 
   test('usa identidad visual coherente, responsive y con movimiento reducido', () => {
-    const spaStyles = spaDocument.querySelector('style')?.textContent || '';
+    const spaStyles = spaCss;
 
     ['#14284B', '#2563EB', '#0D9488'].forEach((color) => {
       expect(spaStyles.toLowerCase()).toContain(color.toLowerCase());
@@ -49,7 +53,7 @@ describe('Sistema visual UX/UI 2.0', () => {
   });
 
   test('mantiene contraste suficiente en las acciones principales', () => {
-    const spaStyles = spaDocument.querySelector('style')?.textContent || '';
+    const spaStyles = spaCss;
 
     expect(spaStyles).toMatch(/\.btn-primary\s*\{[^}]*color:\s*#fff/i);
     expect(spaStyles).toMatch(/\.cta-box\s+\.btn\s*\{[^}]*background:\s*#0f766e[^}]*color:\s*#fff/i);
@@ -70,9 +74,7 @@ describe('Sistema visual UX/UI 2.0', () => {
   });
 
   test('el diálogo de acceso conserva el foco, lo limita y lo devuelve al cerrarse', async () => {
-    const dom = new JSDOM(spaHtml, {
-      runScripts: 'dangerously',
-      pretendToBeVisual: true,
+    const dom = await cargarSpa({
       url: 'http://localhost/',
       beforeParse(window) {
         window.fetch = async () => ({
@@ -80,9 +82,6 @@ describe('Sistema visual UX/UI 2.0', () => {
           status: 404,
           json: async () => ({ error: 'API de prueba no disponible' }),
         });
-        window.alert = () => {};
-        window.confirm = () => true;
-        window.scrollTo = () => {};
       },
     });
 

@@ -6,7 +6,7 @@ Construir una plataforma web para preparar concursos de méritos docentes. La pr
 
 ## Decisiones base
 
-- `indexInicial.html` es la fuente de diseño, contenido y flujo de usuario. Se conservará y se convertirá progresivamente en la interfaz funcional.
+- `indexInicial.html` es la fuente de diseño, contenido y flujo de usuario. Se conservará y se convertirá progresivamente en la interfaz funcional. Desde la Etapa 1 (2026-11-02) el HTML contiene solo el marcado: los estilos están en `public/styles/app.css` y la lógica y los datos en `public/js/**` (ver `docs/arquitectura-frontend.md`).
 - No se crearán nuevas interfaces paralelas. `index.html` y `app.js` son código provisional que se integrará o retirará cuando la SPA principal esté conectada.
 - Supabase será primero la base de datos PostgreSQL administrada. Se conservarán Express, `pg`, JWT y bcryptjs en la primera fase.
 - Vercel se usará después para desplegar el frontend y, si conviene, el backend como funciones o un servicio separado. No se despliega antes de tener una prueba completa local.
@@ -154,7 +154,7 @@ Criterio de salida: frontend y API desplegados, con simulacro anónimo y cuenta 
 - Fase 1 (Supabase): completada. La API opera contra Supabase con `pg`, JWT y bcryptjs.
 - Fase 2 (simulacro gratuito): pendiente.
 - Fase 3 (banco y editor de preguntas): pendiente. El seed ya carga 4 lecciones y 4 quizzes con 4 opciones y 1 respuesta correcta cada uno.
-- Fase 4 (cuenta y aprendizaje): en progreso. `indexInicial.html` registra, inicia sesión y persiste progreso e insignias en la API. Falta reconciliar el contenido de lecciones entre el SPA y la base de datos y retirar `index.html`/`app.js`.
+- Fase 4 (cuenta y aprendizaje): en progreso. `indexInicial.html` registra, inicia sesión y persiste progreso e insignias en la API. Etapa 1 del frontend terminada (SPA modular, 21 suites y 144 pruebas en verde). Falta la evaluación final por curso, el router por hash, reconciliar el contenido de lecciones y retirar `index.html`/`app.js`.
 - Fase 5 (despliegue): preparada y no ejecutada. `vercel.json` + `api/index.js` definen frontend estático y API serverless; en Vercel deben configurarse `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production` y `CORS_ORIGIN`.
 
 ## Criterios permanentes para agentes

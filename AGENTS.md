@@ -8,14 +8,14 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 
 - Plataforma MOOC para preparación de concursos de méritos docentes.
 - Backend: Node.js 18+, Express 4, PostgreSQL, JWT y bcryptjs.
-- Frontend: HTML, CSS y JavaScript vanilla; la SPA principal es `indexInicial.html` (autocontenida) y consume la API directamente.
+- Frontend: HTML, CSS y JavaScript vanilla. Desde la Etapa 1 (2026-11-02) el SPA está modularizado: `indexInicial.html` (30 KB) conserva solo el marcado, `public/styles/app.css` la hoja de estilos y `public/js/**` (16 archivos clásicos) los datos, el núcleo, las vistas y el arranque. Consume la API directamente. Ver `docs/arquitectura-frontend.md`.
 - Punto de entrada backend: `src/server.js`. Escucha solo si se ejecuta directamente y exporta la app para uso serverless.
 - API base: `/api/v1`.
 - Esquema de datos: `database/schema.sql`.
 - Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`, idempotentes. Las opciones de quiz se reconcilian al reejecutar el seed.
 - Base de datos de desarrollo: Supabase (pooler) mediante `DATABASE_URL` en `.env`.
-- Pruebas: `tests/` tiene 6 suites (salud, autenticación, cursos, progreso, interfaz del SPA con jsdom y experiencia de aprendizaje). `tests/learning-experience.test.js` corre sin base de datos con un doble de la API (8 pruebas). `npm test` requiere la base configurada en `.env`.
-- Servido local: `GET /` entrega `indexInicial.html`; `public/` expone `/api-client.js` y `/auth.js` en la raíz.
+- Pruebas: `tests/` tiene 21 suites y 144 pruebas. Las de interfaz ejecutan el SPA real en jsdom con `tests/spa-dom.js` (resuelve `/js/**` y `/styles/**` desde disco); `tests/spa-modular.test.js` protege el contrato de la Etapa 1 y `tests/learning-experience.test.js` corre sin base de datos con un doble de la API. `npm test` requiere la base configurada en `.env`.
+- Servido local: `GET /` entrega `indexInicial.html`; `express.static(public)` sirve `/styles/app.css` y `/js/**`, y `public/` expone `/api-client.js` y `/auth.js` en la raíz.
 - Despliegue: `vercel.json` y `api/index.js` preparan frontend estático + API serverless. Aún no desplegado ni verificado en Vercel.
 - Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
 - Deuda menor: el archivo `nulul` en la raíz es un artefacto de shell versionado por error.
@@ -35,7 +35,7 @@ El flujo actual es:
 - Las consultas están directamente en `src/routes/`; `src/controllers/` y `src/models/` están vacíos.
 - `public/api-client.js` y `public/auth.js` son el cliente de API y la gestión de sesión con `localStorage`.
 - `app.js` es la lógica que intenta consumir la API.
-- `indexInicial.html` es la SPA documentada, pero actualmente usa principalmente módulos y progreso locales; existe una segunda integración en `app.js`.
+- `indexInicial.html` es la SPA documentada: conserva el marcado y los puntos de integración; desde la Etapa 1 carga sus estilos desde `public/styles/app.css` y su lógica desde `public/js/**`.
 
 ### Estado validado para el quiz (2026-09-16)
 
@@ -75,6 +75,21 @@ El flujo actual es:
 - Production (2026-11-01, antes de publicar): `/api/v1/courses` devuelve `{"courses":[]}` aunque la base responde conectada, por lo que la SPA usará la ruta local de cada curso. El diagnóstico sigue publicado con 50 preguntas (`MD-DIA-2026-PILOTO-001`).
 - Despliegue verificado (commit `906e771`, rama `recovery/integracion-20261031`, fast-forward): Production sirve el HTML idéntico al commit (SHA-256 coincidente), con 237 reglas `.lx-`, `#view-course`, `#view-module` y `lx-lesson-page`; rutas administrativas y simulacro siguen en 401 sin token; `/diagnostico-piloto` responde 200. La navegación autenticada en Production no se verificó: no hay credenciales y la API pública no publica cursos. Evidencia en `docs/evidence/learning-experience/production-postdeploy.json`.
 - Pendiente: la calificación del quiz de lección sigue en el navegador (el detalle del curso expone `es_correcta`); debe migrarse al backend como el simulacro.
+
+### Frontend modular: Etapa 1 (2026-11-02)
+
+- Motivo: `indexInicial.html` era aplicación, hoja de estilos y fuente de datos a la vez (6.700 líneas, 273 KB), con el contenido académico enterrado entre CSS y JavaScript. Antes de ampliar cursos y evaluaciones había que separar responsabilidades sin cambiar comportamiento.
+- Resultado: `indexInicial.html` conserva el marcado (574 líneas, 30 KB); `public/styles/app.css` contiene la hoja de estilos (3.072 líneas, 98,6 KB); `public/js/**` contiene 16 archivos clásicos (3.204 líneas, 150 KB): `datos/modulos.js`, `nucleo/{estado,ui,api,sesion,modales}.js`, `admin/{diagnostico-editor,diagnostico-inicio}.js`, `vistas/{acceso,dashboard,quiz-diagnostico,curso-modelo,curso,modulo,leccion}.js` y `principal.js`.
+- Modelo técnico: scripts clásicos (`<script src>`) sin bundler ni módulos ES. Comparten el ámbito global léxico, así que `MODULES`, `state` y las funciones se resuelven entre archivos sin `import`/`export`; el orden de carga importa y `principal.js` (init) va al final. No se puede usar `type="module"` porque jsdom no ejecuta módulos ES.
+- La extracción fue mecánica y verificada: la concatenación de los 16 archivos coincide byte a byte con el bloque `<script>` original y el CSS con el bloque `<style>`. No se reescribió código, marcado, IDs, textos ni `onclick`, y no se tocaron endpoints ni la lógica de progreso.
+- Fuente de contenido: `MODULES` vive ahora en `public/js/datos/modulos.js`. `scripts/generar-carga-catalogo.js` y `scripts/auditar-contenido-catalogo.js` leen ese archivo (mismo parser con `vm`), y los cinco SQL de `database/loads/` se regeneraron con la nueva ruta en la cabecera.
+- Pruebas: nuevo `tests/spa-dom.js` (cargador jsdom con `ResourceLoader` que sirve `/js/**` y `/styles/**` desde disco y espera a que el SPA exponga `handleRegister`) y nuevo `tests/spa-modular.test.js` (8 pruebas): falla si el HTML vuelve a tener `<style>`/`<script>` en línea, si falta un archivo referenciado, si aparece `export`/`import`/`type="module"`, si el CSS pierde tamaño o identidad visual, si `MODULES` deja de ser consumible, si Express no sirve los recursos, si `vercel.json` deja de enrutarlos antes del catch-all o si la CSP deja de permitir los manejadores en línea que el marcado aún usa.
+- Las cinco suites jsdom (`spa-ui`, `learning-experience`, `lesson-quiz-spa`, `admin-pilot-diagnostic-ui`, `ui-design`) se actualizaron para cargar los archivos reales; `ui-design` lee el CSS desde `public/styles/app.css`.
+- Servido: Express ya cubría `public/` con `express.static`; `vercel.json` añade `/styles/(.*) -> public/styles/$1` y `/js/(.*) -> public/js/$1` antes del catch-all, con `Cache-Control: public, max-age=0, must-revalidate` porque los nombres no llevan hash.
+- CSP alineada (hallazgo preexistente): Helmet servía `script-src-attr 'none'`, que bloquea los 49 `onclick`/`onsubmit` del marcado y deja el SPA inerte cuando el HTML sale por Express (local y `vercel dev`); en Production el HTML lo sirve la capa estática de Vercel, por eso no se había detectado. `src/server.js` declara ahora `script-src-attr 'unsafe-inline'` (con `script-src 'self'` intacto, porque ya no hay `<script>` en línea) y `tests/spa-modular.test.js` fija el contrato. Es deuda de la Etapa 2: al sustituir los atributos por delegación de eventos, la directiva vuelve a `'none'`.
+- Validación ejecutada: `node --check` en los 16 archivos; servidor real con `/` 200 (29.929 bytes, enlaza `app.css`), `/styles/app.css` 200 `text/css` (98.634 bytes) y los módulos 200; `npm test` 21/21 suites y 144/144 pruebas; `npm run contenido:catalogo` idéntico al baseline (3 cursos, 9 módulos, 11 lecciones, 11 cuestionarios, 44 opciones, 12.254 caracteres).
+- Referencia completa: `docs/arquitectura-frontend.md` (estructura, orden de carga, flujo de datos, recetas, pruebas, despliegue, límites y evidencia).
+- Límites asumidos en esta etapa: se conservan los `onclick`/`on*` (49+51), no hay router (`hash`/`pushState`), siguen publicados `index.html`/`app.js` y `diagnosticoPiloto.html`. Etapa 2: router por hash y delegación de eventos. Un framework solo se evaluará después, por vista.
 
 ### Decisión de producto
 
@@ -132,7 +147,9 @@ Estado (2026-09-16): Supabase conectado y operativo; seed canónico; bloqueos fu
 
 Estado (2026-11-01): se añadió el recorrido de aprendizaje curso → módulo → lección con el sistema `.lx-` en `indexInicial.html`; las tres vistas consumen módulos, lecciones y progreso reales de la API y declaran como "en preparación" lo que aún no tiene contenido. La suite `tests/learning-experience.test.js` (8 pruebas, sin base de datos) cubre estados, navegación y persistencia simulada. Pendiente de revisión visual en navegador a 1440/768/390 px y de decisión sobre la calificación del quiz de lección en backend.
 
-Siguiente acción concreta: revisar el recorrido curso → módulo → lección en navegador y luego ampliar el banco de preguntas o construir el editor/importador administrativo.
+Estado (2026-11-02): Etapa 1 del frontend completada y verificada. `indexInicial.html` ya no contiene CSS ni JavaScript: enlaza `public/styles/app.css` y carga 16 archivos clásicos de `public/js/**` en orden (datos → núcleo → admin → vistas → arranque). La extracción es byte a byte equivalente al bloque original, las cinco suites jsdom cargan los archivos reales y la nueva suite `tests/spa-modular.test.js` impide que el HTML vuelva a convertirse en aplicación, estilos y datos a la vez. La suite completa queda en 21/21 suites y 144/144 pruebas. `MODULES` se edita ahora en `public/js/datos/modulos.js` y los scripts de catálogo leen ese archivo. Sigue pendiente el examen final por curso, el router por hash y el retiro de `index.html`/`app.js`.
+
+Siguiente acción concreta: definir el contenido del curso #1 (Legislación o Pedagogía), su umbral de aprobación y el formato de entrega, y construir el examen final de curso (`GET/POST /api/v1/courses/:id/assessment`) reutilizando la UI del simulacro. La Etapa 2 (router por hash + delegación de eventos) va después, antes de evaluar cualquier framework.
 
 ## Comandos
 
@@ -141,7 +158,7 @@ npm install
 npm run dev       # nodemon src/server.js
 npm start         # node src/server.js
 npm run seed      # idempotente; requiere PostgreSQL y variables de entorno
-npm test          # 6 suites; las que usan PostgreSQL requieren la base de .env
+npm test          # 21 suites / 144 pruebas; las que usan PostgreSQL requieren la base de .env
 ```
 
 Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en `.env.example`. El servidor verifica la conexión a la base de datos antes de escuchar en el puerto. Con `npm run dev`, el SPA está en `http://localhost:3000/` y la API en `http://localhost:3000/api/v1`. Para reproducir el enrutado de Vercel en local: `npx vercel dev`.
@@ -154,7 +171,16 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en 
 - `src/services/`: lógica de negocio reutilizable.
 - `src/middleware/auth.js`: autenticación y autorización.
 - `src/utils/validators.js`: validación de entradas.
-- `indexInicial.html`: SPA principal (diseño, contenido y flujo del producto).
+- `indexInicial.html`: SPA principal: marcado de vistas, IDs y orden de carga de los módulos.
+- `public/styles/app.css`: hoja de estilos única del SPA (tokens y componentes `.lx-`).
+- `public/js/datos/modulos.js`: `const MODULES`, fuente del catálogo, las lecciones y los quizzes del frontend.
+- `public/js/nucleo/`: estado, vista/navbar, cliente de API, sesión y progreso, modales.
+- `public/js/vistas/`: una vista por archivo (acceso, dashboard, curso, módulo, lección, simulacro).
+- `public/js/admin/`: editor administrativo del diagnóstico piloto.
+- `public/js/principal.js`: `init()` del SPA; se carga al final.
+- `tests/spa-dom.js`: cargador jsdom del SPA modular (sirve `/js/**` y `/styles/**` desde disco).
+- `tests/spa-modular.test.js`: guardián del contrato de la Etapa 1.
+- `docs/arquitectura-frontend.md`: estructura, orden de carga, flujo de datos, recetas, pruebas y despliegue del frontend.
 - `docs/inventario-academico-tres-cursos.md`: inventario A/B/C, contrato de la API, correspondencia SPA↔BD y modelo de presentación de curso, módulo y lección.
 - `tests/learning-experience.test.js`: integración sin base de datos del recorrido curso → módulo → lección con un doble de la API.
 - `public/`: cliente HTTP y autenticación usados por la integración provisional.
@@ -171,8 +197,11 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en 
 - No exponer secretos de `.env`, tokens ni contraseñas en código, logs o documentación.
 - Los cambios de esquema deben incluir la actualización de `database/schema.sql` y del seed cuando aplique.
 - Mantener compatibilidad con las respuestas que consume `indexInicial.html` y `public/api-client.js`.
-- Preguntas iniciales: guardar en PostgreSQL/Supabase mediante `quizzes` y `quiz_options`; no hardcodearlas en el HTML. Usar el seed para la primera carga y reservar un editor/importador para la gestión posterior.
-- Mapeo SPA ↔ API: `indexInicial.html` empareja cada módulo del prototipo con un curso por título, resuelve las lecciones por orden (`modulos[].lecciones[]`) y guarda cada lección completada con `POST /api/v1/progress/lesson/:id`. `GET /api/v1/progress` entrega, por módulo, `lessons` con `completada`.
+- Preguntas iniciales: guardar en PostgreSQL/Supabase mediante `quizzes` y `quiz_options`; no hardcodearlas en el HTML. La fuente del frontend es `public/js/datos/modulos.js`; para la primera carga se usa el seed y el editor/importador queda para la gestión posterior.
+- Frontend modular (Etapa 1): no introducir `<style>` ni `<script>` con lógica en línea en `indexInicial.html`; los estilos van a `public/styles/app.css` y el código a `public/js/**` como scripts clásicos. El orden de carga importa y `principal.js` va al final. No usar `type="module"` (jsdom no ejecuta módulos ES) ni redeclarar nombres entre archivos (comparten ámbito global).
+- Contenido del catálogo: `MODULES` se edita en `public/js/datos/modulos.js`; después se ejecutan `npm run contenido:catalogo` y `npm run carga:catalogo` para auditar y regenerar `database/loads/`. `tests/spa-modular.test.js` debe pasar.
+- CSP: `src/server.js` sirve `script-src 'self'` y `script-src-attr 'unsafe-inline'` solo porque el marcado todavía usa `onclick`/`onsubmit`. No añadir `<script>` en línea (la suite lo impide) y, al migrar a delegación de eventos, devolver `script-src-attr` a `'none'`.
+- Mapeo SPA ↔ API: `public/js/datos/modulos.js` aporta los módulos del prototipo y `nucleo/sesion.js` (`loadCourseMap`) los empareja con cada curso por título, resuelve las lecciones por orden (`modulos[].lecciones[]`) y guarda cada lección completada con `POST /api/v1/progress/lesson/:id`. `GET /api/v1/progress` entrega, por módulo, `lessons` con `completada`.
 - Origen de la API en el SPA: `window.MERITO_API_BASE` si está definido; si no, `origen actual + /api/v1`; si no, `http://localhost:3000/api/v1` (apertura con `file://`). Si la API no responde, el SPA degrada a modo local y avisa al usuario.
 - Claves de `localStorage` compartidas: `auth_token` y `user`.
 - Antes de cambiar un endpoint, revisar su ruta, controlador/modelo y llamada del frontend inmediata; no explorar todo el repositorio sin necesidad.
@@ -302,7 +331,9 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   `DATABASE_URL` y `JWT_SECRET` en el entorno y una base con
   `database/schema.sql`, el seed y
   `database/migrations/20261101_lesson_quiz_responses.sql`. Con eso la suite
-  completa queda en 20/20 suites y 136/136 pruebas (`npx jest --maxWorkers=2`).
+  completa queda en 21/21 suites y 144/144 pruebas (`npx jest --maxWorkers=2`).
+  Validado el 2026-11-02 sobre `postgres:15` en Docker (puerto 5433) con una base
+  desechable; el procedimiento está en `docs/arquitectura-frontend.md` (sección 8).
 
 ## Prioridades pendientes
 
@@ -311,5 +342,6 @@ Estado (2026-11-01, local, sin commit ni despliegue):
 3. ~~Crear Supabase y conectar PostgreSQL mediante `DATABASE_URL`.~~ Hecho.
 4. Implementar el simulacro gratuito sin registro y su calificación en backend.
 5. Crear editor, importar y publicar las primeras 50 preguntas desde Word.
-6. Consolidar `indexInicial.html` como única SPA: progreso migrado a la API; falta reconciliar el contenido de lecciones y retirar `index.html`/`app.js`.
-7. Verificar el despliegue en Vercel (`vercel.json` y `api/index.js` ya preparados) y definir la estrategia de ramas.
+6. ~~Consolidar `indexInicial.html` como única SPA.~~ Etapa 1 hecha (2026-11-02): HTML solo con marcado, CSS en `public/styles/app.css`, lógica en `public/js/**` y guardián `tests/spa-modular.test.js`. Falta la Etapa 2 (router por hash + delegación de eventos) y retirar `index.html`/`app.js`.
+7. Verificar el despliegue en Vercel (`vercel.json` y `api/index.js` ya preparados, ahora con rutas `/js/**` y `/styles/**`) y definir la estrategia de ramas.
+8. Construir la evaluación final por curso (`GET/POST /api/v1/courses/:id/assessment`) con umbral de aprobación y persistencia del intento, empezando por el curso #1.

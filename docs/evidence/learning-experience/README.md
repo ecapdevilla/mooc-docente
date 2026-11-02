@@ -1,7 +1,11 @@
 # Evidencia visual — experiencia curso → módulo → lección
 
 Fecha de la revisión: 2026-11-01
-Alcance: `indexInicial.html` (SPA autocontenida)
+Alcance: `indexInicial.html` (SPA autocontenida). **Nota (2026-11-02):** el SPA se
+modularizó en la Etapa 1; el marcado sigue en `indexInicial.html` y el contenido
+(`const MODULES`) vive ahora en `public/js/datos/modulos.js`. Las capturas y
+mediciones de esta carpeta corresponden al estado anterior a esa extracción y se
+conservan como evidencia histórica.
 Entorno: Chrome estable en Windows conducido con `playwright-core`, viewports 1440×900 (escritorio), 768×1024 (tableta) y 390×844 (móvil), locale `es-CO` y `prefers-reduced-motion: reduce`.
 
 ## Naturaleza de las capturas

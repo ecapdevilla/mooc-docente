@@ -35,13 +35,22 @@ Mooc-Docente/
 │   └── server.js        # Entry point
 ├── public/              # Frontend assets
 │   ├── api-client.js
-│   └── auth.js
+│   ├── auth.js
+│   ├── styles/
+│   │   └── app.css      # Hoja de estilos del SPA (Etapa 1)
+│   └── js/              # SPA modular (Etapa 1): scripts clásicos en orden
+│       ├── datos/       # modulos.js: const MODULES
+│       ├── nucleo/      # estado, ui, api, sesion, modales
+│       ├── admin/       # editor del diagnóstico piloto
+│       ├── vistas/      # acceso, dashboard, curso, módulo, lección, simulacro
+│       └── principal.js # init()
 ├── docs/
-│   └── architecture.md
+│   ├── architecture.md
+│   └── arquitectura-frontend.md  # detalle del frontend modular
 ├── database/
 │   └── schema.sql
 ├── tests/
-├── indexInicial.html    # Frontend SPA
+├── indexInicial.html    # Marcado del SPA + orden de carga de sus módulos
 ├── package.json
 └── .env
 ```
@@ -52,7 +61,7 @@ Mooc-Docente/
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  Frontend (indexInicial.html)                                   │
+│  Frontend (indexInicial.html + public/js)                        │
 │  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐            │
 │  │  Landing     │→│  Dashboard   │←│  Lesson View │            │
 │  │  + Register  │  │  + Progress  │  │  + Quiz      │            │

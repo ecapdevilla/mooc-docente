@@ -12,7 +12,8 @@ npm run contenido:catalogo          # tabla y semáforo por lección
 npm run contenido:catalogo -- --json
 ```
 
-El script lee `const MODULES` de `indexInicial.html` con el mismo parser que
+El script lee `const MODULES` de `public/js/datos/modulos.js` (archivo de datos que
+carga `indexInicial.html` desde la Etapa 1) con el mismo parser que
 `scripts/generar-carga-catalogo.js`, de modo que mide exactamente lo que la
 carga escribe en PostgreSQL (HTML con espacios colapsados).
 
@@ -76,13 +77,13 @@ retroalimentación en ambos sentidos.
 6. **Contenido sin fecha de revisión ni autoría.** Para uso comercial conviene
    registrar versión, fecha y responsable académico de cada lección; hoy la
    única trazabilidad es el lote `catalog_load_batches`/`catalog_load_items` y
-   el propio `indexInicial.html`.
+   el propio `public/js/datos/modulos.js`.
 
 ## 4. Badges: por qué se crean nueve
 
 La carga crea un badge por módulo (`badges.nombre`, `descripcion =
 "Badge obtenido al completar <módulo>"`), tomando nombre, icono y color del
-`badge` declarado en cada módulo de `indexInicial.html`:
+`badge` declarado en cada módulo de `public/js/datos/modulos.js`:
 
 | Curso | Badge |
 | --- | --- |

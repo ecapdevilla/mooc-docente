@@ -2,7 +2,7 @@
 -- RESPALDO PREVIO DEL CATÁLOGO (SOLO LECTURA)
 -- =====================================================================
 -- Generado por scripts/generar-carga-catalogo.js (lote 20261101-catalogo-tres-cursos).
--- Fuente de contenido: indexInicial.html (const MODULES).
+-- Fuente de contenido: public/js/datos/modulos.js (const MODULES).
 -- Ejecutar con: psql "$DATABASE_URL" -f <este archivo> > respaldo.json
 --
 -- Exporta en JSON el estado actual de los cursos del lote y de todas sus

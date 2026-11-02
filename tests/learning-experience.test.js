@@ -2,21 +2,15 @@
  * Experiencia de aprendizaje del SPA: curso → módulo → lección.
  *
  * Prueba de integración sin base de datos: ejecuta el JavaScript real de
- * indexInicial.html en jsdom y sustituye la API por un doble que devuelve
- * módulos, lecciones y progreso coherentes con MODULES.
+ * indexInicial.html + public/js en jsdom y sustituye la API por un doble que
+ * devuelve módulos, lecciones y progreso coherentes con MODULES.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { JSDOM } = require('jsdom');
+const { cargarSpa, leerModulos } = require('./spa-dom');
 
-const html = fs.readFileSync(path.join(__dirname, '..', 'indexInicial.html'), 'utf8');
-
-// Extraer el arreglo MODULES del propio SPA para que el doble de la API use
-// exactamente los mismos títulos y lecciones publicadas.
-const inicio = html.indexOf('const MODULES = [');
-const fin = html.indexOf('\n    ];', inicio);
-const MODULES = eval(html.slice(inicio + 'const MODULES = '.length, fin + 7));
+// MODULES se lee del archivo de datos que carga el SPA para que el doble de la
+// API use exactamente los mismos títulos y lecciones publicadas.
+const MODULES = leerModulos();
 
 const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const texto = (nodo) => (nodo ? nodo.textContent.replace(/\s+/g, ' ').trim() : '');
@@ -86,15 +80,8 @@ function crearFixture() {
 async function crearDom({ sinApi = false } = {}) {
   const fixture = crearFixture();
 
-  const dom = new JSDOM(html, {
-    runScripts: 'dangerously',
-    pretendToBeVisual: true,
-    url: 'http://localhost/',
+  const dom = await cargarSpa({
     beforeParse(win) {
-      win.alert = () => {};
-      win.confirm = () => true;
-      win.scrollTo = () => {};
-      win.Element.prototype.scrollIntoView = () => {};
       win.localStorage.setItem('auth_token', 'token-de-prueba');
       win.localStorage.setItem('user', JSON.stringify({ nombre: 'Docente Prueba' }));
       win.fetch = async (url, opcionesFetch = {}) => {

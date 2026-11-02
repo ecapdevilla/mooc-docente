@@ -1,8 +1,5 @@
-const fs = require('fs');
-const path = require('path');
-const { JSDOM } = require('jsdom');
+const { cargarSpa } = require('./spa-dom');
 
-const HTML_PATH = path.join(__dirname, '..', 'indexInicial.html');
 const VERSION_ID = 'eeb7b88c-1d3c-4a2d-8a15-4f4a98261111';
 const QUESTION_ID = 'dab5fdf0-20a1-4e51-9bf7-d4034f001111';
 const IMPORTED_VERSION_ID = 'eeb7b88c-1d3c-4a2d-8a15-4f4a98262222';
@@ -187,15 +184,11 @@ const createMockApi = (role) => {
 
 const loadPage = async (role) => {
   const mockApi = createMockApi(role);
-  const dom = new JSDOM(fs.readFileSync(HTML_PATH, 'utf8'), {
-    runScripts: 'dangerously',
+  const dom = await cargarSpa({
     url: 'http://localhost/?vista=panel',
-    pretendToBeVisual: true,
     beforeParse(window) {
       window.localStorage.setItem('auth_token', 'mock-session-token');
       window.fetch = mockApi.fetch;
-      window.scrollTo = () => {};
-      window.Element.prototype.scrollIntoView = () => {};
     },
   });
   await waitFor(() => {

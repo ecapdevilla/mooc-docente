@@ -1,21 +1,15 @@
 /**
  * Actividad de lección calificada en el servidor (Bloque 2).
  *
- * Ejecuta el JavaScript real del SPA en jsdom con una API simulada que publica
- * preguntas SIN respuestas correctas. Comprueba que el navegador solo envía
- * identificadores, que la corrección llega del servidor y que no se envía
- * ningún puntaje desde el cliente.
+ * Ejecuta el JavaScript real del SPA (indexInicial.html + public/js) en jsdom
+ * con una API simulada que publica preguntas SIN respuestas correctas.
+ * Comprueba que el navegador solo envía identificadores, que la corrección
+ * llega del servidor y que no se envía ningún puntaje desde el cliente.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { JSDOM } = require('jsdom');
+const { cargarSpa, leerModulos } = require('./spa-dom');
 
-const html = fs.readFileSync(path.join(__dirname, '..', 'indexInicial.html'), 'utf8');
-
-const inicio = html.indexOf('const MODULES = [');
-const fin = html.indexOf('\n    ];', inicio);
-const MODULES = eval(html.slice(inicio + 'const MODULES = '.length, fin + 7));
+const MODULES = leerModulos();
 
 const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const texto = (nodo) => (nodo ? nodo.textContent.replace(/\s+/g, ' ').trim() : '');
@@ -60,15 +54,8 @@ async function crearDom() {
   const peticiones = [];
   const completadas = new Set();
 
-  const dom = new JSDOM(html, {
-    runScripts: 'dangerously',
-    pretendToBeVisual: true,
-    url: 'http://localhost/',
+  const dom = await cargarSpa({
     beforeParse(win) {
-      win.alert = () => {};
-      win.confirm = () => true;
-      win.scrollTo = () => {};
-      win.Element.prototype.scrollIntoView = () => {};
       win.localStorage.setItem('auth_token', 'token-de-prueba');
       win.localStorage.setItem('user', JSON.stringify({ nombre: 'Docente Prueba' }));
 

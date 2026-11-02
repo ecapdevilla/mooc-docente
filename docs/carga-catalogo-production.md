@@ -102,7 +102,7 @@ Fuente de datos académicos existente:
 
 - `src/seed/data.sql`: cursos, módulos, lecciones, cuestionarios y opciones
   idempotentes por título (`WHERE NOT EXISTS`).
-- `indexInicial.html`: títulos de módulos y lecciones que el SPA empareja por
+- `public/js/datos/modulos.js` (cargado por `indexInicial.html`): títulos de módulos y lecciones que el SPA empareja por
   título normalizado.
 
 Pasos en staging:
@@ -114,7 +114,7 @@ Pasos en staging:
 3. Ejecutar el diagnóstico y validar consultas 4, 6, 7, 8 y 9 sin hallazgos.
 4. Probar `GET /api/v1/courses`, `GET /api/v1/courses/:id` y la navegación del
    SPA contra staging (`window.MERITO_API_BASE` apuntando a staging).
-5. Revisar el diff de títulos contra `indexInicial.html`: cada módulo del SPA
+5. Revisar el diff de títulos contra `public/js/datos/modulos.js`: cada módulo del SPA
    debe tener un curso homónimo y cada lección un título único.
 
 Pasos en Production (cuando se autorice):
@@ -156,7 +156,7 @@ dentro de una transacción. No borrar filas preexistentes.
 ## 7. Implementación entregada (2026-11-01): carga idempotente, auditable y reversible
 
 Fuente única: `scripts/generar-carga-catalogo.js`. Extrae `const MODULES` de
-`indexInicial.html` con `vm` (sin copiar contenido a mano), valida el catálogo y
+`public/js/datos/modulos.js` con `vm` (sin copiar contenido a mano), valida el catálogo y
 emite el SQL.
 
 ```bash
@@ -314,7 +314,7 @@ una transacción, tras verificar que el catálogo ya está en su sitio.
 Fuera de alcance de esta carga:
 
 - El segundo módulo de `Legislación Educativa Colombiana` que existe en
-  `src/seed/data.sql` no se incluye: no tiene contenido en `indexInicial.html`.
+  `src/seed/data.sql` no se incluye: no tiene contenido en `public/js/datos/modulos.js`.
 - El `Simulacro diagnóstico` posterior al login está asociado en
   `src/routes/quizzes.js` al curso `Evaluación Educativa y Autonomía
   Institucional`; estos tres cursos no lo alimentan.

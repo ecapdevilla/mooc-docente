@@ -2,8 +2,9 @@
 /**
  * Genera los scripts SQL de carga controlada del catálogo de tres cursos.
  *
- * Fuente de contenido: `indexInicial.html` (const MODULES), que es la fuente
- * principal de contenido del producto. La estructura de módulos coincide con
+ * Fuente de contenido: `public/js/datos/modulos.js` (const MODULES), que es el
+ * archivo de datos que carga `indexInicial.html` y la fuente principal de
+ * contenido del producto. La estructura de módulos coincide con
  * `src/seed/data.sql`; el generador falla si una lección de la SPA no está
  * mapeada o si un título se repite (evita coincidencias ambiguas en
  * `loadCourseMap`).
@@ -24,7 +25,7 @@ const path = require('path');
 const vm = require('vm');
 
 const RAIZ = path.join(__dirname, '..');
-const RUTA_SPA = path.join(RAIZ, 'indexInicial.html');
+const RUTA_DATOS = path.join(RAIZ, 'public', 'js', 'datos', 'modulos.js');
 const DIR_SALIDA = path.join(RAIZ, 'database', 'loads');
 const PREFIJO = '20261101_carga_catalogo_tres_cursos';
 const CODIGO_LOTE = '20261101-catalogo-tres-cursos';
@@ -200,17 +201,17 @@ const CATALOGO = [
 ];
 
 /**
- * Extrae el arreglo `MODULES` de la SPA delimitando el literal con un
- * escáner de corchetes que respeta cadenas. Se evalúa en un contexto vacío
- * (sin acceso a `window`), así que la SPA no se ejecuta.
+ * Extrae el arreglo `MODULES` del archivo de datos del SPA delimitando el
+ * literal con un escáner de corchetes que respeta cadenas. Se evalúa en un
+ * contexto vacío (sin acceso a `window`), así que la SPA no se ejecuta.
  */
 function extraerModulosSpa() {
-  const html = fs.readFileSync(RUTA_SPA, 'utf8');
+  const html = fs.readFileSync(RUTA_DATOS, 'utf8');
   const marca = 'const MODULES =';
   const posicion = html.indexOf(marca);
 
   if (posicion < 0) {
-    throw new Error('No se encontró `const MODULES` en indexInicial.html');
+    throw new Error('No se encontró `const MODULES` en public/js/datos/modulos.js');
   }
 
   const desde = html.indexOf('[', posicion);
@@ -276,7 +277,7 @@ function validarCatalogo(modulosSpa, catalogo) {
     const enSpa = modulosSpa.find(modulo => modulo.title === curso.titulo);
 
     if (!enSpa) {
-      errores.push(`El curso "${curso.titulo}" no existe en indexInicial.html`);
+      errores.push(`El curso "${curso.titulo}" no existe en public/js/datos/modulos.js`);
       continue;
     }
 
@@ -375,7 +376,7 @@ function validarCatalogo(modulosSpa, catalogo) {
 
   if (errores.length > 0) {
     throw new Error(
-      `Catálogo inconsistente con indexInicial.html:\n - ${errores.join('\n - ')}`
+      `Catálogo inconsistente con public/js/datos/modulos.js:\n - ${errores.join('\n - ')}`
     );
   }
 }
@@ -927,7 +928,7 @@ function cabecera(titulo, descripcionLineas) {
     `-- ${titulo}`,
     '-- =====================================================================',
     `-- Generado por scripts/generar-carga-catalogo.js (lote ${CODIGO_LOTE}).`,
-    '-- Fuente de contenido: indexInicial.html (const MODULES).',
+    '-- Fuente de contenido: public/js/datos/modulos.js (const MODULES).',
     ...descripcionLineas.map(linea => (linea === '' ? '--' : `-- ${linea}`)),
     '',
     '',

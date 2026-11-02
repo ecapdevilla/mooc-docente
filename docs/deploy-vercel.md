@@ -5,7 +5,7 @@ Guía operativa para publicar el frontend (`indexInicial.html`) y la API Express
 Arquitectura del despliegue:
 
 ```
-Vercel (estático)  ->  indexInicial.html, index.html, app.js, public/** (api-client.js, auth.js)
+Vercel (estático)  ->  indexInicial.html, index.html, app.js, public/** (js/**, styles/app.css, api-client.js, auth.js)
 Vercel (función)   ->  api/index.js  ->  src/server.js (Express)  ->  Supabase (PostgreSQL)
 ```
 
@@ -13,7 +13,7 @@ Vercel (función)   ->  api/index.js  ->  src/server.js (Express)  ->  Supabase 
 
 ```bash
 npm install
-npm test          # 5 suites / 26 pruebas en verde
+npm test          # 21 suites / 144 pruebas en verde (requiere DATABASE_URL y JWT_SECRET)
 npm run dev       # http://localhost:3000/
 ```
 

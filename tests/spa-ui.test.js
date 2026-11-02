@@ -6,13 +6,10 @@
  * el navegador (por ejemplo, un error de JavaScript que desactive los botones).
  */
 
-const path = require('path');
-const { JSDOM } = require('jsdom');
+const { cargarSpa } = require('./spa-dom');
 
 const app = require('../src/server');
 const { pool } = require('../src/config/database');
-
-const HTML_PATH = path.join(__dirname, '..', 'indexInicial.html');
 
 let server;
 let baseUrl;
@@ -29,23 +26,17 @@ beforeAll(async () => {
     });
   });
 
-  dom = await JSDOM.fromFile(HTML_PATH, {
-    runScripts: 'dangerously',
+  dom = await cargarSpa({
     url: `${baseUrl}/`,
-    pretendToBeVisual: true,
     beforeParse(win) {
-      // jsdom no implementa alert/confirm, fetch ni scroll
-      win.alert = () => {};
-      win.confirm = () => true;
+      // El SPA habla con la API real que escucha en `baseUrl`.
       win.fetch = (url, options) => globalThis.fetch(url, options);
-      win.scrollTo = () => {};
-      win.Element.prototype.scrollIntoView = () => {};
     },
   });
 
   window = dom.window;
 
-  // Esperar a que el script en línea termine de inicializar
+  // Esperar a que la restauración de sesión y el progreso terminen
   await new Promise((resolve) => setTimeout(resolve, 500));
 });
 

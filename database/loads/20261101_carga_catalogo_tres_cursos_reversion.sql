@@ -2,7 +2,7 @@
 -- REVERSIÓN SEGURA DEL LOTE (DESACTIVA SIN BORRAR DATOS DE USUARIOS)
 -- =====================================================================
 -- Generado por scripts/generar-carga-catalogo.js (lote 20261101-catalogo-tres-cursos).
--- Fuente de contenido: indexInicial.html (const MODULES).
+-- Fuente de contenido: public/js/datos/modulos.js (const MODULES).
 -- Ejecutar con: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f <este archivo>
 --
 -- Este archivo NO elimina filas del catálogo ni de los usuarios: deja los

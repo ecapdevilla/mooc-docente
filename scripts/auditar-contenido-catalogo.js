@@ -1,8 +1,9 @@
 /**
  * Auditoría del contenido académico del lote de catálogo.
  *
- * Lee la fuente real (`indexInicial.html`, const MODULES) con el mismo parser
- * que `scripts/generar-carga-catalogo.js` y mide, lección por lección:
+ * Lee la fuente real (`public/js/datos/modulos.js`, const MODULES; archivo de
+ * datos que carga `indexInicial.html`) con el mismo parser que
+ * `scripts/generar-carga-catalogo.js` y mide, lección por lección:
  * extensión, estructura (subtítulos, listas), referencias normativas y la
  * calidad del cuestionario (4 opciones, respuesta correcta, retroalimentación).
  *
