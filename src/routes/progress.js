@@ -4,6 +4,11 @@ const router = express.Router();
 const { pool } = require('../config/database');
 const { authenticate } = require('../middleware/auth');
 const { validateProgress } = require('../utils/validators');
+const {
+  PUNTAJE_APROBACION,
+  dominioLeccion,
+  respuestasDisponibles,
+} = require('../services/lessonQuiz');
 
 /**
  * @route   POST /api/v1/progress/lesson/:lessonId
@@ -29,10 +34,24 @@ router.post('/lesson/:lessonId', authenticate, async (req, res) => {
       });
     }
 
-    const puntaje =
-      validation.value.puntaje !== undefined
-        ? validation.value.puntaje
-        : 100;
+    // El puntaje nunca se toma del cliente: se deriva de las respuestas
+    // verificadas del cuestionario de la lección. Si la lección no tiene
+    // cuestionario o la persona aún no lo domina, el puntaje queda en NULL
+    // y solo se registra la lectura completada.
+    let puntaje = null;
+
+    if (await respuestasDisponibles(pool)) {
+      const dominio = await dominioLeccion(pool, usuarioId, lessonId);
+      puntaje = dominio.dominada ? PUNTAJE_APROBACION : null;
+
+      const exigeCuestionario = process.env.LESSON_COMPLETION_REQUIRES_QUIZ === 'true';
+
+      if (exigeCuestionario && dominio.totalQuizzes > 0 && !dominio.dominada) {
+        return res.status(409).json({
+          error: 'Debes completar correctamente la actividad de la lección antes de marcarla como completada.'
+        });
+      }
+    }
 
     // Verificar que la lección exista y esté activa
     const { rows: lessonRows } = await pool.query(

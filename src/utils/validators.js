@@ -34,9 +34,9 @@ const loginSchema = Joi.object({
 
 const progressSchema = Joi.object({
   completada: Joi.boolean(),
-  puntaje: Joi.number()
-    .min(0)
-    .max(100),
+  // `puntaje` no forma parte del contrato: el backend lo deriva de las
+  // respuestas verificadas del cuestionario. Si el cliente lo envía, se
+  // descarta por `stripUnknown` y nunca llega a la consulta.
 });
 
 /**

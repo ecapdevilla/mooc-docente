@@ -204,6 +204,91 @@ Siguiente acción concreta:
 
 El agente siguiente debe comenzar por `Siguiente acción concreta` y solo ampliar la exploración si la validación lo exige.
 
+## Bloqueos 2026-11-01: catálogo y calificación segura
+
+Estado (2026-11-01, local, sin commit ni despliegue):
+
+- Bloque 1: `GET /api/v1/courses` en Production responde `{"courses":[]}`. La
+  consulta y los filtros son correctos; el detalle `404` y la conexión
+  `db:connected` descartan fallo de ruta o de permisos. Falta confirmar en la
+  base si `courses` está vacía o con `activo = false` mediante
+  `database/diagnostics/20261101_diagnostico_catalogo_solo_lectura.sql` o
+  `npm run diagnostico:catalogo` (solo lectura). El listado ahora incluye
+  `meta: { totalCursos, cursosActivos }` para diagnosticarlo desde la API.
+- Plan de carga: `docs/carga-catalogo-production.md` (staging, transacción,
+  acta de ids, verificación y rollback). El seed no se ejecutó en Production.
+- Bloque 2: la calificación se movió al backend con
+  `POST /api/v1/quizzes/lessons/:lessonId/responses` (`{ quizId, optionId }`).
+  Valida lección/pregunta/opción, califica con `quiz_options.es_correcta`,
+  registra historial append-only en `lesson_quiz_responses` y deriva el puntaje
+  (100 solo si la lección está dominada).
+- `POST /api/v1/progress/lesson/:id` ya no acepta `puntaje` del cliente: lo
+  calcula con las respuestas verificadas; sin cuestionario dominado queda en
+  `NULL`. Con `LESSON_COMPLETION_REQUIRES_QUIZ=true` responde `409` si falta
+  dominar la actividad.
+- SPA: cuando la lección mapeada publica `quizzes` en la API, la actividad usa
+  esas preguntas (sin `es_correcta`) y `answerApiQuiz` califica en el servidor;
+  el diseño 2.0 no cambió. Las actividades solo locales del prototipo siguen
+  calificándose en el navegador y no otorgan puntaje.
+- Migración pendiente de aplicar: `database/migrations/20261101_lesson_quiz_responses.sql`.
+- Pruebas nuevas: `lesson-quiz-security`, `progress-security`,
+  `lesson-quiz-spa`, `catalog-diagnostics` (20/20 con base simulada).
+- Detalle: `docs/calificacion-segura-cuestionarios.md` y
+  `docs/informe-bloqueos-cursos-evaluaciones-20261101.md`.
+
+## Carga del catálogo y login 500 (2026-11-01, verificado en local)
+
+- Causa del `500` en `POST /api/v1/auth/login`: el manejador global de errores
+  convertía `entity.parse.failed` de `body-parser` en `500` en cualquier ruta.
+  Ahora `src/server.js` responde `400 "JSON inválido en el cuerpo de la
+  solicitud"`, registra los 4xx sin volcar el cuerpo y reserva `console.error`
+  para los 5xx. Detalle: `docs/login-500-production-20261101.md`.
+- Production sigue desactualizado: allí el caso malformado responde `500` y
+  `GET /api/v1/courses` no incluye `meta` (la rama local sí). Falta desplegar.
+- Pruebas nuevas: `tests/errores-http.test.js` (4 casos: 400 en login y en ruta
+  inexistente con JSON roto, 404 sin cuerpo, 401 con credenciales inválidas).
+- Carga del catálogo implementada en `scripts/generar-carga-catalogo.js`
+  (`npm run carga:catalogo`): extrae `const MODULES` de `indexInicial.html`,
+  valida títulos normalizados y emite cinco SQL en `database/loads/`
+  (carga, verificación, respaldo, reversión segura y reversión física).
+  Idempotente por `WHERE NOT EXISTS`, auditable con
+  `catalog_load_batches`/`catalog_load_items`, republicable (paso 1.b reactiva
+  el lote) y reversible solo sobre lo creado por el lote.
+- Reversión segura (`..._reversion.sql`): **no borra filas**; deja cursos,
+  módulos y lecciones con `activo = FALSE`, archiva los cuestionarios y compara
+  siete métricas de usuarios antes/después (aborta si cambian). La reversión
+  física (`..._reversion_fisica.sql`) queda bloqueada si hay datos de usuarios o
+  si no se ejecutó antes la segura. Motivo: `enrollments`, `user_progress`,
+  `quiz_attempt_answers`, `user_badges`, `projects`, `course_completion_rules` y
+  `lesson_quiz_responses` cuelgan con `ON DELETE CASCADE`.
+- Validado en PostgreSQL 17 local aislado con usuarios reales simulados
+  (`merito_carga_probe`, 21/21 comprobaciones): carga 3/9/11/11/44 + 9 badges +
+  87 ítems de manifiesto, preflight que aborta sin escribir, reejecución
+  idempotente, reversión segura sin pérdida de datos, recarga que republica y
+  reversión física bloqueada. En `merito_carga_probe_limpia` la reversión física
+  deja todo en cero tras la segura. Los cuestionarios se publican con
+  `estado_revision = 'publicado'`.
+- Compatibilidad con el esquema actual comprobada end-to-end sin la migración
+  (base `merito_premigracion`, 13/13): la API arranca, `/courses` y
+  `/courses/:id` responden 200 sin `es_correcta`, `progress/lesson` responde 200
+  y la calificación segura degrada a `503` con mensaje en español. JSON inválido
+  devuelve 400 y la bitácora no registra la contraseña enviada.
+- Auditoría de contenido reproducible con `npm run contenido:catalogo`
+  (`scripts/auditar-contenido-catalogo.js`): 6 lecciones completas y 5 que
+  requieren revisión académica; las 11 tienen 4 opciones, una sola correcta y
+  retroalimentación. Hallazgo: la respuesta correcta es la opción **B en las 11
+  lecciones**. Detalle y pendientes en `docs/catalogo-contenido-auditoria.md`.
+- Mapeo SPA ↔ catálogo comprobado contra la API local: 3/3 cursos y 11/11
+  lecciones emparejados por título con un único cuestionario publicado.
+- Nada de esto se ejecutó en Production. Procedimiento definitivo, mapa de
+  cascada y mitigaciones en `docs/carga-catalogo-production.md` (secciones 7.2
+  y 7.3).
+- Nota de entorno: este checkout no tiene `.env`; las pruebas requieren
+  `DATABASE_URL` y `JWT_SECRET` en el entorno y una base con
+  `database/schema.sql`, el seed y
+  `database/migrations/20261101_lesson_quiz_responses.sql`. Con eso la suite
+  completa queda en 18/18 suites y 123/123 pruebas (`npx jest --maxWorkers=2`).
+
 ## Prioridades pendientes
 
 1. ~~Corregir esquema, seed y contratos de autenticación, progreso y perfil.~~ Hecho (2026-09-12).

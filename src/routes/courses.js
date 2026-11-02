@@ -18,7 +18,23 @@ router.get('/', async (req, res) => {
        WHERE c.activo = TRUE 
       ORDER BY c.id ASC`
     );
-    res.json({ courses });
+
+    // Contadores de catálogo: permiten distinguir "sin cursos" de "todos
+    // inactivos" sin acceso directo a la base de datos.
+    const { rows: totals } = await pool.query(
+      `SELECT
+         COUNT(*)::int AS total,
+         COUNT(*) FILTER (WHERE activo = TRUE)::int AS activos
+       FROM courses`
+    );
+
+    res.json({
+      courses,
+      meta: {
+        totalCursos: totals[0] ? totals[0].total : 0,
+        cursosActivos: totals[0] ? totals[0].activos : 0
+      }
+    });
   } catch (err) {
     console.error('❌ Error fetching courses:', err);
     res.status(500).json({ error: 'Error interno del servidor' });

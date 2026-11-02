@@ -126,12 +126,40 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Server error:', err);
-  const status = err.status || 500;
+  // Un cuerpo JSON malformado lo reporta body-parser como SyntaxError con
+  // type 'entity.parse.failed'. Ese caso es un 400 del cliente, nunca un 500,
+  // y aplica a cualquier ruta (por eso no se diagnostica como fallo de login).
+  const esCuerpoInvalido =
+    err.type === 'entity.parse.failed' ||
+    (err instanceof SyntaxError && Object.prototype.hasOwnProperty.call(err, 'body'));
+
+  const status = esCuerpoInvalido ? 400 : err.status || err.statusCode || 500;
   const isDevelopment = process.env.NODE_ENV === 'development';
+
+  if (status >= 500) {
+    console.error('❌ Server error:', err);
+  } else if (esCuerpoInvalido) {
+    // El mensaje de V8 puede incluir un fragmento literal del cuerpo recibido
+    // (`Unexpected token 'C', ..."password":"Clave"... is not valid JSON`), por
+    // eso aquí no se imprime: solo el contexto de la petición y el tamaño.
+    const bytes = Buffer.byteLength(String((err && err.body) || ''));
+
+    console.warn(
+      `⚠️  ${req.method} ${req.originalUrl} -> ${status}: cuerpo JSON inválido (${bytes} bytes)`
+    );
+  } else {
+    // Se registra el contexto mínimo: imprimir `err` volcaría el cuerpo
+    // recibido, que puede contener credenciales.
+    console.warn(`⚠️  ${req.method} ${req.originalUrl} -> ${status}: ${err.message}`);
+  }
+
   res.status(status).json({
-    error: isDevelopment ? err.message : 'Error interno del servidor',
-    ...(isDevelopment && { stack: err.stack }),
+    error: esCuerpoInvalido
+      ? 'JSON inválido en el cuerpo de la solicitud'
+      : isDevelopment
+        ? err.message
+        : 'Error interno del servidor',
+    ...(isDevelopment && !esCuerpoInvalido && { stack: err.stack }),
   });
 });
 

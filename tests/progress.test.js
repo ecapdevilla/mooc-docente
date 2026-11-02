@@ -3,6 +3,7 @@ const { api, registerUser, deleteUser, closePool } = require('./helpers');
 let token;
 let email;
 let lessonIds = [];
+let lessonsInModule = 1;
 
 beforeAll(async () => {
   const registration = await registerUser();
@@ -16,6 +17,13 @@ beforeAll(async () => {
   lessonIds = detail.body.course.modulos.flatMap((m) =>
     (m.lecciones || []).map((l) => l.id)
   );
+
+  // El total de lecciones del módulo depende del seed o del catálogo cargado:
+  // la expectativa de porcentaje se calcula, no se fija en 100.
+  const primerModulo = (detail.body.course.modulos || []).find((m) =>
+    (m.lecciones || []).some((l) => l.id === lessonIds[0])
+  );
+  lessonsInModule = ((primerModulo && primerModulo.lecciones) || []).length || 1;
 });
 
 afterAll(async () => {
@@ -53,7 +61,9 @@ describe('Progreso', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.progress.lesson.completada).toBe(true);
-    expect(res.body.progress.moduleProgress).toBe(100);
+    expect(res.body.progress.moduleProgress).toBe(
+      Math.round(100 / lessonsInModule)
+    );
     expect(typeof res.body.progress.courseProgress).toBe('number');
 
     const enrollments = await withToken(api.get('/api/v1/users/enrollments'));
@@ -76,7 +86,11 @@ describe('Progreso', () => {
     expect(again.body.progress.lesson.intentos).toBe(
       first.body.progress.lesson.intentos + 1
     );
-    expect(Number(again.body.progress.lesson.puntaje)).toBe(90);
+
+    // El puntaje ya no se acepta del cliente: solo lo deriva el servidor a
+    // partir de las respuestas verificadas del cuestionario de la lección.
+    expect(again.body.progress.lesson.puntaje).toBeNull();
+    expect(Number(again.body.progress.lesson.puntaje)).not.toBe(90);
   });
 
   test('GET /api/v1/progress devuelve progreso global, lecciones y badges', async () => {

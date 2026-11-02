@@ -4975,6 +4975,7 @@
             titulo: l.titulo,
             descripcion: l.descripcion || '',
             orden: l.orden,
+            quizzes: Array.isArray(l.quizzes) ? l.quizzes : [],
             normalizedTitle: normalizeLessonTitle(l.titulo)
           }));
 
@@ -5076,7 +5077,8 @@
       try {
         await apiFetch(`/progress/lesson/${lesson.id}`, {
           method: 'POST',
-          body: { puntaje: 100 }
+          // Sin puntaje: el backend lo deriva de las respuestas verificadas.
+          body: {}
         });
         return { persisted: true };
       } catch (err) {
@@ -6160,7 +6162,12 @@
         next: posicion < secuencia.length - 1 ? secuencia[posicion + 1] : null,
         progreso: getModuleProgress(moduleId),
         isDone: doneSet.has(lessonIndex),
-        doneSet
+        doneSet,
+        apiLesson: mapped,
+        // Preguntas publicadas en la API (sin respuestas correctas).
+        apiQuizzes: mapped && Array.isArray(mapped.quizzes)
+          ? mapped.quizzes.filter(quiz => quiz && Array.isArray(quiz.opciones) && quiz.opciones.length)
+          : []
       };
     }
 
@@ -6191,6 +6198,9 @@
           </li>`;
       }).join('');
 
+      const usaActividadApi = ctx.apiQuizzes.length > 0 && state.apiOnline && Boolean(state.user);
+      const quizApi = usaActividadApi ? ctx.apiQuizzes : [];
+
       const opcionesQuiz = lesson.quiz
         ? lesson.quiz.options.map((opt, i) => `
             <button class="quiz-option" type="button" data-index="${i}" onclick="answerQuiz(${i})">
@@ -6199,8 +6209,35 @@
             </button>`).join('')
         : '';
 
-      const bloqueQuiz = lesson.quiz
-        ? `<section class="lx-quiz" id="quizBlock" aria-labelledby="lessonQuizTitle">
+      const seccionesApi = quizApi.map((quiz, indice) => {
+        const sufijo = indice === 0 ? '' : `-${quiz.id}`;
+        const opciones = quiz.opciones
+          .slice()
+          .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
+          .map((opcion, i) => `
+            <button class="quiz-option" type="button" data-option-id="${opcion.id}"
+              onclick="answerApiQuiz('${quiz.id}', '${opcion.id}')">
+              <span class="letter">${String.fromCharCode(65 + i)}</span>
+              <span>${lxEscape(opcion.opcion)}</span>
+            </button>`).join('');
+
+        return `<section class="lx-quiz" id="quizBlock${sufijo}" aria-labelledby="lessonQuizTitle${sufijo}">
+             <div class="lx-quiz__head">
+               <div>
+                 <span class="lx-eyebrow">Comprobación</span>
+                 <h2 class="lx-h2" id="lessonQuizTitle${sufijo}">Actividad de la lección${quizApi.length > 1 ? ` · Pregunta ${indice + 1}` : ''}</h2>
+               </div>
+               <span class="lx-muted">Retroalimentación inmediata</span>
+             </div>
+             <p class="lx-quiz__question">${lxEscape(quiz.pregunta)}</p>
+             <div class="quiz-options" id="quizOptions${sufijo}">${opciones}</div>
+             <div class="quiz-feedback" id="quizFeedback${sufijo}"></div>
+           </section>`;
+      }).join('');
+
+      const bloqueQuiz = quizApi.length
+        ? `<div class="lx-lesson-quiz-group">${seccionesApi}</div>`
+        : (lesson.quiz ? `<section class="lx-quiz" id="quizBlock" aria-labelledby="lessonQuizTitle">
              <div class="lx-quiz__head">
                <div>
                  <span class="lx-eyebrow">Comprobación</span>
@@ -6223,7 +6260,7 @@
                <strong>Actividad en preparación</strong>
                <span>Esta lección aún no publica su actividad de comprobación. Puedes marcar la lectura como completada desde el pie de la lección.</span>
              </div>
-           </section>`;
+           </section>`);
 
       const articuloHtml = `
             <article class="lx-lesson-shell">
@@ -6303,9 +6340,13 @@
         </div>
       `;
 
-      // Si ya estaba completada, marcar el quiz como respondido
-      if (isDone && lesson.quiz) {
-        markQuizAsDone(lesson.quiz.correct);
+      // Si ya estaba completada, marcar la actividad como respondida
+      if (isDone) {
+        if (quizApi.length) {
+          markApiQuizAsDone();
+        } else if (lesson.quiz) {
+          markQuizAsDone(lesson.quiz.correct);
+        }
       }
     }
 
@@ -6368,6 +6409,84 @@
      * Se usa cuando la actividad marca la lección como completada para no
      * perder la retroalimentación con un re-render completo.
      */
+    /**
+     * Califica en el backend una respuesta de la actividad publicada en la API.
+     * El cliente solo envía identificadores: la corrección, el puntaje y la
+     * finalización los determina el servidor a partir de quiz_options.
+     */
+    window.answerApiQuiz = async function (quizId, optionId) {
+      const actual = state.currentLesson;
+      if (!actual) return;
+
+      const mapping = state.courseMap && state.courseMap[actual.moduleId];
+      const mapped = mapping && mapping.lessons ? mapping.lessons[actual.lessonIndex] : null;
+      if (!mapped) return;
+
+      const boton = document.querySelector(`.quiz-option[data-option-id="${optionId}"]`);
+      const contenedor = boton ? boton.closest('.quiz-options') : null;
+      const bloque = boton ? boton.closest('.lx-quiz') : null;
+      const feedback = bloque ? bloque.querySelector('.quiz-feedback') : null;
+      const botones = contenedor ? [...contenedor.querySelectorAll('.quiz-option')] : [];
+
+      botones.forEach(opcion => opcion.classList.add('disabled'));
+
+      try {
+        const data = await apiFetch(`/quizzes/lessons/${mapped.id}/responses`, {
+          method: 'POST',
+          body: { quizId: Number(quizId), optionId: Number(optionId) }
+        });
+
+        const respuesta = data && data.response;
+        if (!respuesta) {
+          throw new Error('El servidor no devolvió la calificación de la actividad.');
+        }
+
+        botones.forEach(opcion => {
+          const id = Number(opcion.dataset.optionId);
+          if (id === Number(respuesta.correctOptionId)) opcion.classList.add('correct');
+          else if (id === Number(optionId) && !respuesta.correct) opcion.classList.add('incorrect');
+        });
+
+        if (feedback) {
+          feedback.classList.add('show');
+          feedback.classList.toggle('ok', Boolean(respuesta.correct));
+          feedback.classList.toggle('ko', !respuesta.correct);
+          feedback.innerHTML = `<i class="fas ${respuesta.correct ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${lxEscape(respuesta.explanation || '')}`;
+        }
+
+        const lessonNavInfo = document.getElementById('lessonNavInfo');
+
+        if (data.lesson && data.lesson.completed) {
+          completeLesson(actual.moduleId, actual.lessonIndex);
+          refreshLessonCompletionUi();
+          if (lessonNavInfo) lessonNavInfo.textContent = 'Actividad superada. Guardando progreso...';
+        } else {
+          if (lessonNavInfo) lessonNavInfo.textContent = 'Respuesta incorrecta. Puedes intentarlo de nuevo.';
+          // Reintento permitido: el historial de respuestas es append-only.
+          botones.forEach(opcion => opcion.classList.remove('disabled'));
+        }
+      } catch (err) {
+        botones.forEach(opcion => opcion.classList.remove('disabled'));
+        if (feedback) {
+          feedback.classList.add('show', 'ko');
+          feedback.innerHTML = `<i class="fas fa-times-circle"></i> ${lxEscape(err.message || 'No fue posible calificar la actividad.')}`;
+        }
+        const lessonNavInfo = document.getElementById('lessonNavInfo');
+        if (lessonNavInfo) lessonNavInfo.textContent = 'No se pudo calificar la actividad. Inténtalo de nuevo.';
+      }
+    };
+
+    /**
+     * Refleja una lección ya completada cuando la actividad proviene de la API.
+     */
+    function markApiQuizAsDone() {
+      document.querySelectorAll('.quiz-option').forEach(opcion => opcion.classList.add('disabled'));
+      document.querySelectorAll('.quiz-feedback').forEach(feedback => {
+        feedback.classList.add('show', 'ok');
+        feedback.innerHTML = '<i class="fas fa-check-circle"></i> Lección ya completada anteriormente.';
+      });
+    }
+
     function refreshLessonCompletionUi() {
       const actual = state.currentLesson;
       if (!actual) return;

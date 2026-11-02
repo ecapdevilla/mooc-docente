@@ -9,6 +9,9 @@ describe('Cursos', () => {
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.courses)).toBe(true);
     expect(res.body.courses.length).toBeGreaterThan(0);
+    expect(Number.isInteger(res.body.meta.totalCursos)).toBe(true);
+    expect(Number.isInteger(res.body.meta.cursosActivos)).toBe(true);
+    expect(res.body.meta.cursosActivos).toBeGreaterThan(0);
   });
 
   test('GET /api/v1/courses/:id devuelve módulos, lecciones y opciones de quiz', async () => {
