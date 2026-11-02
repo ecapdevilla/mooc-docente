@@ -21,20 +21,20 @@
   ============================================================ -->
   <nav class="navbar" aria-label="Navegación principal">
     <div class="nav-inner">
-      <a href="#" class="logo" aria-label="Mérito Docente, inicio" onclick="showView('landing'); return false;">
+      <a href="#" class="logo" aria-label="Mérito Docente, inicio" data-action="show-view" data-view="landing">
         <span class="logo-mark" aria-hidden="true"><i class="fas fa-graduation-cap"></i></span>
         <span class="logo-text">MéritoDocente</span>
       </a>
 
       <ul class="nav-links">
-        <li><a href="#" onclick="showView('landing'); return false;">Inicio</a></li>
-        <li><a href="#modulos" onclick="showView('dashboard'); return false;">Cursos</a></li>
-        <li><a href="#mi-aprendizaje" onclick="showView('dashboard'); return false;">Mi aprendizaje</a></li>
-        <li><a href="#" id="adminDiagnosticNav" onclick="showView('admin-diagnostic'); return false;" style="display:none;">Administrar preguntas</a></li>
+        <li><a href="#" data-action="show-view" data-view="landing">Inicio</a></li>
+        <li><a href="#modulos" data-action="show-view" data-view="dashboard">Cursos</a></li>
+        <li><a href="#mi-aprendizaje" data-action="show-view" data-view="dashboard">Mi aprendizaje</a></li>
+        <li><a href="#" id="adminDiagnosticNav" data-action="show-view" data-view="admin-diagnostic" style="display:none;">Administrar preguntas</a></li>
       </ul>
 
       <div class="nav-user">
-        <button class="btn btn-outline btn-sm" id="loginBtn" onclick="openLogin()" style="margin-right:0.5rem;">
+        <button class="btn btn-outline btn-sm" id="loginBtn" data-action="open-login" style="margin-right:0.5rem;">
           <i class="fas fa-right-to-bracket"></i> Iniciar sesión
         </button>
         <div class="user-chip" id="userChip" style="display:none;">
@@ -44,7 +44,7 @@
             <span id="userRole">Preparándose</span>
           </div>
         </div>
-        <button class="icon-btn" id="logoutBtn" title="Cerrar sesión" style="display:none;" onclick="logout()">
+        <button class="icon-btn" id="logoutBtn" title="Cerrar sesión" style="display:none;" data-action="logout">
           <i class="fas fa-sign-out-alt"></i>
         </button>
       </div>
@@ -79,7 +79,7 @@
               <a href="#registro" class="btn btn-primary">
                 <i class="fas fa-user-plus" aria-hidden="true"></i> Crear cuenta gratuita
               </a>
-              <a href="#modulos" class="btn btn-outline" onclick="showView('dashboard'); return false;">
+              <a href="#modulos" class="btn btn-outline" data-action="show-view" data-view="dashboard">
                 <i class="fas fa-compass" aria-hidden="true"></i> Explorar cursos
               </a>
             </div>
@@ -100,7 +100,7 @@
                 <p>Crea tu acceso para comenzar.</p>
               </div>
 
-              <form id="registroForm" onsubmit="handleRegister(event)">
+              <form id="registroForm" data-action="handle-register">
                 <div class="form-field">
                   <i class="fas fa-user"></i>
                   <input type="text" id="nombre" aria-label="Nombre completo" autocomplete="name" placeholder="Nombre completo" required>
@@ -196,14 +196,14 @@
         </div>
 
         <div class="areas-grid">
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">01</div><div class="area-body"><h4>Pedagogía y Didáctica</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">02</div><div class="area-body"><h4>Legislación Educativa</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">03</div><div class="area-body"><h4>Evaluación Educativa</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">04</div><div class="area-body"><h4>Psicología del Aprendizaje</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">05</div><div class="area-body"><h4>TIC en Educación</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">06</div><div class="area-body"><h4>Currículo y Desarrollo</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">07</div><div class="area-body"><h4>Ética Docente</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
-          <a href="#" class="area-card" onclick="showView('dashboard'); return false;"><div class="area-num">08</div><div class="area-body"><h4>Práctica Pedagógica</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">01</div><div class="area-body"><h4>Pedagogía y Didáctica</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">02</div><div class="area-body"><h4>Legislación Educativa</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">03</div><div class="area-body"><h4>Evaluación Educativa</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">04</div><div class="area-body"><h4>Psicología del Aprendizaje</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">05</div><div class="area-body"><h4>TIC en Educación</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">06</div><div class="area-body"><h4>Currículo y Desarrollo</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">07</div><div class="area-body"><h4>Ética Docente</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
+          <a href="#" class="area-card" data-action="show-view" data-view="dashboard"><div class="area-num">08</div><div class="area-body"><h4>Práctica Pedagógica</h4><span>Ver cursos</span></div><i class="fas fa-arrow-right area-arrow"></i></a>
         </div>
       </div>
     </section>
@@ -248,7 +248,7 @@
             <a class="btn btn-outline btn-sm" href="/diagnostico-piloto">
               <i class="fas fa-clipboard-list"></i> Comenzar diagnóstico
             </a>
-            <button class="btn btn-secondary btn-sm" type="button" onclick="openDiagnosticQuiz()" hidden>
+            <button class="btn btn-secondary btn-sm" type="button" data-action="open-diagnostic" hidden>
               <i class="fas fa-play"></i> Iniciar simulacro
             </button>
           </div>
@@ -259,7 +259,7 @@
             <h3><i class="fas fa-list-check"></i> Revisión académica del diagnóstico</h3>
             <p>Gestiona borradores independientes sin alterar el examen publicado.</p>
           </div>
-          <button class="btn btn-primary btn-sm" type="button" onclick="showView('admin-diagnostic')">Abrir administrador</button>
+          <button class="btn btn-primary btn-sm" type="button" data-action="show-view" data-view="admin-diagnostic">Abrir administrador</button>
         </div>
 
         <section class="quiz post-login-quiz hidden" id="postLoginQuizPanel" aria-labelledby="postLoginQuizTitle"></section>
@@ -329,7 +329,7 @@
             <h1>Banco del diagnóstico piloto</h1>
             <p>Trabaja sobre borradores aislados. Los cambios aquí no modifican el examen ni los intentos publicados.</p>
           </div>
-          <button class="btn btn-ghost" type="button" onclick="showView('dashboard')">
+          <button class="btn btn-ghost" type="button" data-action="show-view" data-view="dashboard">
             <i class="fas fa-arrow-left"></i> Volver al panel
           </button>
         </div>
@@ -469,7 +469,7 @@
       <h3 id="badgeDialogTitle">¡Insignia desbloqueada!</h3>
       <p>Has completado satisfactoriamente el módulo</p>
       <div class="badge-name" id="badgeModalName">Nombre de insignia</div>
-      <button class="btn btn-primary" id="badgeModalClose" onclick="closeBadgeModal()">
+      <button class="btn btn-primary" id="badgeModalClose" data-action="close-badge-modal">
         <i class="fas fa-check"></i> ¡Genial!
       </button>
     </div>
@@ -483,7 +483,7 @@
       <h3 id="loginDialogTitle">Inicia sesión</h3>
       <p>Retoma tu progreso desde cualquier dispositivo</p>
 
-      <form id="loginForm" onsubmit="handleLogin(event)">
+      <form id="loginForm" data-action="handle-login">
         <div class="form-field">
           <i class="fas fa-envelope"></i>
           <input type="email" id="loginEmail" aria-label="Correo electrónico" autocomplete="email" placeholder="Correo electrónico" required>
@@ -501,12 +501,12 @@
         </button>
       </form>
 
-      <button class="btn btn-ghost btn-block" style="margin-top:0.5rem;" onclick="closeLogin()">
+      <button class="btn btn-ghost btn-block" style="margin-top:0.5rem;" data-action="close-login">
         Cancelar
       </button>
 
       <div class="auth-hint">
-        ¿Todavía no tienes cuenta? <a href="#registro" onclick="closeLogin(); showView('landing'); return false;">Regístrate gratis</a>
+        ¿Todavía no tienes cuenta? <a href="#registro" data-action="open-register">Regístrate gratis</a>
       </div>
     </div>
   </div>
@@ -518,7 +518,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="#" class="logo" onclick="showView('landing'); return false;">
+          <a href="#" class="logo" data-action="show-view" data-view="landing">
             <span class="logo-mark"><i class="fas fa-graduation-cap"></i></span>
             <span class="logo-text">MéritoDocente</span>
           </a>
@@ -527,8 +527,8 @@
         <div class="footer-col">
           <h5>Plataforma</h5>
           <ul>
-            <li><a href="#" onclick="showView('dashboard'); return false;">Cursos</a></li>
-            <li><a href="#" onclick="showView('landing'); return false;">Crear cuenta</a></li>
+            <li><a href="#" data-action="show-view" data-view="dashboard">Cursos</a></li>
+            <li><a href="#" data-action="show-view" data-view="landing">Crear cuenta</a></li>
             <li><a href="#">Iniciar sesión</a></li>
           </ul>
         </div>
@@ -568,6 +568,7 @@
   <script src="/js/vistas/modulo.js"></script>
   <script src="/js/vistas/leccion.js"></script>
   <script src="/js/nucleo/modales.js"></script>
+  <script src="/js/nucleo/acciones.js"></script>
   <script src="/js/principal.js"></script>
 
 </body>

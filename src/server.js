@@ -33,14 +33,12 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      // La SPA todavía usa atributos `onclick`/`onsubmit` (49+51) en el
-      // marcado de indexInicial.html. Con el valor por defecto de Helmet
-      // (`script-src-attr 'none'`) el navegador bloquea todos esos manejadores
-      // y la interfaz queda inerte cuando el HTML se sirve por Express (local,
-      // `vercel dev` o cualquier despliegue que no use el HTML estático). La
-      // Etapa 2 sustituye esos atributos por delegación de eventos y devuelve
-      // esta directiva a `'none'`.
-      scriptSrcAttr: ["'unsafe-inline'"],
+      // Contrato de la Etapa 2: el marcado no ejecuta JavaScript desde
+      // atributos `on*`. Todas las acciones viajan como `data-action` y las
+      // resuelve un único oyente delegado (public/js/nucleo/acciones.js), así
+      // que `script-src-attr 'none'` (valor por defecto de Helmet) se declara
+      // explícito y no admite atajos.
+      scriptSrcAttr: ["'none'"],
     },
   },
 }));

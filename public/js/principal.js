@@ -9,6 +9,10 @@
        INICIALIZACIÓN
     ============================================================ */
     (function init() {
+      // Toda la interfaz se maneja con delegación: el marcado solo declara
+      // `data-action` y aquí se registran los oyentes únicos (click y submit).
+      iniciarDelegacionDeEventos();
+
       loadState();
       updateNavbar();
       initializeAdminDiagnostic();

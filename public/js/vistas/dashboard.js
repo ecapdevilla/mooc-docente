@@ -72,7 +72,7 @@
                 <span>${p.percent}%</span>
               </div>
             </div>
-            <button class="btn ${p.completed ? 'btn-ghost' : 'btn-secondary'} btn-block btn-sm" onclick="openCourse('${m.id}')">
+            <button class="btn ${p.completed ? 'btn-ghost' : 'btn-secondary'} btn-block btn-sm" data-action="open-course" data-course-id="${m.id}">
               ${p.completed ? '<i class="fas fa-redo"></i> Repasar curso' : (p.done > 0 ? '<i class="fas fa-play"></i> Continuar curso' : '<i class="fas fa-play"></i> Ver curso')}
             </button>
           </div>

@@ -32,9 +32,10 @@ describe('Etapa 1 · SPA modularizado', () => {
   });
 
   test('carga los archivos clásicos en el orden del pipeline', () => {
-    expect(scriptsDelSpa.length).toBeGreaterThanOrEqual(16);
+    expect(scriptsDelSpa.length).toBeGreaterThanOrEqual(17);
     expect(scriptsDelSpa[0]).toBe('/js/datos/modulos.js');
     expect(scriptsDelSpa[scriptsDelSpa.length - 1]).toBe('/js/principal.js');
+    expect(scriptsDelSpa).toContain('/js/nucleo/acciones.js');
 
     scriptsDelSpa.forEach((ruta) => {
       const archivo = path.join(RAIZ, 'public', ruta.replace(/^\//, ''));
@@ -83,16 +84,17 @@ describe('Etapa 1 · SPA modularizado', () => {
     });
   });
 
-  test('la política CSP permite los manejadores en línea que aún usa el marcado', async () => {
+  test('el marcado no usa manejadores en línea y la CSP los bloquea', async () => {
     const res = await api.get('/');
     const csp = res.headers['content-security-policy'] || '';
     const manejadores = (HTML_SPA.match(/\son[a-z]+="/g) || []).length;
 
-    // Contrato temporal de la Etapa 1: mientras el marcado use `onclick`/
-    // `onsubmit`, la CSP servida por Express debe permitirlos o el SPA queda
-    // inerte. La Etapa 2 los sustituye por delegación y vuelve a 'none'.
-    expect(manejadores).toBeGreaterThan(0);
-    expect(csp).toContain("script-src-attr 'unsafe-inline'");
+    // Contrato de la Etapa 2 (T2.1): sin atributos `on*` la directiva vuelve a
+    // su valor seguro. Si el marcado reintroduce un `onclick`, esta prueba y la
+    // de `spa-acciones.test.js` fallan antes de romper la interfaz publicada.
+    expect(manejadores).toBe(0);
+    expect(csp).toContain("script-src-attr 'none'");
+    expect(csp).not.toContain("script-src-attr 'unsafe-inline'");
   });
 
   test('Express sirve el HTML, la hoja de estilos y los módulos', async () => {

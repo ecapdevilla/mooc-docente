@@ -41,10 +41,9 @@
           ? 'lx-status--done'
           : (m.estado === 'en-curso' ? 'lx-status--current' : (m.estado === 'pendiente' ? 'lx-status--pending' : ''));
         const disponibles = m.lessonIndexes.length;
-        const moduloArg = m.id == null ? 'null' : `'${m.id}'`;
         const accion = disponibles
           ? `<button class="btn ${m.estado === 'en-curso' ? 'btn-primary' : 'btn-secondary'} btn-sm" type="button"
-               onclick="openModule('${course.idSpa}', ${moduloArg})">
+               data-action="open-module" data-course-id="${course.idSpa}" data-module-id="${m.id == null ? '' : m.id}">
                ${m.estado === 'completado' ? 'Repasar módulo' : (m.estado === 'en-curso' ? 'Continuar módulo' : 'Ver módulo')}
              </button>`
           : '<span class="lx-pending">Contenido en preparación</span>';
@@ -78,7 +77,7 @@
       }).join('');
       view.innerHTML = `
         <nav class="lx-crumbs" aria-label="Ruta de navegación">
-          <button type="button" class="lx-crumb" onclick="showView('dashboard')">Mi aprendizaje</button>
+          <button type="button" class="lx-crumb" data-action="show-view" data-view="dashboard">Mi aprendizaje</button>
           <span class="lx-crumbs__sep" aria-hidden="true">/</span>
           <span class="lx-crumb" aria-current="page">${lxEscape(course.titulo)}</span>
         </nav>
@@ -106,7 +105,7 @@
               </div>
             </div>
             <div class="lx-hero__actions">
-              <button class="btn btn-primary" type="button" onclick="openLesson('${course.idSpa}', ${course.nextLessonIndex})">
+              <button class="btn btn-primary" type="button" data-action="open-lesson" data-course-id="${course.idSpa}" data-lesson-index="${course.nextLessonIndex}">
                 ${ctaLabel} <i class="fas fa-arrow-right" aria-hidden="true"></i>
               </button>
               <a class="btn btn-ghost" href="#coursePath">Ver la ruta</a>

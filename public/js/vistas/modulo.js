@@ -47,7 +47,7 @@
                 </div>
               </div>
               <div class="lx-lesson-row__action">
-                <button class="btn btn-secondary btn-sm" type="button" onclick="openLesson('${course.idSpa}', ${leccion.index})">
+                <button class="btn btn-secondary btn-sm" type="button" data-action="open-lesson" data-course-id="${course.idSpa}" data-lesson-index="${leccion.index}">
                   ${leccion.completada ? 'Repasar' : (esSiguiente ? 'Continuar' : 'Abrir')}
                 </button>
               </div>
@@ -80,7 +80,7 @@
                  <strong>Continúa con: ${lxEscape(model.siguiente.titulo)}</strong>
                  <span>Lección ${model.siguiente.index + 1} de ${disponibles} de este módulo</span>
                </div>
-               <button class="btn btn-primary btn-sm" type="button" onclick="openLesson('${course.idSpa}', ${model.siguiente.index})">
+               <button class="btn btn-primary btn-sm" type="button" data-action="open-lesson" data-course-id="${course.idSpa}" data-lesson-index="${model.siguiente.index}">
                  ${modulo.completadas > 0 ? 'Continuar lección' : 'Empezar lección'}
                  <i class="fas fa-arrow-right" aria-hidden="true"></i>
                </button>
@@ -90,21 +90,18 @@
                  <strong>Módulo completado</strong>
                  <span>Puedes repasar cualquier lección desde la lista.</span>
                </div>
-               <button class="btn btn-ghost btn-sm" type="button" onclick="openLesson('${course.idSpa}', ${model.lecciones[0].index})">
+               <button class="btn btn-ghost btn-sm" type="button" data-action="open-lesson" data-course-id="${course.idSpa}" data-lesson-index="${model.lecciones[0].index}">
                  Repasar desde el inicio
                </button>
              </section>`)
         : '';
 
-      const siguienteArg = siguienteModulo && siguienteModulo.id != null
-        ? `'${siguienteModulo.id}'`
-        : 'null';
 
       view.innerHTML = `
         <nav class="lx-crumbs" aria-label="Ruta de navegación">
-          <button type="button" class="lx-crumb" onclick="showView('dashboard')">Mi aprendizaje</button>
+          <button type="button" class="lx-crumb" data-action="show-view" data-view="dashboard">Mi aprendizaje</button>
           <span class="lx-crumbs__sep" aria-hidden="true">/</span>
-          <button type="button" class="lx-crumb" onclick="openCourse('${course.idSpa}')">${lxEscape(course.titulo)}</button>
+          <button type="button" class="lx-crumb" data-action="open-course" data-course-id="${course.idSpa}">${lxEscape(course.titulo)}</button>
           <span class="lx-crumbs__sep" aria-hidden="true">/</span>
           <span class="lx-crumb" aria-current="page">Módulo ${model.posicion}</span>
         </nav>
@@ -150,15 +147,15 @@
 
         <div class="lx-panel lx-panel--flat">
           <div class="lx-lesson-footer__row">
-            <button class="btn btn-ghost btn-sm" type="button" onclick="openCourse('${course.idSpa}')">
+            <button class="btn btn-ghost btn-sm" type="button" data-action="open-course" data-course-id="${course.idSpa}">
               <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al curso
             </button>
             <div class="lx-lesson-footer__nav">
               ${siguienteModulo
-                ? `<button class="btn btn-secondary btn-sm" type="button" onclick="openModule('${course.idSpa}', ${siguienteArg})">
+                ? `<button class="btn btn-secondary btn-sm" type="button" data-action="open-module" data-course-id="${course.idSpa}" data-module-id="${siguienteModulo.id}">
                      Siguiente módulo <i class="fas fa-arrow-right" aria-hidden="true"></i>
                    </button>`
-                : `<button class="btn btn-secondary btn-sm" type="button" onclick="openCourse('${course.idSpa}')">
+                : `<button class="btn btn-secondary btn-sm" type="button" data-action="open-course" data-course-id="${course.idSpa}">
                      Ver la ruta del curso
                    </button>`}
             </div>

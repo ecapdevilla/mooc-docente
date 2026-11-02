@@ -78,7 +78,6 @@
       if (!ctx || !view) return;
 
       const { mod, lesson, course, modulo, progreso, isDone } = ctx;
-      const moduloArg = modulo && modulo.id != null ? `'${modulo.id}'` : 'null';
       const moduloTitulo = modulo ? modulo.titulo : 'Ruta del curso';
       const totalModulos = course ? course.totalModulos : 1;
       const area = course ? course.area : mod.area;
@@ -91,7 +90,7 @@
         return `
           <li>
             <button class="lx-outline__link ${activa ? 'is-active' : ''} ${hecha ? 'is-done' : ''}" type="button"
-              onclick="openLesson('${moduleId}', ${indice})" ${activa ? 'aria-current="step"' : ''}>
+              data-action="open-lesson" data-course-id="${moduleId}" data-lesson-index="${indice}" ${activa ? 'aria-current="step"' : ''}>
               <span class="lx-outline__num">${hecha ? '<i class="fas fa-check" aria-hidden="true"></i>' : orden + 1}</span>
               <span>${lxEscape(item.title)}</span>
             </button>
@@ -103,7 +102,7 @@
 
       const opcionesQuiz = lesson.quiz
         ? lesson.quiz.options.map((opt, i) => `
-            <button class="quiz-option" type="button" data-index="${i}" onclick="answerQuiz(${i})">
+            <button class="quiz-option" type="button" data-index="${i}" data-action="answer-quiz" data-option-index="${i}">
               <span class="letter">${String.fromCharCode(65 + i)}</span>
               <span>${lxEscape(opt)}</span>
             </button>`).join('')
@@ -116,7 +115,7 @@
           .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
           .map((opcion, i) => `
             <button class="quiz-option" type="button" data-option-id="${opcion.id}"
-              onclick="answerApiQuiz('${quiz.id}', '${opcion.id}')">
+              data-action="answer-api-quiz" data-quiz-id="${quiz.id}">
               <span class="letter">${String.fromCharCode(65 + i)}</span>
               <span>${lxEscape(opcion.opcion)}</span>
             </button>`).join('');
@@ -188,19 +187,19 @@
                   <div class="lx-lesson-meta" id="lessonNavInfo" role="status" aria-live="polite">${isDone ? 'Lección completada' : 'Aún no marcas esta lección como completada'}</div>
                   ${isDone
                     ? '<span class="lx-status lx-status--done"><i class="fas fa-check" aria-hidden="true"></i> Completada</span>'
-                    : '<button class="btn btn-primary btn-sm" type="button" onclick="completeLessonFromFooter()">Marcar completada</button>'}
+                    : '<button class="btn btn-primary btn-sm" type="button" data-action="complete-lesson">Marcar completada</button>'}
                 </div>
                 <div class="lx-lesson-footer__row">
-                  <button class="btn btn-ghost btn-sm" type="button" onclick="openModule('${moduleId}', ${moduloArg})">
+                  <button class="btn btn-ghost btn-sm" type="button" data-action="open-module" data-course-id="${moduleId}" data-module-id="${modulo && modulo.id != null ? modulo.id : ''}">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al módulo
                   </button>
                   <div class="lx-lesson-footer__nav">
                     ${ctx.previous !== null
-                      ? `<button class="btn btn-ghost btn-sm" type="button" onclick="openLesson('${moduleId}', ${ctx.previous})"><i class="fas fa-arrow-left" aria-hidden="true"></i> Anterior</button>`
+                      ? `<button class="btn btn-ghost btn-sm" type="button" data-action="open-lesson" data-course-id="${moduleId}" data-lesson-index="${ctx.previous}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Anterior</button>`
                       : ''}
                     ${ctx.next !== null
-                      ? `<button class="btn btn-secondary btn-sm" type="button" onclick="openLesson('${moduleId}', ${ctx.next})">Siguiente <i class="fas fa-arrow-right" aria-hidden="true"></i></button>`
-                      : `<button class="btn btn-secondary btn-sm" type="button" onclick="openCourse('${moduleId}')">Finalizar curso <i class="fas fa-check" aria-hidden="true"></i></button>`}
+                      ? `<button class="btn btn-secondary btn-sm" type="button" data-action="open-lesson" data-course-id="${moduleId}" data-lesson-index="${ctx.next}">Siguiente <i class="fas fa-arrow-right" aria-hidden="true"></i></button>`
+                      : `<button class="btn btn-secondary btn-sm" type="button" data-action="open-course" data-course-id="${moduleId}">Finalizar curso <i class="fas fa-check" aria-hidden="true"></i></button>`}
                   </div>
                 </div>
               </footer>
@@ -221,15 +220,15 @@
                 </div>
                 <p class="lx-muted" style="margin-top:.35rem">${progreso.done} de ${progreso.total} lecciones del curso</p>
               </div>
-              <button class="btn btn-ghost btn-sm" type="button" onclick="openModule('${moduleId}', ${moduloArg})">Ver el módulo</button>
+              <button class="btn btn-ghost btn-sm" type="button" data-action="open-module" data-course-id="${moduleId}" data-module-id="${modulo && modulo.id != null ? modulo.id : ''}">Ver el módulo</button>
             </aside>`;
       view.innerHTML = `
         <nav class="lx-crumbs" aria-label="Ruta de navegación">
-          <button type="button" class="lx-crumb" onclick="showView('dashboard')">Mi aprendizaje</button>
+          <button type="button" class="lx-crumb" data-action="show-view" data-view="dashboard">Mi aprendizaje</button>
           <span class="lx-crumbs__sep" aria-hidden="true">/</span>
-          <button type="button" class="lx-crumb" onclick="openCourse('${moduleId}')">${lxEscape(course.titulo)}</button>
+          <button type="button" class="lx-crumb" data-action="open-course" data-course-id="${moduleId}">${lxEscape(course.titulo)}</button>
           <span class="lx-crumbs__sep" aria-hidden="true">/</span>
-          <button type="button" class="lx-crumb" onclick="openModule('${moduleId}', ${moduloArg})">${lxEscape(moduloTitulo)}</button>
+          <button type="button" class="lx-crumb" data-action="open-module" data-course-id="${moduleId}" data-module-id="${modulo && modulo.id != null ? modulo.id : ''}">${lxEscape(moduloTitulo)}</button>
           <span class="lx-crumbs__sep" aria-hidden="true">/</span>
           <span class="lx-crumb" aria-current="page">Lección ${ctx.posicionModulo}</span>
         </nav>
