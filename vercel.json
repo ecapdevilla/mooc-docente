@@ -18,6 +18,8 @@
     { "src": "/diagnostico-piloto", "dest": "diagnosticoPiloto.html" },
     { "src": "/diagnosticoPiloto.js", "dest": "public/diagnosticoPiloto.js" },
     { "src": "/diagnosticoPiloto.css", "dest": "public/diagnosticoPiloto.css" },
+    { "src": "/styles/(.*)", "dest": "public/styles/$1" },
+    { "src": "/js/(.*)", "dest": "public/js/$1" },
     { "src": "/", "dest": "indexInicial.html" },
     { "src": "/(.*)", "dest": "indexInicial.html" }
   ],
@@ -26,6 +28,18 @@
       "source": "/diagnostico-piloto",
       "headers": [
         { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/styles/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     }
   ]
