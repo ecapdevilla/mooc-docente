@@ -245,8 +245,12 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   para los 5xx. Detalle: `docs/login-500-production-20261101.md`.
 - Production sigue desactualizado: allí el caso malformado responde `500` y
   `GET /api/v1/courses` no incluye `meta` (la rama local sí). Falta desplegar.
-- Pruebas nuevas: `tests/errores-http.test.js` (4 casos: 400 en login y en ruta
-  inexistente con JSON roto, 404 sin cuerpo, 401 con credenciales inválidas).
+- Pruebas nuevas: `tests/errores-http.test.js` (5 casos: 400 en login y en ruta
+  inexistente con JSON roto, log sin cuerpo ni contraseña, 404 sin cuerpo y 401
+  con credenciales inválidas) y `tests/http-errors.test.js` (6 casos del
+  clasificador). En local el error llega como `entity.parse.failed`; en Vercel
+  llega sin `type` y con `SyntaxError` de otro contexto, por eso la detección
+  vive en `src/utils/httpErrors.js`.
 - Carga del catálogo implementada en `scripts/generar-carga-catalogo.js`
   (`npm run carga:catalogo`): extrae `const MODULES` de `indexInicial.html`,
   valida títulos normalizados y emite cinco SQL en `database/loads/`
@@ -287,7 +291,7 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   `DATABASE_URL` y `JWT_SECRET` en el entorno y una base con
   `database/schema.sql`, el seed y
   `database/migrations/20261101_lesson_quiz_responses.sql`. Con eso la suite
-  completa queda en 18/18 suites y 123/123 pruebas (`npx jest --maxWorkers=2`).
+  completa queda en 19/19 suites y 129/129 pruebas (`npx jest --maxWorkers=2`).
 
 ## Prioridades pendientes
 

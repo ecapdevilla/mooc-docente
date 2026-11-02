@@ -82,3 +82,26 @@ Resultado: 4/4 en verde.
    revisar las tablas de identidad de la base de Production con
    `database/diagnostics/20261101_diagnostico_catalogo_solo_lectura.sql`
    (consultas 11 y 12): sería un problema de esquema, no del login.
+
+## 7. Verificación tras el despliegue (2026-11-01)
+
+Commit desplegado: `3d7eca7` en `recovery/integracion-20261031`.
+
+| Petición a `https://mooc-docente.vercel.app` | Antes | Después |
+| --- | --- | --- |
+| `POST /api/v1/auth/login` con JSON malformado | `500` | `400` |
+| `POST /api/v1/ruta-inexistente` con JSON malformado | `500` | `400` |
+| `GET /api/v1/courses` | `200` sin `meta` | `200` con `meta {totalCursos, cursosActivos}` |
+| `POST /api/v1/auth/login` con usuario inexistente | `401` | `401` |
+| `POST /api/v1/quizzes/post-login/attempts` con token inválido | `500` | `401` |
+| `GET /api/v1/progress` sin token | `401` | `401` |
+| `GET /api/v1/diagnostico-piloto/info` | `200`, 50 preguntas | `200`, 50 preguntas |
+
+Hallazgo adicional del despliegue: el `400` ya no llega con el mensaje
+`JSON inválido en el cuerpo de la solicitud`, sino con el genérico
+`Error interno del servidor`. Motivo: en el runtime serverless de Vercel el
+error no trae `type = 'entity.parse.failed'` y el `SyntaxError` se crea en otro
+contexto, así que la comprobación con `instanceof` falla. La detección se movió
+a `src/utils/httpErrors.js` y ahora reconoce las tres formas (tipo de
+`body-parser`, `SyntaxError` de otro contexto con status 400 y error 400 con
+`body`). Cubierto por `tests/http-errors.test.js` (6 casos).

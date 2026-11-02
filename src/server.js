@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { pool } = require('./config/database');
+const { esCuerpoJsonInvalido } = require('./utils/httpErrors');
 const authRoutes = require('./routes/auth');
 const courseRoutes = require('./routes/courses');
 const progressRoutes = require('./routes/progress');
@@ -129,9 +130,9 @@ app.use((err, req, res, next) => {
   // Un cuerpo JSON malformado lo reporta body-parser como SyntaxError con
   // type 'entity.parse.failed'. Ese caso es un 400 del cliente, nunca un 500,
   // y aplica a cualquier ruta (por eso no se diagnostica como fallo de login).
-  const esCuerpoInvalido =
-    err.type === 'entity.parse.failed' ||
-    (err instanceof SyntaxError && Object.prototype.hasOwnProperty.call(err, 'body'));
+  // El runtime de Vercel entrega el mismo caso sin `type`, así que la
+  // detección vive en `src/utils/httpErrors.js`.
+  const esCuerpoInvalido = esCuerpoJsonInvalido(err);
 
   const status = esCuerpoInvalido ? 400 : err.status || err.statusCode || 500;
   const isDevelopment = process.env.NODE_ENV === 'development';
