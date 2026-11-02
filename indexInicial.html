@@ -2134,6 +2134,880 @@
     }
     :disabled { cursor: not-allowed; }
 
+    /* ==========================================================
+       SISTEMA DE APRENDIZAJE 2.1 · curso, módulo y lección
+       Componentes reutilizables con prefijo .lx- compartidos por
+       los tres cursos. Sin dependencias externas ni cambios de
+       contrato con la API.
+       ========================================================== */
+    .lx-page {
+      background: var(--light);
+      padding: clamp(1rem, 2.6vw, 2rem) 0 clamp(2.5rem, 6vw, 4rem);
+    }
+    .lx-shell {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(1rem, 2.2vw, 1.75rem);
+      min-width: 0;
+    }
+    .lx-crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .3rem .45rem;
+      font-size: .82rem;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+    .lx-crumbs__sep { color: var(--gray-300); }
+    .lx-crumb {
+      border: 0;
+      background: none;
+      padding: .15rem .1rem;
+      font: inherit;
+      font-weight: 600;
+      color: var(--secondary-light);
+      cursor: pointer;
+      border-radius: .35rem;
+    }
+    .lx-crumb:hover { color: var(--secondary); text-decoration: underline; }
+    .lx-crumb[aria-current="page"] {
+      color: var(--text-soft);
+      cursor: default;
+      text-decoration: none;
+    }
+
+    /* Encabezado de curso ------------------------------------- */
+    .lx-hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      gap: 1.1rem;
+      padding: clamp(1.4rem, 3.4vw, 2.5rem);
+      border-radius: 1.35rem;
+      color: #fff;
+      background: linear-gradient(118deg, #14284B 0%, #1B3A6B 56%, #234F8C 100%);
+      box-shadow: var(--shadow-md);
+    }
+    .lx-hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -140px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(13, 148, 136, .45), rgba(13, 148, 136, 0) 68%);
+      pointer-events: none;
+    }
+    .lx-hero > * { position: relative; z-index: 1; min-width: 0; }
+    .lx-hero__eyebrow {
+      font-size: .74rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #99F6E4;
+    }
+    .lx-hero h1 {
+      margin: .15rem 0 0;
+      font-size: clamp(1.5rem, 3.4vw, 2.3rem);
+      line-height: 1.16;
+      letter-spacing: -.025em;
+      color: #fff;
+    }
+    .lx-hero__lead {
+      margin: 0;
+      max-width: 62ch;
+      font-size: clamp(.94rem, 1.4vw, 1.02rem);
+      line-height: 1.65;
+      color: rgba(255, 255, 255, .84);
+    }
+    .lx-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+    .lx-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      min-height: 30px;
+      padding: .25rem .7rem;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(255, 255, 255, .22);
+      background: rgba(255, 255, 255, .12);
+      color: #F1F5F9;
+      font-size: .78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .lx-chip--light {
+      border-color: var(--gray-200);
+      background: #F4F7FC;
+      color: var(--text-mid);
+    }
+    .lx-chip--light i { color: var(--primary); }
+    .lx-hero__footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1.25rem;
+      align-items: end;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, .16);
+    }
+    .lx-hero__progress { display: grid; gap: .45rem; min-width: 0; }
+    .lx-hero__progress-label {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: .35rem .8rem;
+      font-size: .82rem;
+      color: rgba(255, 255, 255, .78);
+    }
+    .lx-hero__progress-label strong { color: #fff; font-size: .9rem; }
+    .lx-hero__actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+    /* Barra de progreso --------------------------------------- */
+    .lx-meter {
+      height: 8px;
+      border-radius: var(--r-pill);
+      background: rgba(255, 255, 255, .2);
+      overflow: hidden;
+    }
+    .lx-meter__fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #14B8A6, #5EEAD4);
+      transition: width .35s ease;
+    }
+    .lx-meter--dark { background: #E4EBF5; }
+    .lx-meter--dark .lx-meter__fill { background: linear-gradient(90deg, #0D9488, #2563EB); }
+    .lx-meter--sm { height: 6px; }
+    .lx-progress-line {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      min-width: 0;
+      font-size: .8rem;
+      color: var(--text-soft);
+    }
+    .lx-progress-line .lx-meter { flex: 1 1 auto; min-width: 60px; }
+    .lx-progress-line strong { color: var(--secondary); font-size: .82rem; }
+
+    /* Paneles y bloques de contenido -------------------------- */
+    .lx-panel {
+      min-width: 0;
+      padding: clamp(1.1rem, 2.4vw, 1.7rem);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--r-lg);
+      background: #fff;
+      box-shadow: var(--shadow-xs);
+    }
+    .lx-panel--flat { box-shadow: none; background: #FBFCFE; }
+    .lx-panel__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: .35rem .9rem;
+      margin-bottom: 1rem;
+    }
+    .lx-eyebrow {
+      display: block;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--primary-dark);
+    }
+    .lx-h2 {
+      margin: .2rem 0 0;
+      font-size: clamp(1.12rem, 2vw, 1.38rem);
+      line-height: 1.3;
+      letter-spacing: -.015em;
+      color: var(--secondary);
+    }
+    .lx-h3 {
+      margin: 0 0 .4rem;
+      font-size: 1rem;
+      line-height: 1.35;
+      color: var(--secondary);
+    }
+    .lx-muted { margin: 0; font-size: .88rem; line-height: 1.6; color: var(--text-soft); }
+    .lx-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(.85rem, 2vw, 1.35rem);
+      align-items: start;
+    }
+    .lx-facts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .7rem;
+    }
+    .lx-fact {
+      min-width: 0;
+      padding: .85rem .95rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--r-md);
+      background: #fff;
+    }
+    .lx-fact__label {
+      display: block;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+    .lx-fact__value {
+      display: block;
+      margin-top: .25rem;
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.3;
+      color: var(--secondary);
+      overflow-wrap: anywhere;
+    }
+    .lx-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: .55rem;
+    }
+    .lx-list li {
+      position: relative;
+      padding-left: 1.35rem;
+      font-size: .93rem;
+      line-height: 1.6;
+      color: var(--text-mid);
+    }
+    .lx-list li::before {
+      content: "";
+      position: absolute;
+      left: .2rem;
+      top: .62em;
+      width: .45rem;
+      height: .45rem;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+    .lx-note {
+      margin: 0;
+      padding: .85rem 1rem;
+      border-left: 3px solid var(--secondary-light);
+      border-radius: .55rem;
+      background: var(--secondary-soft);
+      font-size: .86rem;
+      line-height: 1.6;
+      color: #33456A;
+    }
+    .lx-empty {
+      display: grid;
+      justify-items: start;
+      gap: .35rem;
+      padding: 1.1rem 1.15rem;
+      border: 1px dashed var(--gray-300);
+      border-radius: var(--r-md);
+      background: #FBFCFE;
+      color: var(--text-mid);
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+    .lx-empty strong { color: var(--secondary); font-size: .95rem; }
+    .lx-pending {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .2rem .6rem;
+      border-radius: var(--r-pill);
+      background: #FFF7ED;
+      color: #9A3412;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .lx-pending::before {
+      content: "";
+      width: .45rem;
+      height: .45rem;
+      border-radius: 50%;
+      background: #F59E0B;
+    }
+
+    /* Ruta de aprendizaje (vista de curso) -------------------- */
+    .lx-path { margin: 0; padding: 0; list-style: none; display: grid; gap: .85rem; }
+    .lx-path__item {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: .85rem;
+      min-width: 0;
+    }
+    .lx-path__rail { display: flex; flex-direction: column; align-items: center; }
+    .lx-path__dot {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #D8E3F2;
+      background: #fff;
+      color: var(--secondary-light);
+      font-size: .88rem;
+      font-weight: 800;
+    }
+    .lx-path__line { flex: 1 1 auto; width: 2px; margin-top: .35rem; background: #E2E9F3; }
+    .lx-path__item:last-child .lx-path__line { display: none; }
+    .lx-path__item.is-current .lx-path__dot {
+      background: var(--secondary-light);
+      border-color: var(--secondary-light);
+      color: #fff;
+      box-shadow: 0 0 0 5px rgba(37, 99, 235, .12);
+    }
+    .lx-path__item.is-done .lx-path__dot {
+      background: var(--accent-soft);
+      border-color: #5EEAD4;
+      color: var(--accent-dark);
+    }
+    .lx-path__card {
+      display: grid;
+      gap: .55rem;
+      min-width: 0;
+      padding: .9rem 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--r-md);
+      background: #fff;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .lx-path__card:hover { border-color: #B9CAE6; }
+    .lx-path__item.is-current .lx-path__card {
+      border-color: #BFD3F5;
+      box-shadow: var(--shadow-sm);
+    }
+    .lx-path__title { margin: 0; font-size: .98rem; line-height: 1.35; color: var(--secondary); }
+    .lx-path__desc { margin: 0; font-size: .85rem; line-height: 1.55; color: var(--text-soft); }
+    .lx-path__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .35rem .7rem;
+      font-size: .78rem;
+      color: var(--text-soft);
+    }
+    .lx-path__actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+    .lx-status {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .18rem .55rem;
+      border-radius: var(--r-pill);
+      background: #EEF2F8;
+      color: #42526B;
+      font-size: .72rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .lx-status--current { background: #E8F0FF; color: #1D4ED8; }
+    .lx-status--done { background: var(--accent-soft); color: var(--accent-dark); }
+    .lx-status--pending { background: #FFF7ED; color: #9A3412; }
+
+    /* Vista de módulo ----------------------------------------- */
+    .lx-module-head { display: grid; gap: .6rem; min-width: 0; }
+    .lx-module-head__position {
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--primary-dark);
+    }
+    .lx-module-head h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.8vw, 1.95rem);
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      color: var(--secondary);
+    }
+    .lx-module-head__lead {
+      margin: 0;
+      max-width: 66ch;
+      font-size: .95rem;
+      line-height: 1.65;
+      color: var(--text-mid);
+    }
+    .lx-lesson-list { margin: 0; padding: 0; list-style: none; display: grid; gap: .6rem; }
+    .lx-lesson-row {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) auto;
+      gap: .35rem .85rem;
+      align-items: center;
+      padding: .8rem .9rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--r-md);
+      background: #fff;
+      transition: border-color .18s ease, background .18s ease;
+    }
+    .lx-lesson-row:hover { border-color: #B9CAE6; }
+    .lx-lesson-row.is-done { background: #F5FBF9; border-color: #C7ECE4; }
+    .lx-lesson-row.is-pending { background: #FCFDFE; }
+    .lx-lesson-row__index {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: .7rem;
+      background: #EEF2F8;
+      color: #42526B;
+      font-size: .85rem;
+      font-weight: 800;
+    }
+    .lx-lesson-row.is-done .lx-lesson-row__index { background: var(--accent); color: #fff; }
+    .lx-lesson-row.is-current .lx-lesson-row__index {
+      background: var(--secondary-light);
+      color: #fff;
+    }
+    .lx-lesson-row__body { display: grid; gap: .2rem; min-width: 0; }
+    .lx-lesson-row__title {
+      font-size: .93rem;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--secondary);
+      overflow-wrap: anywhere;
+    }
+    .lx-lesson-row__desc {
+      font-size: .82rem;
+      line-height: 1.5;
+      color: var(--text-soft);
+      overflow-wrap: anywhere;
+    }
+    .lx-lesson-row__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .3rem .6rem;
+      font-size: .76rem;
+      color: var(--text-soft);
+    }
+    .lx-lesson-row__action { justify-self: end; }
+    .lx-continue {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .7rem 1rem;
+      padding: .9rem 1rem;
+      border: 1px solid #D7E3F5;
+      border-radius: var(--r-md);
+      background: linear-gradient(180deg, #F6FAFF, #fff);
+    }
+    .lx-continue__text { display: grid; gap: .15rem; min-width: 0; }
+    .lx-continue__text strong { color: var(--secondary); font-size: .93rem; }
+    .lx-continue__text span { color: var(--text-soft); font-size: .82rem; }
+
+    /* Vista de lección ---------------------------------------- */
+    .lx-lesson-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: clamp(.9rem, 2vw, 1.35rem);
+      align-items: start;
+      min-width: 0;
+    }
+    .lx-lesson-shell {
+      max-width: none;
+      margin: 0;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--r-lg);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .lx-lesson-shell > .lx-quiz {
+      margin: 0 clamp(1.1rem, 2.6vw, 2rem) clamp(1.1rem, 2.6vw, 2rem);
+    }
+    .lx-lesson-head {
+      display: grid;
+      gap: .5rem;
+      padding: clamp(1.1rem, 2.6vw, 1.7rem);
+      border-bottom: 1px solid #E8EEF6;
+      background: linear-gradient(180deg, #F8FBFF, #FFFFFF);
+    }
+    .lx-lesson-head h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2.6vw, 1.8rem);
+      line-height: 1.22;
+      letter-spacing: -.02em;
+      color: var(--secondary);
+    }
+    .lx-lesson-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .3rem .8rem;
+      font-size: .78rem;
+      color: var(--text-soft);
+    }
+    .lx-lesson-meta__item { display: inline-flex; align-items: center; gap: .3rem; }
+    .lx-lesson-meta__item i { color: var(--primary); }
+    .lx-reading {
+      max-width: 74ch;
+      margin-inline: auto;
+      padding: clamp(1.1rem, 2.6vw, 2rem);
+      font-size: 1rem;
+      line-height: 1.78;
+      color: #33425C;
+    }
+    .lx-reading > * + * { margin-top: 1rem; }
+    .lx-reading h2 {
+      margin: 1.9rem 0 0;
+      font-size: clamp(1.1rem, 2vw, 1.32rem);
+      line-height: 1.3;
+      letter-spacing: -.015em;
+      color: var(--secondary);
+    }
+    .lx-reading h3 {
+      margin: 1.5rem 0 0;
+      font-size: 1.02rem;
+      line-height: 1.4;
+      color: var(--secondary);
+    }
+    .lx-reading h4 {
+      margin: 1.2rem 0 0;
+      font-size: .95rem;
+      line-height: 1.45;
+      letter-spacing: .005em;
+      color: var(--secondary);
+    }
+    .lx-reading p { margin: 0; }
+    .lx-reading strong { color: var(--text-dark); }
+    .lx-reading a {
+      color: var(--secondary-light);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .lx-reading ul, .lx-reading ol {
+      margin: 0;
+      padding-left: 1.3rem;
+      display: grid;
+      gap: .4rem;
+    }
+    .lx-reading li::marker { color: var(--primary); font-weight: 700; }
+    .lx-reading blockquote {
+      margin: 0;
+      padding: .9rem 1.1rem;
+      border-left: 3px solid var(--primary);
+      border-radius: .55rem;
+      background: var(--accent-soft);
+      color: #134E4A;
+    }
+    .lx-reading hr { margin: 1.6rem 0; border: 0; border-top: 1px solid var(--gray-200); }
+    .lx-reading .info-box,
+    .lx-reading .concept-box {
+      margin: 0;
+      padding: .95rem 1.1rem;
+      border: 1px solid #D9E7F6;
+      border-left: 4px solid var(--secondary-light);
+      border-radius: .7rem;
+      background: #F7FAFF;
+      font-size: .93rem;
+      line-height: 1.65;
+      color: #2C3E5C;
+    }
+    .lx-reading .concept-box strong { color: var(--secondary); }
+
+    /* Bloques didácticos tipados ------------------------------ */
+    .lx-definition {
+      padding: 1rem 1.1rem;
+      border: 1px solid #D9E7F6;
+      border-left: 4px solid var(--secondary-light);
+      border-radius: .8rem;
+      background: #F7FAFF;
+    }
+    .lx-definition__label {
+      display: block;
+      margin-bottom: .35rem;
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--secondary-light);
+    }
+    .lx-definition p { margin: 0; }
+    .lx-callout {
+      display: grid;
+      gap: .3rem;
+      padding: .95rem 1.1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: .85rem;
+      font-size: .93rem;
+      line-height: 1.65;
+    }
+    .lx-callout__title {
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .lx-callout p { margin: 0; }
+    .lx-callout--key { background: #F0FDFA; border-color: #CCFBF1; color: #134E4A; }
+    .lx-callout--key .lx-callout__title { color: var(--primary-dark); }
+    .lx-callout--example { background: #F7FAFF; border-color: #DCE8FA; color: #1E3A63; }
+    .lx-callout--example .lx-callout__title { color: var(--secondary-light); }
+    .lx-callout--case { background: #FFFBF3; border-color: #FDE9C4; color: #7C4A03; }
+    .lx-callout--case .lx-callout__title { color: #B45309; }
+    .lx-callout--reflection { background: #F6F5FF; border-color: #E4E0FF; color: #3B2E7E; }
+    .lx-callout--reflection .lx-callout__title { color: #5B4BC4; }
+    .lx-callout--activity { background: #F4FBF7; border-color: #CFEBDD; color: #14532D; }
+    .lx-callout--activity .lx-callout__title { color: #15803D; }
+    .lx-table-wrap {
+      max-width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      border-radius: .8rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lx-table-wrap table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .lx-table-wrap th,
+    .lx-table-wrap td {
+      padding: .65rem .8rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--gray-200);
+      line-height: 1.55;
+    }
+    .lx-table-wrap th {
+      background: #F5F8FC;
+      color: var(--secondary);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .lx-table-wrap tr:last-child td { border-bottom: 0; }
+    .lx-figure { margin: 0; display: grid; gap: .4rem; }
+    .lx-figure img {
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--gray-200);
+      border-radius: .8rem;
+    }
+    .lx-figure figcaption { font-size: .8rem; line-height: 1.5; color: var(--text-soft); }
+    .lx-biblio {
+      display: grid;
+      gap: .5rem;
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: .87rem;
+      line-height: 1.6;
+      color: var(--text-mid);
+    }
+    .lx-biblio li { overflow-wrap: anywhere; }
+    .lx-checklist { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+    .lx-checklist li {
+      display: grid;
+      grid-template-columns: 20px minmax(0, 1fr);
+      gap: .55rem;
+      align-items: start;
+      font-size: .92rem;
+      line-height: 1.6;
+      color: var(--text-mid);
+    }
+    .lx-checklist__mark {
+      display: grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      margin-top: .18rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: .35rem;
+      background: #fff;
+      color: var(--accent-dark);
+      font-size: .62rem;
+      font-weight: 900;
+    }
+
+    /* Actividad de comprobación ------------------------------- */
+    .lx-quiz {
+      display: grid;
+      gap: .9rem;
+      padding: clamp(1.05rem, 2.4vw, 1.5rem);
+      border: 1px solid #E1E8F2;
+      border-radius: 1rem;
+      background: #FBFCFE;
+    }
+    .lx-quiz__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .4rem .8rem;
+    }
+    .lx-quiz__question {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--secondary);
+    }
+    .lx-quiz .quiz-options { display: grid; gap: .55rem; }
+    .lx-quiz .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: .7rem;
+      width: 100%;
+      padding: .7rem .8rem;
+      border: 1px solid #D8E1ED;
+      border-radius: .75rem;
+      background: #fff;
+      font: inherit;
+      font-size: .92rem;
+      line-height: 1.55;
+      text-align: left;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease;
+    }
+    .lx-quiz .quiz-option .letter {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: .5rem;
+      background: #EEF2F8;
+      color: #42526B;
+      font-size: .76rem;
+      font-weight: 800;
+    }
+    .lx-quiz .quiz-option.selected { border-color: var(--secondary-light); background: #EFF6FF; }
+    .lx-quiz .quiz-option.correct { border-color: #86E0CE; background: #F0FDFA; }
+    .lx-quiz .quiz-option.correct .letter { background: var(--accent); color: #fff; }
+    .lx-quiz .quiz-option.incorrect { border-color: #F5B5AE; background: var(--danger-soft); }
+    .lx-quiz .quiz-option.incorrect .letter { background: var(--danger); color: #fff; }
+    .lx-quiz .quiz-option.disabled { cursor: default; }
+    .lx-quiz .quiz-feedback { display: none; gap: .5rem; padding: .8rem .9rem; border-radius: .7rem; font-size: .88rem; line-height: 1.6; }
+    .lx-quiz .quiz-feedback.show { display: flex; }
+    .lx-quiz .quiz-feedback.ok { background: var(--accent-soft); color: var(--accent-dark); }
+    .lx-quiz .quiz-feedback.ko { background: var(--danger-soft); color: #991B1B; }
+
+    /* Índice lateral de la lección ---------------------------- */
+    .lx-outline {
+      position: sticky;
+      top: 88px;
+      display: grid;
+      gap: .55rem;
+    }
+    .lx-outline__course {
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+    .lx-outline__title { margin: 0; font-size: .95rem; line-height: 1.35; color: var(--secondary); }
+    .lx-outline__list { margin: 0; padding: 0; list-style: none; display: grid; gap: .12rem; }
+    .lx-outline__link {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: .5rem;
+      align-items: start;
+      width: 100%;
+      padding: .5rem .55rem;
+      border: 0;
+      border-radius: .6rem;
+      background: none;
+      font: inherit;
+      font-size: .84rem;
+      line-height: 1.45;
+      text-align: left;
+      color: var(--text-mid);
+      cursor: pointer;
+    }
+    .lx-outline__link:hover { background: #F1F5FB; color: var(--secondary); }
+    .lx-outline__link.is-active { background: #EFF6FF; color: var(--secondary); font-weight: 700; }
+    .lx-outline__num {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: .4rem;
+      background: #EEF2F8;
+      color: #42526B;
+      font-size: .68rem;
+      font-weight: 800;
+    }
+    .lx-outline__link.is-done .lx-outline__num { background: var(--accent-soft); color: var(--accent-dark); }
+    .lx-outline__link.is-active .lx-outline__num { background: var(--secondary-light); color: #fff; }
+    .lx-outline__link[disabled] { cursor: default; opacity: .7; }
+    .lx-outline__progress { margin-top: .3rem; }
+
+    /* Pie de lección: avance, anterior y siguiente ------------- */
+    .lx-lesson-footer {
+      display: grid;
+      gap: .8rem;
+      padding: clamp(1rem, 2.2vw, 1.3rem) clamp(1.1rem, 2.4vw, 1.7rem);
+      border-top: 1px solid #E8EEF6;
+      background: #FBFCFE;
+    }
+    .lx-lesson-footer__row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .6rem 1rem;
+    }
+    .lx-lesson-footer__nav { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .lx-lesson-footer__nav .btn { min-height: 44px; }
+    .lx-complete-state {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+    }
+    .lx-lesson-status {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .5rem;
+      font-size: .82rem;
+      color: var(--text-soft);
+    }
+
+    /* Adaptación de la experiencia de aprendizaje -------------- */
+    @media (max-width: 1080px) {
+      .lx-lesson-layout { grid-template-columns: minmax(0, 1fr); }
+      .lx-outline { position: static; order: -1; }
+      .lx-outline__list { max-height: 280px; overflow-y: auto; padding-right: .25rem; }
+    }
+    @media (max-width: 768px) {
+      .lx-hero__footer { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+      .lx-hero__actions .btn { flex: 1 1 auto; justify-content: center; }
+      .lx-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lx-grid-2 { grid-template-columns: minmax(0, 1fr); }
+      .lx-path__item { grid-template-columns: 34px minmax(0, 1fr); gap: .65rem; }
+      .lx-path__dot { width: 32px; height: 32px; font-size: .78rem; }
+      .lx-lesson-row { grid-template-columns: 36px minmax(0, 1fr); }
+      .lx-lesson-row__action { grid-column: 1 / -1; justify-self: stretch; }
+      .lx-lesson-row__action .btn { width: 100%; justify-content: center; }
+      .lx-continue { flex-direction: column; align-items: stretch; }
+      .lx-continue .btn { width: 100%; justify-content: center; }
+      .lx-reading { padding: 1.25rem; }
+    }
+    @media (max-width: 540px) {
+      .lx-page { padding-top: .5rem; }
+      .lx-hero { border-radius: 1rem; padding: 1.15rem; }
+      .lx-hero__actions .btn { width: 100%; }
+      .lx-crumbs { font-size: .78rem; }
+      .lx-reading { padding: 1.1rem; font-size: .97rem; }
+      .lx-lesson-footer__row { flex-direction: column; align-items: stretch; }
+      .lx-lesson-footer__nav { flex-direction: column-reverse; }
+      .lx-lesson-footer__nav .btn { width: 100%; justify-content: center; }
+      .lx-quiz .quiz-option { padding: .65rem .7rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lx-meter__fill, .lx-path__card, .lx-lesson-row, .lx-quiz .quiz-option { transition: none !important; }
+    }
+
     @media (max-width: 992px) {
       .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr); gap: 2rem; }
       .hero-content { text-align: left; }
@@ -2497,6 +3371,22 @@
     </section>
   </div>
 
+  <div id="view-course" class="hidden">
+    <div class="lx-page">
+      <div class="container">
+        <div class="lx-shell" id="courseView"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-module" class="hidden">
+    <div class="lx-page">
+      <div class="container">
+        <div class="lx-shell" id="moduleView"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="view-admin-diagnostic" class="hidden">
     <section class="section admin-editor">
       <div class="container">
@@ -2626,13 +3516,14 @@
        VISTA 3: LECCIÓN
   ============================================================ -->
   <div id="view-lesson" class="hidden">
-    <section class="section">
+    <div class="lx-page">
       <div class="container">
-        <div class="lesson-view" id="lessonView"></div>
+        <div class="lx-lesson-page" id="lessonView"></div>
       </div>
-      </main>
-    </section>
+    </div>
   </div>
+
+  </main>
 
   <!-- ============================================================
        MODAL DE INSIGNIA
@@ -3165,6 +4056,8 @@
 
       document.getElementById('view-landing').classList.add('hidden');
       document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-course').classList.add('hidden');
+      document.getElementById('view-module').classList.add('hidden');
       document.getElementById('view-lesson').classList.add('hidden');
       document.getElementById('view-admin-diagnostic').classList.add('hidden');
 
@@ -3180,6 +4073,19 @@
         }
         document.getElementById('view-dashboard').classList.remove('hidden');
         renderDashboard();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (view === 'course' || view === 'module') {
+        if (!state.user) {
+          showView('dashboard');
+          return;
+        }
+        if (view === 'course') {
+          renderCourseView();
+          document.getElementById('view-course').classList.remove('hidden');
+        } else {
+          renderModuleView();
+          document.getElementById('view-module').classList.remove('hidden');
+        }
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (view === 'lesson') {
         document.getElementById('view-lesson').classList.remove('hidden');
@@ -4045,7 +4951,14 @@
         );
         if (matchingCourses.length !== 1) {
           console.warn(`No hay una correspondencia única para el curso "${mod.title}".`);
-          map[mod.id] = { courseId: null, moduloIds: [], lessons: mod.lessons.map(() => null) };
+          map[mod.id] = {
+            courseId: null,
+            courseTitulo: null,
+            moduloIds: [],
+            modules: [],
+            apiLessons: [],
+            lessons: mod.lessons.map(() => null)
+          };
           continue;
         }
 
@@ -4053,17 +4966,29 @@
         const detail = await apiFetch(`/courses/${course.id}`);
         const apiLessons = [];
         const moduloIds = [];
+        const modules = [];
 
         (detail.course.modulos || []).forEach(m => {
+          const moduleLessons = (m.lecciones || []).map(l => ({
+            id: l.id,
+            moduloId: m.id,
+            titulo: l.titulo,
+            descripcion: l.descripcion || '',
+            orden: l.orden,
+            normalizedTitle: normalizeLessonTitle(l.titulo)
+          }));
+
           moduloIds.push(m.id);
-          (m.lecciones || []).forEach(l => {
-            apiLessons.push({
-              id: l.id,
-              moduloId: m.id,
-              normalizedTitle: normalizeLessonTitle(l.titulo)
-            });
+          modules.push({
+            id: m.id,
+            titulo: m.titulo,
+            descripcion: m.descripcion || '',
+            orden: m.orden,
+            lecciones: moduleLessons
           });
+          moduleLessons.forEach(l => apiLessons.push(l));
         });
+        modules.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
         const lessons = mod.lessons.map(spaLesson => {
           const title = normalizeLessonTitle(spaLesson.title);
@@ -4077,7 +5002,14 @@
           return matches[0];
         });
 
-        map[mod.id] = { courseId: course.id, moduloIds, lessons };
+        map[mod.id] = {
+          courseId: course.id,
+          courseTitulo: course.titulo,
+          moduloIds,
+          modules,
+          apiLessons,
+          lessons
+        };
       }
 
       state.courseMap = map;
@@ -4638,8 +5570,8 @@
                 <span>${p.percent}%</span>
               </div>
             </div>
-            <button class="btn ${p.completed ? 'btn-ghost' : 'btn-secondary'} btn-block btn-sm" onclick="startModule('${m.id}')">
-              ${p.completed ? '<i class="fas fa-redo"></i> Repasar módulo' : (p.done > 0 ? '<i class="fas fa-play"></i> Continuar' : '<i class="fas fa-play"></i> Empezar módulo')}
+            <button class="btn ${p.completed ? 'btn-ghost' : 'btn-secondary'} btn-block btn-sm" onclick="openCourse('${m.id}')">
+              ${p.completed ? '<i class="fas fa-redo"></i> Repasar curso' : (p.done > 0 ? '<i class="fas fa-play"></i> Continuar curso' : '<i class="fas fa-play"></i> Ver curso')}
             </button>
           </div>
         `;
@@ -4668,24 +5600,515 @@
     }
 
     /* ============================================================
+       EXPERIENCIA DE APRENDIZAJE 2.1 · MODELO DE PRESENTACIÓN
+       Curso, módulo y lección se derivan de MODULES (contenido
+       publicado) y de state.courseMap (módulos, lecciones y
+       progreso reales de la API). Nunca se inventan métricas.
+    ============================================================ */
+    function lxEscape(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function lxPlural(count, singular, plural) {
+      return `${count} ${count === 1 ? singular : plural}`;
+    }
+
+    function lxEstadoLabel(estado) {
+      return {
+        completado: 'Completado',
+        'en-curso': 'En curso',
+        nuevo: 'Sin iniciar',
+        pendiente: 'En preparación'
+      }[estado] || 'Sin iniciar';
+    }
+
+    function getNextLessonIndex(modId) {
+      const mod = MODULES.find(m => m.id === modId);
+      if (!mod) return 0;
+      const done = state.progress[modId]?.lessonsDone || [];
+      const pending = mod.lessons.findIndex((_, index) => !done.includes(index));
+      return pending >= 0 ? pending : 0;
+    }
+
+    function getCourseModel(modId) {
+      const mod = MODULES.find(m => m.id === modId);
+      if (!mod) return null;
+
+      const mapping = state.courseMap?.[mod.id] || null;
+      const prog = getModuleProgress(mod.id);
+      const doneSet = new Set(state.progress[mod.id]?.lessonsDone || []);
+      const apiModules = Array.isArray(mapping?.modules) ? mapping.modules : [];
+
+      let modulos;
+      if (apiModules.length) {
+        modulos = apiModules.map(m => {
+          const lessonIndexes = [];
+          mod.lessons.forEach((_, index) => {
+            const mapped = mapping.lessons?.[index];
+            if (mapped && String(mapped.moduloId) === String(m.id)) lessonIndexes.push(index);
+          });
+          const completadas = lessonIndexes.filter(index => doneSet.has(index)).length;
+          const totalLecciones = (m.lecciones || []).length;
+
+          return {
+            id: m.id,
+            titulo: m.titulo,
+            descripcion: m.descripcion || '',
+            orden: m.orden,
+            totalLecciones,
+            enPreparacion: Math.max(0, totalLecciones - lessonIndexes.length),
+            lessonIndexes,
+            completadas,
+            porcentaje: lessonIndexes.length
+              ? Math.round((completadas / lessonIndexes.length) * 100)
+              : 0,
+            estado: lessonIndexes.length === 0
+              ? 'pendiente'
+              : (completadas === lessonIndexes.length
+                ? 'completado'
+                : (completadas > 0 ? 'en-curso' : 'nuevo'))
+          };
+        });
+      } else {
+        modulos = [{
+          id: null,
+          titulo: 'Ruta del curso',
+          descripcion: mod.description,
+          orden: 1,
+          totalLecciones: mod.lessons.length,
+          enPreparacion: 0,
+          lessonIndexes: mod.lessons.map((_, index) => index),
+          completadas: prog.done,
+          porcentaje: prog.percent,
+          estado: prog.completed ? 'completado' : (prog.done > 0 ? 'en-curso' : 'nuevo')
+        }];
+      }
+
+      const totalLecciones = apiModules.length
+        ? modulos.reduce((sum, m) => sum + m.totalLecciones, 0)
+        : mod.lessons.length;
+
+      return {
+        idSpa: mod.id,
+        titulo: mod.title,
+        area: mod.area,
+        nivel: mod.level,
+        descripcion: mod.description,
+        icono: mod.icon,
+        badge: mod.badge,
+        idApi: mapping?.courseId || null,
+        origen: apiModules.length ? 'api' : 'local',
+        modulos,
+        totalModulos: modulos.length,
+        totalLecciones,
+        enPreparacion: Math.max(0, totalLecciones - mod.lessons.length),
+        leccionesDisponibles: mod.lessons.length,
+        completadas: prog.done,
+        porcentaje: prog.percent,
+        estado: prog.completed ? 'completado' : (prog.done > 0 ? 'en-curso' : 'nuevo'),
+        nextLessonIndex: getNextLessonIndex(mod.id)
+      };
+    }
+    function getModuleModel(modId, moduleId) {
+      const course = getCourseModel(modId);
+      if (!course || !course.modulos.length) return null;
+
+      let posicion = course.modulos.findIndex(
+        m => m.id != null && String(m.id) === String(moduleId)
+      );
+      if (posicion < 0) posicion = 0;
+
+      const modulo = course.modulos[posicion];
+      const mod = MODULES.find(m => m.id === modId);
+      const mapping = state.courseMap?.[modId] || null;
+      const doneSet = new Set(state.progress[modId]?.lessonsDone || []);
+
+      const lecciones = modulo.lessonIndexes.map(index => {
+        const mapped = mapping?.lessons?.[index] || null;
+        return {
+          index,
+          titulo: mod.lessons[index].title,
+          descripcion: mapped?.descripcion || '',
+          tieneQuiz: !!mod.lessons[index].quiz,
+          completada: doneSet.has(index)
+        };
+      });
+
+      const mappedIds = new Set(
+        (mapping?.lessons || []).filter(Boolean).map(lesson => String(lesson.id))
+      );
+      const moduloApi = modulo.id == null
+        ? null
+        : (mapping?.modules || []).find(m => String(m.id) === String(modulo.id));
+      const pendientes = (moduloApi?.lecciones || [])
+        .filter(lesson => !mappedIds.has(String(lesson.id)))
+        .map(lesson => ({ titulo: lesson.titulo, descripcion: lesson.descripcion || '' }));
+
+      return {
+        course,
+        modulo,
+        posicion: posicion + 1,
+        totalModulos: course.modulos.length,
+        lecciones,
+        pendientes,
+        siguiente: lecciones.find(lesson => !lesson.completada) || null
+      };
+    }
+
+    window.openCourse = function (modId) {
+      if (!MODULES.some(m => m.id === modId)) return;
+      state.currentCourse = modId;
+      state.currentModule = null;
+      saveState();
+      showView('course');
+    };
+
+    window.openModule = function (modId, moduleId) {
+      if (!MODULES.some(m => m.id === modId)) return;
+      state.currentCourse = modId;
+      state.currentModule = moduleId == null ? null : moduleId;
+      saveState();
+      showView('module');
+    };
+    /* ============================================================
+       VISTA DE CURSO
+    ============================================================ */
+    function renderCourseView() {
+      const view = document.getElementById('courseView');
+      if (!view) return;
+
+      if (!state.currentCourse || !MODULES.some(m => m.id === state.currentCourse)) {
+        state.currentCourse = MODULES[0].id;
+      }
+      const course = getCourseModel(state.currentCourse);
+      if (!course) {
+        view.innerHTML = '';
+        return;
+      }
+
+      const pct = course.porcentaje;
+      const ctaLabel = course.estado === 'completado'
+        ? 'Repasar curso'
+        : (course.estado === 'en-curso' ? 'Continuar donde quedé' : 'Empezar curso');
+
+      const ejes = course.origen === 'api'
+        ? course.modulos
+            .filter(m => m.totalLecciones > 0)
+            .map(m => `<li><strong>${lxEscape(m.titulo)}</strong>${m.descripcion ? ` — ${lxEscape(m.descripcion)}` : ''}</li>`)
+            .join('')
+        : [`<li><strong>${lxEscape(course.titulo)}</strong> — ${lxEscape(course.descripcion)}</li>`]
+            .concat(MODULES.find(m => m.id === course.idSpa).lessons.map(l => `<li>${lxEscape(l.title)}</li>`))
+            .join('');
+
+      const pathItems = course.modulos.map((m, index) => {
+        const itemClass = m.estado === 'completado' ? 'is-done' : (m.estado === 'en-curso' ? 'is-current' : '');
+        const statusClass = m.estado === 'completado'
+          ? 'lx-status--done'
+          : (m.estado === 'en-curso' ? 'lx-status--current' : (m.estado === 'pendiente' ? 'lx-status--pending' : ''));
+        const disponibles = m.lessonIndexes.length;
+        const moduloArg = m.id == null ? 'null' : `'${m.id}'`;
+        const accion = disponibles
+          ? `<button class="btn ${m.estado === 'en-curso' ? 'btn-primary' : 'btn-secondary'} btn-sm" type="button"
+               onclick="openModule('${course.idSpa}', ${moduloArg})">
+               ${m.estado === 'completado' ? 'Repasar módulo' : (m.estado === 'en-curso' ? 'Continuar módulo' : 'Ver módulo')}
+             </button>`
+          : '<span class="lx-pending">Contenido en preparación</span>';
+
+        return `
+          <li class="lx-path__item ${itemClass}">
+            <div class="lx-path__rail">
+              <span class="lx-path__dot">${m.estado === 'completado' ? '<i class="fas fa-check" aria-hidden="true"></i>' : index + 1}</span>
+              <span class="lx-path__line"></span>
+            </div>
+            <div class="lx-path__card">
+              <div class="lx-path__meta">
+                <span class="lx-status ${statusClass}">${lxEstadoLabel(m.estado)}</span>
+                <span>${lxPlural(m.totalLecciones, 'lección', 'lecciones')}</span>
+                ${m.enPreparacion ? `<span>${m.enPreparacion} en preparación</span>` : ''}
+                ${disponibles ? `<span>${m.completadas}/${disponibles} completadas</span>` : ''}
+              </div>
+              <h3 class="lx-path__title">${lxEscape(m.titulo)}</h3>
+              ${m.descripcion ? `<p class="lx-path__desc">${lxEscape(m.descripcion)}</p>` : ''}
+              <div class="lx-progress-line">
+                <div class="lx-meter lx-meter--dark lx-meter--sm" role="progressbar"
+                     aria-valuenow="${m.porcentaje}" aria-valuemin="0" aria-valuemax="100"
+                     aria-label="Avance del módulo ${lxEscape(m.titulo)}">
+                  <span class="lx-meter__fill" style="width:${m.porcentaje}%"></span>
+                </div>
+                <strong>${m.porcentaje}%</strong>
+              </div>
+              <div class="lx-path__actions">${accion}</div>
+            </div>
+          </li>`;
+      }).join('');
+      view.innerHTML = `
+        <nav class="lx-crumbs" aria-label="Ruta de navegación">
+          <button type="button" class="lx-crumb" onclick="showView('dashboard')">Mi aprendizaje</button>
+          <span class="lx-crumbs__sep" aria-hidden="true">/</span>
+          <span class="lx-crumb" aria-current="page">${lxEscape(course.titulo)}</span>
+        </nav>
+
+        <header class="lx-hero">
+          <div>
+            <span class="lx-hero__eyebrow">Curso · ${lxEscape(course.area)}</span>
+            <h1>${lxEscape(course.titulo)}</h1>
+            <p class="lx-hero__lead">${lxEscape(course.descripcion)}</p>
+          </div>
+          <div class="lx-chips">
+            <span class="lx-chip"><i class="${course.icono}" aria-hidden="true"></i> ${lxEscape(course.nivel)}</span>
+            <span class="lx-chip">${lxPlural(course.totalModulos, 'módulo', 'módulos')}</span>
+            <span class="lx-chip">${lxPlural(course.totalLecciones, 'lección', 'lecciones')}</span>
+            <span class="lx-chip">${course.origen === 'api' ? 'Progreso sincronizado' : 'Avance en este dispositivo'}</span>
+          </div>
+          <div class="lx-hero__footer">
+            <div class="lx-hero__progress">
+              <div class="lx-hero__progress-label">
+                <span>Tu avance · ${course.completadas} de ${lxPlural(course.leccionesDisponibles, 'lección disponible', 'lecciones disponibles')}</span>
+                <strong>${pct}%</strong>
+              </div>
+              <div class="lx-meter" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance del curso">
+                <span class="lx-meter__fill" style="width:${pct}%"></span>
+              </div>
+            </div>
+            <div class="lx-hero__actions">
+              <button class="btn btn-primary" type="button" onclick="openLesson('${course.idSpa}', ${course.nextLessonIndex})">
+                ${ctaLabel} <i class="fas fa-arrow-right" aria-hidden="true"></i>
+              </button>
+              <a class="btn btn-ghost" href="#coursePath">Ver la ruta</a>
+            </div>
+          </div>
+        </header>
+
+        <div class="lx-facts" role="list">
+          <div class="lx-fact" role="listitem"><span class="lx-fact__label">Módulos</span><span class="lx-fact__value">${course.totalModulos}</span></div>
+          <div class="lx-fact" role="listitem"><span class="lx-fact__label">Lecciones</span><span class="lx-fact__value">${course.totalLecciones}</span></div>
+          <div class="lx-fact" role="listitem"><span class="lx-fact__label">Nivel</span><span class="lx-fact__value">${lxEscape(course.nivel)}</span></div>
+          <div class="lx-fact" role="listitem"><span class="lx-fact__label">Estado</span><span class="lx-fact__value">${lxEstadoLabel(course.estado)}</span></div>
+        </div>
+
+        <div class="lx-grid-2">
+          <section class="lx-panel" aria-labelledby="courseLearnTitle">
+            <div class="lx-panel__head">
+              <div>
+                <span class="lx-eyebrow">Diseño académico</span>
+                <h2 class="lx-h2" id="courseLearnTitle">¿Qué aprenderás?</h2>
+              </div>
+            </div>
+            <ul class="lx-list">${ejes}</ul>
+            <div class="lx-empty" style="margin-top:1rem">
+              <strong>Resultados de aprendizaje en curación</strong>
+              <span>Las competencias, los resultados de aprendizaje y los tiempos por unidad están en revisión editorial. Cuando se aprueben se publicarán aquí; este curso no los presenta como si ya existieran.</span>
+            </div>
+          </section>
+
+          <section class="lx-panel lx-panel--flat" aria-labelledby="courseHowTitle">
+            <div class="lx-panel__head">
+              <div>
+                <span class="lx-eyebrow">Cómo funciona</span>
+                <h2 class="lx-h2" id="courseHowTitle">Tu avance</h2>
+              </div>
+            </div>
+            <ul class="lx-list">
+              <li>Cada lección cierra con una actividad de comprobación y retroalimentación.</li>
+              <li>${course.origen === 'api'
+                ? 'Tu avance se guarda en tu cuenta y se recupera al iniciar sesión.'
+                : 'Tu avance se guarda en este dispositivo mientras la conexión con la base de datos no esté disponible.'}</li>
+              <li>Puedes retomar el curso en cualquier momento desde la ruta: las lecciones completadas quedan marcadas.</li>
+            </ul>
+            ${course.origen === 'api'
+              ? ''
+              : '<p class="lx-note" style="margin-top:1rem">Este curso no está vinculado a la base de datos en este momento. El avance local no reemplaza el progreso de tu cuenta.</p>'}
+          </section>
+        </div>
+
+        <section class="lx-panel" id="coursePath" aria-labelledby="coursePathTitle">
+          <div class="lx-panel__head">
+            <div>
+              <span class="lx-eyebrow">Ruta de aprendizaje</span>
+              <h2 class="lx-h2" id="coursePathTitle">Módulos en orden</h2>
+            </div>
+            <span class="lx-muted">${course.enPreparacion
+              ? `${lxPlural(course.enPreparacion, 'lección', 'lecciones')} en preparación editorial`
+              : 'Toda la ruta tiene contenido publicado'}</span>
+          </div>
+          <ol class="lx-path">${pathItems}</ol>
+        </section>
+      `;
+    }
+
+    /* ============================================================
+       VISTA DE MÓDULO
+    ============================================================ */
+    function renderModuleView() {
+      const view = document.getElementById('moduleView');
+      if (!view) return;
+
+      if (!state.currentCourse || !MODULES.some(m => m.id === state.currentCourse)) {
+        state.currentCourse = MODULES[0].id;
+      }
+      const model = getModuleModel(state.currentCourse, state.currentModule);
+      if (!model) {
+        view.innerHTML = '';
+        return;
+      }
+
+      const { course, modulo } = model;
+      const disponibles = modulo.lessonIndexes.length;
+      const pct = modulo.porcentaje;
+      const estadoModulo = lxEstadoLabel(modulo.estado);
+
+      const filas = model.lecciones.map(leccion => {
+        const esSiguiente = !!model.siguiente && model.siguiente.index === leccion.index;
+        const clases = [
+          'lx-lesson-row',
+          leccion.completada ? 'is-done' : '',
+          esSiguiente ? 'is-current' : ''
+        ].filter(Boolean).join(' ');
+
+        return `
+          <li>
+            <article class="${clases}">
+              <span class="lx-lesson-row__index">${leccion.completada ? '<i class="fas fa-check" aria-hidden="true"></i>' : leccion.index + 1}</span>
+              <div class="lx-lesson-row__body">
+                <h3 class="lx-lesson-row__title">${lxEscape(leccion.titulo)}</h3>
+                ${leccion.descripcion ? `<p class="lx-lesson-row__desc">${lxEscape(leccion.descripcion)}</p>` : ''}
+                <div class="lx-lesson-row__meta">
+                  <span class="lx-status ${leccion.completada ? 'lx-status--done' : (esSiguiente ? 'lx-status--current' : '')}">${leccion.completada ? 'Completada' : (esSiguiente ? 'Siguiente' : 'Pendiente')}</span>
+                  <span>${leccion.tieneQuiz ? 'Actividad de comprobación' : 'Lectura guiada'}</span>
+                </div>
+              </div>
+              <div class="lx-lesson-row__action">
+                <button class="btn btn-secondary btn-sm" type="button" onclick="openLesson('${course.idSpa}', ${leccion.index})">
+                  ${leccion.completada ? 'Repasar' : (esSiguiente ? 'Continuar' : 'Abrir')}
+                </button>
+              </div>
+            </article>
+          </li>`;
+      }).join('');
+
+      const filasPendientes = model.pendientes.map(p => `
+        <li>
+          <article class="lx-lesson-row is-pending">
+            <span class="lx-lesson-row__index"><i class="fas fa-hourglass-half" aria-hidden="true"></i></span>
+            <div class="lx-lesson-row__body">
+              <h3 class="lx-lesson-row__title">${lxEscape(p.titulo)}</h3>
+              ${p.descripcion ? `<p class="lx-lesson-row__desc">${lxEscape(p.descripcion)}</p>` : ''}
+              <div class="lx-lesson-row__meta">
+                <span class="lx-status lx-status--pending">En preparación</span>
+                <span>Contenido en revisión editorial</span>
+              </div>
+            </div>
+            <div class="lx-lesson-row__action"><span class="lx-pending">Aún sin contenido</span></div>
+          </article>
+        </li>`).join('');
+      const idxActual = course.modulos.indexOf(modulo);
+      const siguienteModulo = course.modulos[idxActual + 1] || null;
+
+      const continuar = disponibles
+        ? (model.siguiente
+          ? `<section class="lx-continue">
+               <div class="lx-continue__text">
+                 <strong>Continúa con: ${lxEscape(model.siguiente.titulo)}</strong>
+                 <span>Lección ${model.siguiente.index + 1} de ${disponibles} de este módulo</span>
+               </div>
+               <button class="btn btn-primary btn-sm" type="button" onclick="openLesson('${course.idSpa}', ${model.siguiente.index})">
+                 ${modulo.completadas > 0 ? 'Continuar lección' : 'Empezar lección'}
+                 <i class="fas fa-arrow-right" aria-hidden="true"></i>
+               </button>
+             </section>`
+          : `<section class="lx-continue">
+               <div class="lx-continue__text">
+                 <strong>Módulo completado</strong>
+                 <span>Puedes repasar cualquier lección desde la lista.</span>
+               </div>
+               <button class="btn btn-ghost btn-sm" type="button" onclick="openLesson('${course.idSpa}', ${model.lecciones[0].index})">
+                 Repasar desde el inicio
+               </button>
+             </section>`)
+        : '';
+
+      const siguienteArg = siguienteModulo && siguienteModulo.id != null
+        ? `'${siguienteModulo.id}'`
+        : 'null';
+
+      view.innerHTML = `
+        <nav class="lx-crumbs" aria-label="Ruta de navegación">
+          <button type="button" class="lx-crumb" onclick="showView('dashboard')">Mi aprendizaje</button>
+          <span class="lx-crumbs__sep" aria-hidden="true">/</span>
+          <button type="button" class="lx-crumb" onclick="openCourse('${course.idSpa}')">${lxEscape(course.titulo)}</button>
+          <span class="lx-crumbs__sep" aria-hidden="true">/</span>
+          <span class="lx-crumb" aria-current="page">Módulo ${model.posicion}</span>
+        </nav>
+
+        <section class="lx-panel" aria-labelledby="moduleTitle">
+          <div class="lx-module-head">
+            <span class="lx-module-head__position">Módulo ${model.posicion} de ${model.totalModulos} · ${estadoModulo}</span>
+            <h1 id="moduleTitle">${lxEscape(modulo.titulo)}</h1>
+            ${modulo.descripcion ? `<p class="lx-module-head__lead">${lxEscape(modulo.descripcion)}</p>` : ''}
+            ${disponibles
+              ? `<div class="lx-progress-line">
+                   <div class="lx-meter lx-meter--dark lx-meter--sm" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Avance del módulo">
+                     <span class="lx-meter__fill" style="width:${pct}%"></span>
+                   </div>
+                   <strong>${pct}%</strong>
+                   <span>${modulo.completadas}/${disponibles} lecciones</span>
+                 </div>`
+              : '<span class="lx-pending">Este módulo aún no tiene lecciones disponibles</span>'}
+            <div class="lx-chips">
+              <span class="lx-chip lx-chip--light">${lxPlural(modulo.totalLecciones, 'lección', 'lecciones')} en la ruta</span>
+              <span class="lx-chip lx-chip--light">${disponibles} con contenido</span>
+              ${modulo.enPreparacion ? `<span class="lx-chip lx-chip--light">${modulo.enPreparacion} en preparación</span>` : ''}
+            </div>
+          </div>
+        </section>
+
+        ${continuar}
+
+        <section class="lx-panel" aria-labelledby="moduleLessonsTitle">
+          <div class="lx-panel__head">
+            <div>
+              <span class="lx-eyebrow">Contenido del módulo</span>
+              <h2 class="lx-h2" id="moduleLessonsTitle">Lecciones</h2>
+            </div>
+            <span class="lx-muted">${disponibles} con contenido${model.pendientes.length ? ` · ${model.pendientes.length} en preparación` : ''}</span>
+          </div>
+          <ul class="lx-lesson-list">${filas}${filasPendientes}</ul>
+          <div class="lx-empty" style="margin-top:1rem">
+            <strong>Objetivos y competencias en curación</strong>
+            <span>Este módulo todavía no publica objetivos ni competencias verificadas. La ruta visible se organiza por lecciones con contenido aprobado.</span>
+          </div>
+        </section>
+
+        <div class="lx-panel lx-panel--flat">
+          <div class="lx-lesson-footer__row">
+            <button class="btn btn-ghost btn-sm" type="button" onclick="openCourse('${course.idSpa}')">
+              <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al curso
+            </button>
+            <div class="lx-lesson-footer__nav">
+              ${siguienteModulo
+                ? `<button class="btn btn-secondary btn-sm" type="button" onclick="openModule('${course.idSpa}', ${siguienteArg})">
+                     Siguiente módulo <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                   </button>`
+                : `<button class="btn btn-secondary btn-sm" type="button" onclick="openCourse('${course.idSpa}')">
+                     Ver la ruta del curso
+                   </button>`}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ============================================================
        MÓDULOS Y LECCIONES
     ============================================================ */
     window.startModule = function (modId) {
-      const mod = MODULES.find(m => m.id === modId);
-      if (!mod) return;
-
-      const p = getModuleProgress(modId);
-      // Abrir la primera lección no completada, o la primera si todas están completas
-      let nextIdx = 0;
-      for (let i = 0; i < mod.lessons.length; i++) {
-        if (!p.done || !state.progress[modId].lessonsDone.includes(i)) {
-          nextIdx = i;
-          break;
-        }
-        nextIdx = i;
-      }
-
-      openLesson(modId, nextIdx);
+      // La entrada a un curso es ahora su vista de curso, no la primera lección.
+      window.openCourse(modId);
     };
 
     window.openLesson = function (modId, lessonIdx) {
@@ -4693,70 +6116,208 @@
       if (!mod || lessonIdx < 0 || lessonIdx >= mod.lessons.length) return;
 
       state.currentLesson = { moduleId: modId, lessonIndex: lessonIdx };
+      // Mantener el módulo coherente con la lección abierta; la vista de lección
+      // vuelve a derivarlo de la correspondencia con la API cuando existe.
+      const mapped = state.courseMap?.[modId]?.lessons?.[lessonIdx] || null;
+      state.currentModule = mapped ? mapped.moduloId : null;
       saveState();
 
       renderLesson();
       showView('lesson');
     };
 
+    function getLessonContext(moduleId, lessonIndex) {
+      const mod = MODULES.find(m => m.id === moduleId);
+      if (!mod || !mod.lessons[lessonIndex]) return null;
+
+      const mapping = state.courseMap?.[moduleId] || null;
+      const mapped = mapping?.lessons?.[lessonIndex] || null;
+      const moduleIdApi = mapped ? mapped.moduloId : state.currentModule;
+      const model = getModuleModel(moduleId, moduleIdApi);
+      const course = getCourseModel(moduleId);
+      const doneSet = new Set(state.progress[moduleId]?.lessonsDone || []);
+      const secuencia = model
+        ? model.lecciones.map(l => l.index)
+        : mod.lessons.map((_, i) => i);
+
+      let posicion = secuencia.indexOf(lessonIndex);
+      if (posicion < 0) posicion = lessonIndex;
+
+      const posicionModulo = model
+        ? model.lecciones.findIndex(l => l.index === lessonIndex) + 1
+        : lessonIndex + 1;
+
+      return {
+        mod,
+        lesson: mod.lessons[lessonIndex],
+        course,
+        model,
+        modulo: model ? model.modulo : null,
+        secuencia,
+        posicion,
+        posicionModulo: posicionModulo > 0 ? posicionModulo : lessonIndex + 1,
+        previous: posicion > 0 ? secuencia[posicion - 1] : null,
+        next: posicion < secuencia.length - 1 ? secuencia[posicion + 1] : null,
+        progreso: getModuleProgress(moduleId),
+        isDone: doneSet.has(lessonIndex),
+        doneSet
+      };
+    }
+
     function renderLesson() {
       const { moduleId, lessonIndex } = state.currentLesson;
-      const mod = MODULES.find(m => m.id === moduleId);
-      const lesson = mod.lessons[lessonIndex];
-      const p = getModuleProgress(moduleId);
-      const isDone = state.progress[moduleId].lessonsDone.includes(lessonIndex);
-
+      const ctx = getLessonContext(moduleId, lessonIndex);
       const view = document.getElementById('lessonView');
+      if (!ctx || !view) return;
 
+      const { mod, lesson, course, modulo, progreso, isDone } = ctx;
+      const moduloArg = modulo && modulo.id != null ? `'${modulo.id}'` : 'null';
+      const moduloTitulo = modulo ? modulo.titulo : 'Ruta del curso';
+      const totalModulos = course ? course.totalModulos : 1;
+      const area = course ? course.area : mod.area;
+      const icono = course ? course.icono : mod.icon;
+
+      const outlineItems = ctx.secuencia.map((indice, orden) => {
+        const item = mod.lessons[indice];
+        const activa = indice === lessonIndex;
+        const hecha = ctx.doneSet.has(indice);
+        return `
+          <li>
+            <button class="lx-outline__link ${activa ? 'is-active' : ''} ${hecha ? 'is-done' : ''}" type="button"
+              onclick="openLesson('${moduleId}', ${indice})" ${activa ? 'aria-current="step"' : ''}>
+              <span class="lx-outline__num">${hecha ? '<i class="fas fa-check" aria-hidden="true"></i>' : orden + 1}</span>
+              <span>${lxEscape(item.title)}</span>
+            </button>
+          </li>`;
+      }).join('');
+
+      const opcionesQuiz = lesson.quiz
+        ? lesson.quiz.options.map((opt, i) => `
+            <button class="quiz-option" type="button" data-index="${i}" onclick="answerQuiz(${i})">
+              <span class="letter">${String.fromCharCode(65 + i)}</span>
+              <span>${lxEscape(opt)}</span>
+            </button>`).join('')
+        : '';
+
+      const bloqueQuiz = lesson.quiz
+        ? `<section class="lx-quiz" id="quizBlock" aria-labelledby="lessonQuizTitle">
+             <div class="lx-quiz__head">
+               <div>
+                 <span class="lx-eyebrow">Comprobación</span>
+                 <h2 class="lx-h2" id="lessonQuizTitle">Actividad de la lección</h2>
+               </div>
+               <span class="lx-muted">Retroalimentación inmediata</span>
+             </div>
+             <p class="lx-quiz__question">${lxEscape(lesson.quiz.question)}</p>
+             <div class="quiz-options" id="quizOptions">${opcionesQuiz}</div>
+             <div class="quiz-feedback" id="quizFeedback"></div>
+           </section>`
+        : `<section class="lx-quiz" id="quizBlock" aria-labelledby="lessonQuizTitle">
+             <div class="lx-quiz__head">
+               <div>
+                 <span class="lx-eyebrow">Comprobación</span>
+                 <h2 class="lx-h2" id="lessonQuizTitle">Actividad de la lección</h2>
+               </div>
+             </div>
+             <div class="lx-empty">
+               <strong>Actividad en preparación</strong>
+               <span>Esta lección aún no publica su actividad de comprobación. Puedes marcar la lectura como completada desde el pie de la lección.</span>
+             </div>
+           </section>`;
+
+      const articuloHtml = `
+            <article class="lx-lesson-shell">
+              <header class="lx-lesson-head">
+                <div class="lx-lesson-meta">
+                  <span class="lx-lesson-meta__item"><i class="${icono}" aria-hidden="true"></i> ${lxEscape(area)}</span>
+                  <span class="lx-lesson-meta__item"><i class="fas fa-layer-group" aria-hidden="true"></i> Módulo ${ctx.model ? ctx.model.posicion : 1} de ${totalModulos}</span>
+                  <span class="lx-lesson-meta__item"><i class="fas fa-book-open" aria-hidden="true"></i> Lección ${ctx.posicionModulo} de ${ctx.secuencia.length}</span>
+                  <span class="lx-status ${isDone ? 'lx-status--done' : 'lx-status--current'}">${isDone ? 'Completada' : 'En curso'}</span>
+                </div>
+                <h1>${lxEscape(lesson.title)}</h1>
+                <div class="lx-chips">
+                  <span class="lx-chip lx-chip--light">${lxEscape(mod.level)}</span>
+                  <span class="lx-chip lx-chip--light">${progreso.percent}% del curso</span>
+                  ${lesson.quiz ? '<span class="lx-chip lx-chip--light">Actividad de comprobación</span>' : ''}
+                </div>
+              </header>
+
+              <div class="lx-reading">${lesson.content}</div>
+
+              ${bloqueQuiz}
+
+              <footer class="lx-lesson-footer">
+                <div class="lx-lesson-footer__row">
+                  <div class="lx-lesson-meta" id="lessonNavInfo" role="status" aria-live="polite">${isDone ? 'Lección completada' : 'Aún no marcas esta lección como completada'}</div>
+                  ${isDone
+                    ? '<span class="lx-status lx-status--done"><i class="fas fa-check" aria-hidden="true"></i> Completada</span>'
+                    : '<button class="btn btn-primary btn-sm" type="button" onclick="completeLessonFromFooter()">Marcar completada</button>'}
+                </div>
+                <div class="lx-lesson-footer__row">
+                  <button class="btn btn-ghost btn-sm" type="button" onclick="openModule('${moduleId}', ${moduloArg})">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al módulo
+                  </button>
+                  <div class="lx-lesson-footer__nav">
+                    ${ctx.previous !== null
+                      ? `<button class="btn btn-ghost btn-sm" type="button" onclick="openLesson('${moduleId}', ${ctx.previous})"><i class="fas fa-arrow-left" aria-hidden="true"></i> Anterior</button>`
+                      : ''}
+                    ${ctx.next !== null
+                      ? `<button class="btn btn-secondary btn-sm" type="button" onclick="openLesson('${moduleId}', ${ctx.next})">Siguiente <i class="fas fa-arrow-right" aria-hidden="true"></i></button>`
+                      : `<button class="btn btn-secondary btn-sm" type="button" onclick="openCourse('${moduleId}')">Finalizar curso <i class="fas fa-check" aria-hidden="true"></i></button>`}
+                  </div>
+                </div>
+              </footer>
+            </article>`;
+      const indiceHtml = `
+            <aside class="lx-outline" aria-label="Lecciones del módulo">
+              <div class="lx-outline__course">${lxEscape(course.titulo)}</div>
+              <p class="lx-outline__title">${lxEscape(moduloTitulo)}</p>
+              <ol class="lx-outline__list">${outlineItems}</ol>
+              <div class="lx-outline__progress">
+                <div class="lx-progress-line">
+                  <div class="lx-meter lx-meter--dark lx-meter--sm" role="progressbar"
+                       aria-valuenow="${progreso.percent}" aria-valuemin="0" aria-valuemax="100"
+                       aria-label="Avance del curso">
+                    <span class="lx-meter__fill" style="width:${progreso.percent}%"></span>
+                  </div>
+                  <strong>${progreso.percent}%</strong>
+                </div>
+                <p class="lx-muted" style="margin-top:.35rem">${progreso.done} de ${progreso.total} lecciones del curso</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="openModule('${moduleId}', ${moduloArg})">Ver el módulo</button>
+            </aside>`;
       view.innerHTML = `
-        <div class="lesson-header">
-          <button class="back-btn" onclick="showView('dashboard')" title="Volver">
-            <i class="fas fa-arrow-left"></i>
-          </button>
-          <div class="lesson-header-info">
-            <div class="module-tag">${mod.area} · Módulo ${MODULES.indexOf(mod) + 1}</div>
-            <h2>${mod.title}</h2>
-          </div>
-          <div class="lesson-progress-badge">
-            Lección ${lessonIndex + 1} / ${mod.lessons.length}
-          </div>
-        </div>
+        <nav class="lx-crumbs" aria-label="Ruta de navegación">
+          <button type="button" class="lx-crumb" onclick="showView('dashboard')">Mi aprendizaje</button>
+          <span class="lx-crumbs__sep" aria-hidden="true">/</span>
+          <button type="button" class="lx-crumb" onclick="openCourse('${moduleId}')">${lxEscape(course.titulo)}</button>
+          <span class="lx-crumbs__sep" aria-hidden="true">/</span>
+          <button type="button" class="lx-crumb" onclick="openModule('${moduleId}', ${moduloArg})">${lxEscape(moduloTitulo)}</button>
+          <span class="lx-crumbs__sep" aria-hidden="true">/</span>
+          <span class="lx-crumb" aria-current="page">Lección ${ctx.posicionModulo}</span>
+        </nav>
 
-        <div class="lesson-content">
-          <h3>${lesson.title}</h3>
-          ${lesson.content}
-
-          <div class="quiz" id="quizBlock">
-            <h4><i class="fas fa-question-circle" style="color:var(--secondary-light);"></i> Evaluación de la lección</h4>
-            <div class="quiz-question">${lesson.quiz.question}</div>
-            <div class="quiz-options" id="quizOptions">
-              ${lesson.quiz.options.map((opt, i) => `
-                <button class="quiz-option" data-index="${i}" onclick="answerQuiz(${i})">
-                  <span class="letter">${String.fromCharCode(65 + i)}</span>
-                  <span>${opt}</span>
-                </button>
-              `).join('')}
-            </div>
-            <div class="quiz-feedback" id="quizFeedback"></div>
-          </div>
-
-          <div class="lesson-nav">
-            <div class="lesson-nav-info" id="lessonNavInfo">
-              ${isDone ? '<i class="fas fa-check-circle" style="color:var(--accent);"></i> Lección completada' : 'Responde correctamente para completar la lección'}
-            </div>
-            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-              ${lessonIndex > 0 ? `<button class="btn btn-ghost btn-sm" onclick="openLesson('${moduleId}', ${lessonIndex - 1})"><i class="fas fa-arrow-left"></i> Anterior</button>` : ''}
-              ${lessonIndex < mod.lessons.length - 1 ? `<button class="btn btn-secondary btn-sm" onclick="openLesson('${moduleId}', ${lessonIndex + 1})">Siguiente <i class="fas fa-arrow-right"></i></button>` : `<button class="btn btn-secondary btn-sm" onclick="showView('dashboard')">Finalizar <i class="fas fa-check"></i></button>`}
-            </div>
-          </div>
+        <div class="lx-lesson-layout">
+          ${articuloHtml}
+          ${indiceHtml}
         </div>
       `;
 
       // Si ya estaba completada, marcar el quiz como respondido
-      if (isDone) {
+      if (isDone && lesson.quiz) {
         markQuizAsDone(lesson.quiz.correct);
       }
     }
+
+    window.completeLessonFromFooter = function () {
+      const actual = state.currentLesson;
+      if (!actual) return;
+      const mod = MODULES.find(m => m.id === actual.moduleId);
+      if (!mod || !mod.lessons[actual.lessonIndex]) return;
+
+      completeLesson(actual.moduleId, actual.lessonIndex);
+      renderLesson();
+    };
 
     window.answerQuiz = function (selectedIdx) {
       const { moduleId, lessonIndex } = state.currentLesson;
@@ -4782,6 +6343,7 @@
         feedback.classList.add('ok');
         feedback.innerHTML = `<i class="fas fa-check-circle"></i> ${lesson.quiz.feedbackOk}`;
         completeLesson(moduleId, lessonIndex);
+        refreshLessonCompletionUi();
       } else {
         feedback.classList.add('ko');
         feedback.innerHTML = `<i class="fas fa-times-circle"></i> ${lesson.quiz.feedbackKo}`;
@@ -4801,6 +6363,65 @@
       feedback.classList.add('show', 'ok');
       feedback.innerHTML = '<i class="fas fa-check-circle"></i> Lección ya completada anteriormente.';
     }
+    /**
+     * Refresca en el lugar los indicadores de avance de la lección abierta.
+     * Se usa cuando la actividad marca la lección como completada para no
+     * perder la retroalimentación con un re-render completo.
+     */
+    function refreshLessonCompletionUi() {
+      const actual = state.currentLesson;
+      if (!actual) return;
+
+      const { moduleId, lessonIndex } = actual;
+      const done = state.progress[moduleId]?.lessonsDone || [];
+      if (!done.includes(lessonIndex)) return;
+
+      const status = document.querySelector('#lessonView .lx-lesson-head .lx-status');
+      if (status) {
+        status.classList.remove('lx-status--current');
+        status.classList.add('lx-status--done');
+        status.textContent = 'Completada';
+      }
+
+      const footerRow = document.querySelector('#lessonView .lx-lesson-footer__row');
+      const footerButton = footerRow ? footerRow.querySelector('button.btn-primary') : null;
+      if (footerButton) {
+        const badge = document.createElement('span');
+        badge.className = 'lx-status lx-status--done';
+        badge.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Completada';
+        footerButton.replaceWith(badge);
+      }
+
+      const activeLink = document.querySelector('#lessonView .lx-outline__link.is-active');
+      if (activeLink) {
+        activeLink.classList.add('is-done');
+        const number = activeLink.querySelector('.lx-outline__num');
+        if (number) number.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
+      }
+
+      const course = getCourseModel(moduleId);
+      if (!course) return;
+
+      const chip = [...document.querySelectorAll('#lessonView .lx-lesson-head .lx-chip')]
+        .find(element => /% del curso$/.test(element.textContent.trim()));
+      if (chip) chip.textContent = `${course.porcentaje}% del curso`;
+
+      const meter = document.querySelector('#lessonView .lx-outline__progress .lx-meter');
+      if (meter) {
+        meter.setAttribute('aria-valuenow', String(course.porcentaje));
+        const fill = meter.querySelector('.lx-meter__fill');
+        if (fill) fill.style.width = `${course.porcentaje}%`;
+      }
+      const percentLabel = document.querySelector('#lessonView .lx-outline__progress .lx-progress-line strong');
+      if (percentLabel) percentLabel.textContent = `${course.porcentaje}%`;
+      const countLabel = document.querySelector('#lessonView .lx-outline__progress .lx-muted');
+      const mod = MODULES.find(item => item.id === moduleId);
+      if (countLabel && mod) {
+        countLabel.textContent = `${done.length} de ${mod.lessons.length} lecciones del curso`;
+      }
+    }
+
+
 
     function completeLesson(moduleId, lessonIndex) {
       const prog = state.progress[moduleId];

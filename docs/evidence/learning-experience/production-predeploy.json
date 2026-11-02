@@ -1,0 +1,28 @@
+{
+  "label": "predeploy",
+  "checkedAt": "2026-11-02T03:47:36.603Z",
+  "site": "https://mooc-docente.vercel.app",
+  "status": 200,
+  "lastModified": "Sun, 01 Nov 2026 18:53:58 GMT",
+  "etag": "W/\"b5fe966c2d764359130213e88b169ef5\"",
+  "landing": {
+    "title": "MéritoDocente | Prepárate para el Concurso de Méritos Docentes",
+    "lxReferences": 0,
+    "hasViewCourse": false,
+    "hasViewModule": false,
+    "landingVisible": true,
+    "heroTitle": "Prepárate con claridad avanza con propósito",
+    "moduleCards": 0
+  },
+  "publicCoursesStatus": "200 (0 cursos)",
+  "adminRouteWithoutToken": {
+    "error": "No se proporcionó token de autenticación"
+  },
+  "postLoginWithoutToken": 401,
+  "pilotPage": {
+    "status": 200,
+    "hasTitle": true,
+    "bytes": 6004
+  },
+  "note": "Sin credenciales: la navegación autenticada y el administrador no se prueban aquí"
+}

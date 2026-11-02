@@ -14,7 +14,7 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 - Esquema de datos: `database/schema.sql`.
 - Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`, idempotentes. Las opciones de quiz se reconcilian al reejecutar el seed.
 - Base de datos de desarrollo: Supabase (pooler) mediante `DATABASE_URL` en `.env`.
-- Pruebas: `tests/` tiene 5 suites (salud, autenticación, cursos, progreso y la interfaz del SPA con jsdom). `npm test` pasa 26/26 (validado 2026-09-16).
+- Pruebas: `tests/` tiene 6 suites (salud, autenticación, cursos, progreso, interfaz del SPA con jsdom y experiencia de aprendizaje). `tests/learning-experience.test.js` corre sin base de datos con un doble de la API (8 pruebas). `npm test` requiere la base configurada en `.env`.
 - Servido local: `GET /` entrega `indexInicial.html`; `public/` expone `/api-client.js` y `/auth.js` en la raíz.
 - Despliegue: `vercel.json` y `api/index.js` preparan frontend estático + API serverless. Aún no desplegado ni verificado en Vercel.
 - Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
@@ -60,6 +60,20 @@ El flujo actual es:
 - Se añadieron las preguntas 29 a 33: permanencia y convivencia, seguimiento de funciones docentes, promoción anticipada, aplicación temporal del SIEE e información académica de estudiantes mayores de edad. Sus respuestas correctas son C, C, B, C y C.
 - El listado de cursos quedó ordenado por `id ASC` en `src/routes/courses.js`; al agregar el curso avanzado, el orden por fecha hacía que una prueba de progreso tomara un curso de dos lecciones y devolviera 50% en lugar de 100%.
 - El simulacro diagnóstico cuenta con `GET /api/v1/quizzes/post-login` y `POST /api/v1/quizzes/post-login/attempts`. El primero oculta `es_correcta`; el segundo califica en backend y guarda intentos/respuestas en `quiz_attempts` y `quiz_attempt_answers`. La SPA solo solicita las preguntas cuando la persona pulsa `Iniciar simulacro`.
+
+### Experiencia de curso, módulo y lección (2026-11-01)
+
+- `indexInicial.html` incorpora un sistema visual reutilizable con prefijo `.lx-` y tres vistas: `#view-course`, `#view-module` y `#view-lesson` renovada; el contenido está en `docs/inventario-academico-tres-cursos.md`.
+- El dashboard abre la vista de curso (`openCourse`). Esa vista muestra la ruta real por módulos de la API, el avance por lección y los módulos/lecciones en preparación; no inventa objetivos ni resultados de aprendizaje: los declara en curación editorial.
+- `loadCourseMap` conserva ahora `modules` y `apiLessons` con título, descripción y orden; `getCourseModel` y `getModuleModel` derivan todos los estados de `state.progress` y de la correspondencia por título.
+- La vista de módulo lista solo lecciones con contenido publicado, marca la siguiente, permite continuar y deja las lecciones sin contenido como "En preparación", sin acción.
+- La vista de lección conserva los IDs que usa la calificación existente (`quizBlock`, `quizOptions`, `quizFeedback`, `lessonNavInfo`), añade lectura tipada, índice lateral y navegación anterior/siguiente; `completeLessonFromFooter` reutiliza `completeLesson` y la persistencia en `/progress/lesson/:id`.
+- Si un curso no tiene correspondencia con la API, la vista muestra una sola "Ruta del curso" y advierte que el avance es local.
+- Validación ejecutada: `npx jest tests/ui-design.test.js tests/learning-experience.test.js` 14/14 y `npx jest` sobre las cinco suites de administrador, diagnóstico y Excel (54/54, con base simulada). Las suites que requieren PostgreSQL no se ejecutaron por falta de `.env`.
+- Revisión visual con navegador real (`playwright-core` + Chrome) y API aislada: 33 capturas en 1440/768/390 px, sin desbordamiento horizontal. Evidencia en `docs/evidence/learning-experience/` (`README.md`, `manifest.json` y capturas identificadas como simulación).
+- Defectos corregidos en esa revisión: `#lessonView` duplicaba `lx-lesson-layout` y reducía el artículo a 2 px (ahora `lx-lesson-page`); al responder correctamente la actividad, el estado se refresca en el lugar con `refreshLessonCompletionUi()` sin perder la retroalimentación.
+- Production (2026-11-01, antes de publicar): `/api/v1/courses` devuelve `{"courses":[]}` aunque la base responde conectada, por lo que la SPA usará la ruta local de cada curso. El diagnóstico sigue publicado con 50 preguntas (`MD-DIA-2026-PILOTO-001`).
+- Pendiente: la calificación del quiz de lección sigue en el navegador (el detalle del curso expone `es_correcta`); debe migrarse al backend como el simulacro.
 
 ### Decisión de producto
 
@@ -115,7 +129,9 @@ Evaluar Supabase Auth, Storage y Row Level Security únicamente después de esta
 
 Estado (2026-09-16): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 30 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar. Las preguntas avanzadas están cargadas en Supabase mediante el seed. El dashboard ofrece el `Simulacro diagnóstico` como submódulo opcional; al abrirlo, se califica en backend y se guarda el intento.
 
-Siguiente acción concreta: revisar el diagnóstico en navegador y ampliar el banco con nuevas preguntas; después construir el editor/importador administrativo para dejar de depender del seed.
+Estado (2026-11-01): se añadió el recorrido de aprendizaje curso → módulo → lección con el sistema `.lx-` en `indexInicial.html`; las tres vistas consumen módulos, lecciones y progreso reales de la API y declaran como "en preparación" lo que aún no tiene contenido. La suite `tests/learning-experience.test.js` (8 pruebas, sin base de datos) cubre estados, navegación y persistencia simulada. Pendiente de revisión visual en navegador a 1440/768/390 px y de decisión sobre la calificación del quiz de lección en backend.
+
+Siguiente acción concreta: revisar el recorrido curso → módulo → lección en navegador y luego ampliar el banco de preguntas o construir el editor/importador administrativo.
 
 ## Comandos
 
@@ -124,7 +140,7 @@ npm install
 npm run dev       # nodemon src/server.js
 npm start         # node src/server.js
 npm run seed      # idempotente; requiere PostgreSQL y variables de entorno
-npm test          # 5 suites / 26 pruebas contra la base configurada en .env
+npm test          # 6 suites; las que usan PostgreSQL requieren la base de .env
 ```
 
 Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en `.env.example`. El servidor verifica la conexión a la base de datos antes de escuchar en el puerto. Con `npm run dev`, el SPA está en `http://localhost:3000/` y la API en `http://localhost:3000/api/v1`. Para reproducir el enrutado de Vercel en local: `npx vercel dev`.
@@ -138,6 +154,8 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y un `.env` basado en 
 - `src/middleware/auth.js`: autenticación y autorización.
 - `src/utils/validators.js`: validación de entradas.
 - `indexInicial.html`: SPA principal (diseño, contenido y flujo del producto).
+- `docs/inventario-academico-tres-cursos.md`: inventario A/B/C, contrato de la API, correspondencia SPA↔BD y modelo de presentación de curso, módulo y lección.
+- `tests/learning-experience.test.js`: integración sin base de datos del recorrido curso → módulo → lección con un doble de la API.
 - `public/`: cliente HTTP y autenticación usados por la integración provisional.
 - `api/index.js`: entrada serverless de la API para Vercel.
 - `vercel.json`: builds y rutas del despliegue (frontend estático + API).

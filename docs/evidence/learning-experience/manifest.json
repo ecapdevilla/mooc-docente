@@ -1,0 +1,674 @@
+{
+  "generatedAt": "2026-11-02T03:45:43.931Z",
+  "browser": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "mode": "SIMULACIÓN: SPA real servida localmente con API aislada; sin Supabase ni Production",
+  "totals": {
+    "captures": 33,
+    "records": 33,
+    "failures": 0
+  },
+  "results": [
+    {
+      "scenario": "full",
+      "screen": "login-dashboard",
+      "viewport": "desktop",
+      "file": "full-login-dashboard-desktop.jpg",
+      "bytes": 85868,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "Inicio de sesión por interfaz contra la API simulada",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "dashboard",
+      "viewport": "desktop",
+      "file": "full-dashboard-desktop.jpg",
+      "bytes": 85868,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "course",
+      "viewport": "desktop",
+      "file": "full-course-desktop.jpg",
+      "bytes": 100539,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 54,
+        "meterValue": "33",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "module",
+      "viewport": "desktop",
+      "file": "full-module-desktop.jpg",
+      "bytes": 56063,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "50",
+        "shellDisplay": "flex",
+        "h1": "Unidad 1"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "lesson",
+      "viewport": "desktop",
+      "file": "full-lesson-desktop.jpg",
+      "bytes": 78815,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "33",
+        "shellDisplay": null,
+        "h1": "Corrientes pedagógicas contemporáneas"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "lesson-quiz",
+      "viewport": "desktop",
+      "file": "full-lesson-quiz-desktop.jpg",
+      "bytes": 81493,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "67",
+        "shellDisplay": null,
+        "h1": "Corrientes pedagógicas contemporáneas"
+      },
+      "notes": "Actividad respondida; puede incluir modal de insignia",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "course-progress",
+      "viewport": "desktop",
+      "file": "full-course-progress-desktop.jpg",
+      "bytes": 100272,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 54,
+        "meterValue": "67",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "Progreso tras completar la actividad",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "module-pending",
+      "viewport": "desktop",
+      "file": "full-module-pending-desktop.jpg",
+      "bytes": 49026,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": "67",
+        "shellDisplay": "flex",
+        "h1": "Unidad en preparación"
+      },
+      "notes": "Módulo sin lecciones publicadas",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "dashboard",
+      "viewport": "tablet",
+      "file": "full-dashboard-tablet.jpg",
+      "bytes": 177058,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 768,
+        "scrollWidth": 768,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "course",
+      "viewport": "tablet",
+      "file": "full-course-tablet.jpg",
+      "bytes": 204341,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 768,
+        "scrollWidth": 768,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 54,
+        "meterValue": "33",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "module",
+      "viewport": "tablet",
+      "file": "full-module-tablet.jpg",
+      "bytes": 119881,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 768,
+        "scrollWidth": 768,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "50",
+        "shellDisplay": "flex",
+        "h1": "Unidad 1"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "lesson",
+      "viewport": "tablet",
+      "file": "full-lesson-tablet.jpg",
+      "bytes": 173439,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 768,
+        "scrollWidth": 768,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "33",
+        "shellDisplay": null,
+        "h1": "Corrientes pedagógicas contemporáneas"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "dashboard",
+      "viewport": "mobile",
+      "file": "full-dashboard-mobile.jpg",
+      "bytes": 162062,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "course",
+      "viewport": "mobile",
+      "file": "full-course-mobile.jpg",
+      "bytes": 183621,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 46,
+        "meterValue": "33",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "module",
+      "viewport": "mobile",
+      "file": "full-module-mobile.jpg",
+      "bytes": 100152,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "50",
+        "shellDisplay": "flex",
+        "h1": "Unidad 1"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "full",
+      "screen": "lesson",
+      "viewport": "mobile",
+      "file": "full-lesson-mobile.jpg",
+      "bytes": 155509,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "33",
+        "shellDisplay": null,
+        "h1": "Corrientes pedagógicas contemporáneas"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "dashboard",
+      "viewport": "desktop",
+      "file": "noprog-dashboard-desktop.jpg",
+      "bytes": 85454,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "course",
+      "viewport": "desktop",
+      "file": "noprog-course-desktop.jpg",
+      "bytes": 98580,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 54,
+        "meterValue": "0",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "module",
+      "viewport": "desktop",
+      "file": "noprog-module-desktop.jpg",
+      "bytes": 53977,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "0",
+        "shellDisplay": "flex",
+        "h1": "Unidad 1"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "lesson",
+      "viewport": "desktop",
+      "file": "noprog-lesson-desktop.jpg",
+      "bytes": 72784,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "0",
+        "shellDisplay": null,
+        "h1": "¿Qué es la Pedagogía?"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "lesson-quiz",
+      "viewport": "desktop",
+      "file": "noprog-lesson-quiz-desktop.jpg",
+      "bytes": 76345,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "33",
+        "shellDisplay": null,
+        "h1": "¿Qué es la Pedagogía?"
+      },
+      "notes": "Actividad respondida; puede incluir modal de insignia",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "course-progress",
+      "viewport": "desktop",
+      "file": "noprog-course-progress-desktop.jpg",
+      "bytes": 100539,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 54,
+        "meterValue": "33",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "Progreso tras completar la actividad",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "module-pending",
+      "viewport": "desktop",
+      "file": "noprog-module-pending-desktop.jpg",
+      "bytes": 49026,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": "33",
+        "shellDisplay": "flex",
+        "h1": "Unidad en preparación"
+      },
+      "notes": "Módulo sin lecciones publicadas",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "dashboard",
+      "viewport": "mobile",
+      "file": "noprog-dashboard-mobile.jpg",
+      "bytes": 161318,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "course",
+      "viewport": "mobile",
+      "file": "noprog-course-mobile.jpg",
+      "bytes": 181120,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 46,
+        "meterValue": "0",
+        "shellDisplay": "flex",
+        "h1": "Fundamentos de Pedagogía y Didáctica"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "module",
+      "viewport": "mobile",
+      "file": "noprog-module-mobile.jpg",
+      "bytes": 98282,
+      "metrics": {
+        "activeView": "view-module",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "0",
+        "shellDisplay": "flex",
+        "h1": "Unidad 1"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "noprog",
+      "screen": "lesson",
+      "viewport": "mobile",
+      "file": "noprog-lesson-mobile.jpg",
+      "bytes": 141841,
+      "metrics": {
+        "activeView": "view-lesson",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 44,
+        "meterValue": "0",
+        "shellDisplay": null,
+        "h1": "¿Qué es la Pedagogía?"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "nocourse",
+      "screen": "dashboard",
+      "viewport": "desktop",
+      "file": "nocourse-dashboard-desktop.jpg",
+      "bytes": 86031,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "nocourse",
+      "screen": "course-fallback",
+      "viewport": "desktop",
+      "file": "nocourse-course-fallback-desktop.jpg",
+      "bytes": 95780,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 54,
+        "meterValue": "0",
+        "shellDisplay": "flex",
+        "h1": "Inteligencia Artificial para Docentes"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "nocourse",
+      "screen": "dashboard",
+      "viewport": "mobile",
+      "file": "nocourse-dashboard-mobile.jpg",
+      "bytes": 162062,
+      "metrics": {
+        "activeView": "view-dashboard",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": null,
+        "h1": null
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "nocourse",
+      "screen": "course-fallback",
+      "viewport": "mobile",
+      "file": "nocourse-course-fallback-mobile.jpg",
+      "bytes": 184950,
+      "metrics": {
+        "activeView": "view-course",
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": 46,
+        "meterValue": "0",
+        "shellDisplay": "flex",
+        "h1": "Inteligencia Artificial para Docentes"
+      },
+      "notes": "",
+      "problems": []
+    },
+    {
+      "scenario": "apierror",
+      "screen": "login-apierror",
+      "viewport": "desktop",
+      "file": "apierror-login-apierror-desktop.jpg",
+      "bytes": 107740,
+      "metrics": {
+        "activeView": null,
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": "flex",
+        "h1": "Prepárate con claridad \n              avanza con propósito"
+      },
+      "notes": "Error visible para la persona: Fallo simulado de la API",
+      "problems": []
+    },
+    {
+      "scenario": "apierror",
+      "screen": "login-apierror",
+      "viewport": "mobile",
+      "file": "apierror-login-apierror-mobile.jpg",
+      "bytes": 205309,
+      "metrics": {
+        "activeView": null,
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "horizontalOverflow": 0,
+        "overflowingElements": [],
+        "ctaHeight": null,
+        "meterValue": null,
+        "shellDisplay": "flex",
+        "h1": "Prepárate con claridad \n              avanza con propósito"
+      },
+      "notes": "Error visible para la persona: Fallo simulado de la API",
+      "problems": []
+    }
+  ],
+  "failures": [],
+  "note": "Capturas comprimidas a JPEG (máximo 950 px de ancho) para el repositorio."
+}
