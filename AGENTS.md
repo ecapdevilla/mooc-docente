@@ -243,7 +243,7 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   Ahora `src/server.js` responde `400 "JSON inválido en el cuerpo de la
   solicitud"`, registra los 4xx sin volcar el cuerpo y reserva `console.error`
   para los 5xx. Detalle: `docs/login-500-production-20261101.md`.
-- Production ya está al día con `d6d5ce6`: `POST /api/v1/auth/login` con JSON
+- Production ya está al día con `42c9160`: `POST /api/v1/auth/login` con JSON
   roto responde `400 "JSON inválido en el cuerpo de la solicitud"`,
   `GET /api/v1/courses` incluye `meta`, las credenciales inválidas dan `401`, las
   rutas protegidas sin token dan `401` y el diagnóstico piloto sigue sirviendo

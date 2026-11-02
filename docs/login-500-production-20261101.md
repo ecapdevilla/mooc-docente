@@ -111,7 +111,7 @@ cubierto por `tests/http-errors.test.js` (8 casos).
 
 ### 7.1 Verificación final
 
-Commit desplegado y confirmado en producción: `d6d5ce6` en
+Commit desplegado y confirmado en producción: `42c9160` en
 `recovery/integracion-20261031` (marcador `commit` de `GET /api/v1`).
 
 | Sonda en `https://mooc-docente.vercel.app` | Resultado |
@@ -125,7 +125,7 @@ Commit desplegado y confirmado en producción: `d6d5ce6` en
 | `GET /api/v1/progress` sin token | `401` |
 | `POST /api/v1/quizzes/post-login/attempts` con token inválido | `401` |
 | `GET /api/v1/diagnostico-piloto/info` | `200` con 50 preguntas |
-| `GET /api/v1` | `200` con `commit: d6d5ce6` |
+| `GET /api/v1` | `200` con `commit: 42c9160` |
 | `GET /health` | `200` con `commit` (enrutado a la función en `vercel.json`) |
 
 Observaciones del runtime que quedaron documentadas en el código:
