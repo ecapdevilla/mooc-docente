@@ -84,6 +84,9 @@ CREATE TABLE quiz_options (
 CREATE TABLE quiz_attempts (
     id SERIAL PRIMARY KEY,
     usuario_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    curso_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    alcance VARCHAR(20) NOT NULL DEFAULT 'diagnostico' CHECK (alcance IN ('diagnostico','evaluacion_curso')),
+    aprobado BOOLEAN,
     estado VARCHAR(20) DEFAULT 'finalizado',
     iniciado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     finalizado_en TIMESTAMP,
@@ -193,6 +196,7 @@ CREATE INDEX idx_modules_curso ON modules(curso_id);
 CREATE INDEX idx_lessons_modulo ON lessons(modulo_id);
 CREATE INDEX idx_quiz_leccion ON quizzes(leccion_id);
 CREATE INDEX idx_quiz_attempts_usuario ON quiz_attempts(usuario_id);
+CREATE INDEX idx_quiz_attempts_usuario_curso ON quiz_attempts(usuario_id, curso_id) WHERE curso_id IS NOT NULL;
 CREATE INDEX idx_quiz_attempt_answers_intento ON quiz_attempt_answers(intento_id);
 CREATE INDEX idx_quiz_modulo ON quizzes(modulo_id);
 CREATE INDEX idx_quiz_estado ON quizzes(estado_revision);
