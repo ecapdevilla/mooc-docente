@@ -251,7 +251,12 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   clasificador). En local el error llega como `entity.parse.failed`; en Vercel
   llega con otra forma, así que `src/server.js` marca `req.cuerpoJsonInvalido`
   al envolver `express.json()` y `src/utils/httpErrors.js` queda como red de
-  seguridad. `GET /health` devuelve `commit` con el SHA desplegado.
+  seguridad.
+- Marcador de despliegue: `GET /api/v1` y `GET /health` devuelven `commit` (SHA
+  corto de `VERCEL_GIT_COMMIT_SHA`, o `local` en desarrollo), para verificar qué
+  versión está en línea sin abrir el panel de Vercel. En Vercel solo `/api/*`
+  llega a la función; por eso `vercel.json` enruta `/health` a `api/index.js`
+  antes de la ruta catch-all que sirve la SPA.
 - Carga del catálogo implementada en `scripts/generar-carga-catalogo.js`
   (`npm run carga:catalogo`): extrae `const MODULES` de `indexInicial.html`,
   valida títulos normalizados y emite cinco SQL en `database/loads/`

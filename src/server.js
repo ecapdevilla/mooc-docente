@@ -87,9 +87,14 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/ping', require('./routes/ping'));
 app.use('/api/v1/diagnostico-piloto', pilotDiagnosticRoutes);
 
-// Verificación rápida de que la API (o la función serverless) está en línea
+// Verificación rápida de que la API (o la función serverless) está en línea.
+// `commit` es el marcador de despliegue: el runtime de Vercel expone el SHA de
+// la compilación y permite comprobar qué versión está en línea sin abrir el
+// panel. Se publica aquí y en /health.
+const commitDesplegado = (process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT || 'local').slice(0, 7);
+
 app.get('/api/v1', (req, res) => {
-  res.json({ status: 'ok', api: 'MéritoDocente', version: 'v1' });
+  res.json({ status: 'ok', api: 'MéritoDocente', version: 'v1', commit: commitDesplegado });
 });
 
 // Health check
@@ -99,7 +104,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    commit: (process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT || 'local').slice(0, 7),
+    commit: commitDesplegado,
   });
 });
 

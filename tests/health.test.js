@@ -21,6 +21,16 @@ describe('Salud del sistema', () => {
     expect(res.body).toEqual({ status: 'ok', db: 'connected' });
   });
 
+  test('GET /api/v1 identifica la API y la versión desplegada', async () => {
+    const res = await api.get('/api/v1');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ status: 'ok', api: 'MéritoDocente', version: 'v1' });
+    // Marcador de despliegue: SHA de Vercel en Production, 'local' en desarrollo.
+    expect(typeof res.body.commit).toBe('string');
+    expect(res.body.commit.length).toBeGreaterThan(0);
+  });
+
   test('una ruta desconocida responde 404 en formato JSON', async () => {
     const res = await api.get('/api/v1/ruta-inexistente');
 
