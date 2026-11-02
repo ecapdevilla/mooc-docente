@@ -413,8 +413,7 @@ Pendiente (no bloquea nada de lo anterior):
 - Nota de entorno: el PostgreSQL de `127.0.0.1:5432` estaba en modo de
   recuperación; la suite se ejecutó contra `merito_test_local` en
   `127.0.0.1:5433`, sin tocar Supabase ni Production.
-- **Despliegue verificado en Production (código en `fe7770c`; `/health`
-  reporta `148e1df`, el commit de esta documentación, con los mismos archivos)**: `GET
+- **Despliegue verificado en Production (código en `fe7770c`; los commits posteriores solo tocan documentación)**: `GET
   https://mooc-docente.vercel.app/` → 200 con **18** `<script src>` (incluye
   `/js/nucleo/ruta.js` antes de `principal.js`) y **0** manejadores en línea;
   `/js/nucleo/ruta.js` → 200 `application/javascript`; `/js/principal.js` → 200
