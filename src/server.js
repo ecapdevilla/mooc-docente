@@ -164,7 +164,9 @@ app.use((err, req, res, next) => {
   // El marcador lo pone el middleware `analizarJson` cuando `express.json()`
   // rechaza el cuerpo. El clasificador cubre el caso en que el error llega sin
   // pasar por ese middleware (por ejemplo, desde otra capa de análisis).
-  const esCuerpoInvalido = req.cuerpoJsonInvalido === true || esCuerpoJsonInvalido(err);
+  const esCuerpoInvalido =
+    req.cuerpoJsonInvalido === true ||
+    esCuerpoJsonInvalido(err, typeof req.is === 'function' && Boolean(req.is('application/json')));
 
   const status = esCuerpoInvalido ? 400 : err.status || err.statusCode || 500;
   const isDevelopment = process.env.NODE_ENV === 'development';

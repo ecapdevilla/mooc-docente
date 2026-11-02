@@ -14,9 +14,10 @@ const tienePropia = (objeto, clave) =>
 
 /**
  * @param {unknown} error Error recibido por el manejador global.
+ * @param {boolean} [esPeticionJson] La petición declaraba `application/json`.
  * @returns {boolean} true si el fallo proviene de analizar el cuerpo JSON.
  */
-function esCuerpoJsonInvalido(error) {
+function esCuerpoJsonInvalido(error, esPeticionJson = false) {
   if (!error || typeof error !== 'object') return false;
 
   if (error.type === 'entity.parse.failed' || error.type === 'entity.verify.failed') {
@@ -30,7 +31,13 @@ function esCuerpoJsonInvalido(error) {
   // `instanceof` falla cuando el SyntaxError se creó en otro contexto (por
   // ejemplo, dentro del bundle del runtime de Vercel), así que se compara el
   // nombre. `body` es la señal que adjunta body-parser al cuerpo rechazado.
-  return error.name === 'SyntaxError' || tienePropia(error, 'body');
+  if (error.name === 'SyntaxError' || tienePropia(error, 'body')) return true;
+
+  // Último recurso: en una petición JSON, un 400 que llega al manejador global
+  // no puede venir de la lógica de negocio (esas validaciones responden sin
+  // lanzar), así que corresponde al análisis del cuerpo. Es la forma que toma
+  // el error cuando el runtime entrega el fallo del flujo de lectura.
+  return esPeticionJson;
 }
 
 module.exports = { esCuerpoJsonInvalido };

@@ -39,6 +39,18 @@ describe('esCuerpoJsonInvalido', () => {
     expect(esCuerpoJsonInvalido(error)).toBe(false);
   });
 
+  test('trata como cuerpo inválido el 400 sin marcas en una petición JSON (runtime Vercel)', () => {
+    const error = { status: 400, message: 'error del flujo de lectura' };
+
+    expect(esCuerpoJsonInvalido(error, true)).toBe(true);
+  });
+
+  test('no trata como cuerpo inválido un 400 sin marcas fuera de una petición JSON', () => {
+    const error = { status: 400, message: 'error del flujo de lectura' };
+
+    expect(esCuerpoJsonInvalido(error, false)).toBe(false);
+  });
+
   test('no trata un SyntaxError interno (5xx) como cuerpo inválido', () => {
     const error = Object.assign(new SyntaxError('fallo interno'), { status: 500 });
 
