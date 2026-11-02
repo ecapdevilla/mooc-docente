@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-11-02T03:51:11.090Z",
+  "localBytes": 268187,
+  "servedBytes": 261607,
+  "localSha256": "f37796affd045b7ae219f08d27b0aef29b94556ea7537f7f0ace409f62e33a1a",
+  "servedSha256": "f37796affd045b7ae219f08d27b0aef29b94556ea7537f7f0ace409f62e33a1a",
+  "identical": true,
+  "lxRules": 237,
+  "hasLessonPageContainer": true,
+  "pilot": {
+    "status": 200,
+    "title": "Diagnóstico piloto | Mérito Docente",
+    "heading": "Diagnóstico inicial de preparación"
+  }
+}

@@ -73,6 +73,7 @@ El flujo actual es:
 - Revisión visual con navegador real (`playwright-core` + Chrome) y API aislada: 33 capturas en 1440/768/390 px, sin desbordamiento horizontal. Evidencia en `docs/evidence/learning-experience/` (`README.md`, `manifest.json` y capturas identificadas como simulación).
 - Defectos corregidos en esa revisión: `#lessonView` duplicaba `lx-lesson-layout` y reducía el artículo a 2 px (ahora `lx-lesson-page`); al responder correctamente la actividad, el estado se refresca en el lugar con `refreshLessonCompletionUi()` sin perder la retroalimentación.
 - Production (2026-11-01, antes de publicar): `/api/v1/courses` devuelve `{"courses":[]}` aunque la base responde conectada, por lo que la SPA usará la ruta local de cada curso. El diagnóstico sigue publicado con 50 preguntas (`MD-DIA-2026-PILOTO-001`).
+- Despliegue verificado (commit `906e771`, rama `recovery/integracion-20261031`, fast-forward): Production sirve el HTML idéntico al commit (SHA-256 coincidente), con 237 reglas `.lx-`, `#view-course`, `#view-module` y `lx-lesson-page`; rutas administrativas y simulacro siguen en 401 sin token; `/diagnostico-piloto` responde 200. La navegación autenticada en Production no se verificó: no hay credenciales y la API pública no publica cursos. Evidencia en `docs/evidence/learning-experience/production-postdeploy.json`.
 - Pendiente: la calificación del quiz de lección sigue en el navegador (el detalle del curso expone `es_correcta`); debe migrarse al backend como el simulacro.
 
 ### Decisión de producto

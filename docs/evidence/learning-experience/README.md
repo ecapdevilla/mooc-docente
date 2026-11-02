@@ -58,6 +58,19 @@ Entorno: Chrome estable en Windows conducido con `playwright-core`, viewports 14
 - `GET /api/v1/diagnostico-piloto/info` → 50 preguntas, examen `MD-DIA-2026-PILOTO-001`, estado `revision_academica_pendiente` (sin cambios).
 - `/diagnostico-piloto` → 200 y contiene el título del diagnóstico.
 
+## Verificación después del despliegue
+
+Commit publicado: `906e771` (`feat(ui): unify course, module and lesson learning experience`), push normal sobre `recovery/integracion-20261031` (`ca80549..906e771`, fast-forward).
+
+`production-postdeploy-desktop.jpg`, `production-postdeploy-mobile.jpg`, `production-diagnostico-desktop.jpg` y `production-postdeploy.json`.
+
+- `GET https://mooc-docente.vercel.app/` → 200, `Last-Modified: Mon, 02 Nov 2026 03:50:39 GMT`, **237 referencias a `.lx-`**, `#view-course` y `#view-module` presentes y contenedor `lx-lesson-page` servido.
+- El HTML servido es **idéntico** al del commit: mismo SHA-256 tras normalizar saltos de línea (`f37796af…e33a1a`), 261 607 bytes servidos frente a 268 187 locales (diferencia solo de CRLF).
+- `GET /api/v1/admin/users` sin token → 401; `GET /api/v1/quizzes/post-login` sin token → 401.
+- `GET /diagnostico-piloto` → 200, título «Diagnóstico piloto | Mérito Docente», encabezado «Diagnóstico inicial de preparación», 50 preguntas y 85 minutos.
+- `GET /api/v1/ping/health` → `{"status":"ok","db":"connected"}`; `GET /api/v1/courses` sigue devolviendo `{"courses":[]}` (sin cambios de datos).
+- La landing pública conserva su diseño, el formulario de inscripción y los accesos a cursos y diagnóstico.
+
 ## Limitaciones de esta evidencia
 
 - La revisión visual se hizo con API simulada: no sustituye una sesión real contra Supabase ni una revisión con contenido definitivo.
