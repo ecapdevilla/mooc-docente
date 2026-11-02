@@ -243,20 +243,25 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   Ahora `src/server.js` responde `400 "JSON inválido en el cuerpo de la
   solicitud"`, registra los 4xx sin volcar el cuerpo y reserva `console.error`
   para los 5xx. Detalle: `docs/login-500-production-20261101.md`.
-- Production sigue desactualizado: allí el caso malformado responde `500` y
-  `GET /api/v1/courses` no incluye `meta` (la rama local sí). Falta desplegar.
+- Production ya está al día con `d6d5ce6`: `POST /api/v1/auth/login` con JSON
+  roto responde `400 "JSON inválido en el cuerpo de la solicitud"`,
+  `GET /api/v1/courses` incluye `meta`, las credenciales inválidas dan `401`, las
+  rutas protegidas sin token dan `401` y el diagnóstico piloto sigue sirviendo
+  50 preguntas. Verificación repetible en `docs/login-500-production-20261101.md`.
 - Pruebas nuevas: `tests/errores-http.test.js` (5 casos: 400 en login y en ruta
   inexistente con JSON roto, log sin cuerpo ni contraseña, 404 sin cuerpo y 401
-  con credenciales inválidas) y `tests/http-errors.test.js` (6 casos del
-  clasificador). En local el error llega como `entity.parse.failed`; en Vercel
-  llega con otra forma, así que `src/server.js` marca `req.cuerpoJsonInvalido`
-  al envolver `express.json()` y `src/utils/httpErrors.js` queda como red de
-  seguridad.
+  con credenciales inválidas), `tests/http-errors.test.js` (8 casos del
+  clasificador) y `tests/vercel-entry.test.js` (4 casos del punto de entrada
+  serverless: `/health`, `/api/v1`, ruta sin prefijo y JSON roto). En local el
+  error llega como `entity.parse.failed`; en Vercel llega como 400 sin marcas,
+  así que `src/server.js` marca `req.cuerpoJsonInvalido` al envolver
+  `express.json()`, `src/utils/httpErrors.js` trata el 400 de una petición JSON
+  como cuerpo inválido y el resto de formas queda cubierto por sus pruebas.
 - Marcador de despliegue: `GET /api/v1` y `GET /health` devuelven `commit` (SHA
   corto de `VERCEL_GIT_COMMIT_SHA`, o `local` en desarrollo), para verificar qué
-  versión está en línea sin abrir el panel de Vercel. En Vercel solo `/api/*`
-  llega a la función; por eso `vercel.json` enruta `/health` a `api/index.js`
-  antes de la ruta catch-all que sirve la SPA.
+  versión está en línea sin abrir el panel de Vercel. En Vercel solo `/api/*` y
+  `/health` llegan a la función (`vercel.json`); `api/index.js` no normaliza
+  `/health` porque vive fuera de `/api/v1`.
 - Carga del catálogo implementada en `scripts/generar-carga-catalogo.js`
   (`npm run carga:catalogo`): extrae `const MODULES` de `indexInicial.html`,
   valida títulos normalizados y emite cinco SQL en `database/loads/`
@@ -297,7 +302,7 @@ Estado (2026-11-01, local, sin commit ni despliegue):
   `DATABASE_URL` y `JWT_SECRET` en el entorno y una base con
   `database/schema.sql`, el seed y
   `database/migrations/20261101_lesson_quiz_responses.sql`. Con eso la suite
-  completa queda en 19/19 suites y 129/129 pruebas (`npx jest --maxWorkers=2`).
+  completa queda en 20/20 suites y 136/136 pruebas (`npx jest --maxWorkers=2`).
 
 ## Prioridades pendientes
 

@@ -107,8 +107,47 @@ Corrección definitiva: `src/server.js` envuelve `express.json()` y marca
 `req.cuerpoJsonInvalido` cuando ese middleware rechaza el cuerpo; el manejador
 global usa la marca antes de inspeccionar el error. `src/utils/httpErrors.js`
 queda como red de seguridad para errores que no pasan por ese middleware y está
-cubierto por `tests/http-errors.test.js` (6 casos). Esta detección ya no depende
-de la forma del error.
+cubierto por `tests/http-errors.test.js` (8 casos).
 
-Para verificar qué versión está en línea sin abrir el panel, `GET /health`
-devuelve `commit` (SHA corto de `VERCEL_GIT_COMMIT_SHA` o `local` en desarrollo).
+### 7.1 Verificación final
+
+Commit desplegado y confirmado en producción: `d6d5ce6` en
+`recovery/integracion-20261031` (marcador `commit` de `GET /api/v1`).
+
+| Sonda en `https://mooc-docente.vercel.app` | Resultado |
+| --- | --- |
+| `POST /api/v1/auth/login` con JSON malformado | `400 "JSON inválido en el cuerpo de la solicitud"` |
+| `POST /api/v1/auth/login` con cuerpo de 20 KB | `400` con el mismo mensaje (límite `10kb`) |
+| `POST /api/v1/auth/login` con `charset=iso-8859-1` | `400` con el mismo mensaje |
+| `POST /api/v1/auth/login` con `{}` | `400 "\"email\" is required"` (validación, no cuerpo) |
+| `GET /api/v1/courses` | `200` con `meta {totalCursos, cursosActivos}` |
+| `POST /api/v1/auth/login` con usuario inexistente | `401` |
+| `GET /api/v1/progress` sin token | `401` |
+| `POST /api/v1/quizzes/post-login/attempts` con token inválido | `401` |
+| `GET /api/v1/diagnostico-piloto/info` | `200` con 50 preguntas |
+| `GET /api/v1` | `200` con `commit: d6d5ce6` |
+| `GET /health` | `200` con `commit` (enrutado a la función en `vercel.json`) |
+
+Observaciones del runtime que quedaron documentadas en el código:
+
+1. En Vercel el fallo de análisis del cuerpo llega como `400` sin
+   `entity.parse.failed`, sin `body` y sin un `SyntaxError` identificable; por eso
+   la clasificación no puede depender de la forma del error. La combinación que
+   funciona en producción es: marca en el middleware + `400` en una petición
+   `application/json`.
+2. Las validaciones de negocio responden sin lanzar, así que un `400` que llega
+   al manejador global en una petición JSON solo puede venir del análisis del
+   cuerpo. Un `500` con `SyntaxError` interno sigue reportándose como `500`.
+3. `vercel.json` debe enrutar `/health` a `api/index.js`; la ruta catch-all sirve
+   la SPA para todo lo demás. `api/index.js` no normaliza `/health` para no
+   convertirla en `/api/v1/health`.
+
+Para verificar qué versión está en línea sin abrir el panel, `GET /api/v1` y
+`GET /health` devuelven `commit` (SHA corto de `VERCEL_GIT_COMMIT_SHA` o `local`
+en desarrollo).
+
+Pendiente conocido de contrato: un cuerpo enviado con `Content-Type: text/plain`
+no pasa por el analizador JSON y la validación responde
+`400 "\"value\" must be of type object"`. No afecta a la SPA (siempre envía
+`application/json`), pero conviene responder `415` cuando el tipo no sea JSON.
+
