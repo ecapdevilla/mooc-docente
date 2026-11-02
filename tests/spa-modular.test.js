@@ -32,10 +32,14 @@ describe('Etapa 1 · SPA modularizado', () => {
   });
 
   test('carga los archivos clásicos en el orden del pipeline', () => {
-    expect(scriptsDelSpa.length).toBeGreaterThanOrEqual(17);
+    expect(scriptsDelSpa.length).toBeGreaterThanOrEqual(18);
     expect(scriptsDelSpa[0]).toBe('/js/datos/modulos.js');
     expect(scriptsDelSpa[scriptsDelSpa.length - 1]).toBe('/js/principal.js');
     expect(scriptsDelSpa).toContain('/js/nucleo/acciones.js');
+    expect(scriptsDelSpa).toContain('/js/nucleo/ruta.js');
+    expect(scriptsDelSpa.indexOf('/js/nucleo/ruta.js')).toBeLessThan(
+      scriptsDelSpa.indexOf('/js/principal.js')
+    );
 
     scriptsDelSpa.forEach((ruta) => {
       const archivo = path.join(RAIZ, 'public', ruta.replace(/^\//, ''));

@@ -44,10 +44,12 @@
       panel.classList.remove('hidden');
       loadPostLoginQuiz();
       panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sincronizarRuta(RUTA_DIAGNOSTICO);
     };
 
     window.closeDiagnosticQuiz = function () {
       document.getElementById('postLoginQuizPanel')?.classList.add('hidden');
+      sincronizarRuta(RUTA_DASHBOARD);
     };
 
     function renderPostLoginQuiz(quiz) {

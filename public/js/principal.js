@@ -19,15 +19,13 @@
       loadPilotDuration();
       const returnToDashboard = new URLSearchParams(window.location.search).get('vista') === 'panel';
 
-      // Restaurar la sesión y el progreso reales desde la API.
+      // Restaurar la sesión y el progreso reales desde la API y, con el estado
+      // ya cargado, aplicar la ruta de la barra de direcciones (T2.2). Así los
+      // enlaces profundos a vistas protegidas encuentran la sesión resuelta.
       refreshSession().then((restored) => {
-        if (!restored) return;
-
-        updateNavbar();
-        if (state.user) {
-          if (returnToDashboard) showView('dashboard');
-          else renderDashboard();
-        }
+        if (restored) updateNavbar();
+        if (returnToDashboard && state.user) reemplazarRuta(RUTA_DASHBOARD);
+        iniciarRuta();
       });
 
       // Sombra navbar al scroll

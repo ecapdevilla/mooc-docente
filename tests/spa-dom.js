@@ -2,7 +2,7 @@
  * Utilidades compartidas por las pruebas de interfaz del SPA.
  *
  * Desde la Etapa 1 el SPA no es un archivo autocontenido: `indexInicial.html`
- * enlaza `public/styles/app.css` y carga 17 archivos clásicos de
+ * enlaza `public/styles/app.css` y carga 18 archivos clásicos de
  * `public/js/`. jsdom no descarga recursos por sí solo, así que aquí se
  * resuelve cada `/js/...` y `/styles/...` desde el disco con un
  * `ResourceLoader`. Así las pruebas ejecutan exactamente los archivos que

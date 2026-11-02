@@ -18,7 +18,7 @@ Ahora el HTML solo contiene estructura y orden de carga:
 | --- | --- | --- |
 | `indexInicial.html` | Marcado de todas las vistas, IDs y puntos de integración | 575 líneas / 30 KB |
 | `public/styles/app.css` | Toda la hoja de estilos | 3.072 líneas / 98,6 KB |
-| `public/js/**` (17 archivos) | Datos, núcleo, vistas y arranque | 3.264 líneas / 151 KB |
+| `public/js/**` (18 archivos) | Datos, núcleo, vistas, router y arranque | 3.717 líneas / 166 KB |
 
 Lo que **no** cambió en la Etapa 1:
 
@@ -49,7 +49,8 @@ public/js/
 │   ├── api.js               # API_BASE, claves de sesión y apiFetch
 │   ├── sesion.js            # saveSession/clearSession, mapa de cursos, progreso
 │   ├── modales.js           # modal de insignia y gestión de foco del teclado
-│   └── acciones.js          # registro `data-action` y oyente delegado (click/submit)
+│   ├── acciones.js          # registro `data-action` y oyente delegado (click/submit)
+│   └── ruta.js              # router por hash: rutas, historial y redirecciones
 ├── admin/
 │   ├── diagnostico-editor.js  # editor editorial del diagnóstico (661 líneas)
 │   └── diagnostico-inicio.js  # initializeAdminDiagnostic, loadPilotDuration
@@ -74,8 +75,9 @@ public/js/
 4. `nucleo/sesion.js`
 5. `vistas/quiz-diagnostico.js`, `vistas/acceso.js`, `vistas/dashboard.js`,
    `vistas/curso-modelo.js`, `vistas/curso.js`, `vistas/modulo.js`, `vistas/leccion.js`
-6. `nucleo/modales.js`, `nucleo/acciones.js`
-7. `principal.js` (registra la delegación y ejecuta `init()`)
+6. `nucleo/modales.js`, `nucleo/acciones.js`, `nucleo/ruta.js`
+7. `principal.js` (registra la delegación, ejecuta `init()` y arranca el router
+   cuando la sesión ya está resuelta)
 
 Reglas del modelo:
 
@@ -144,6 +146,45 @@ antes de ejecutar la acción, que es el equivalente exacto del antiguo
 Estado verificado: 51 manejadores en línea (27 en `indexInicial.html` y 24 en las
 plantillas de `vistas/*.js`) → 0, con 15 acciones registradas.
 
+### 4.2 Router por hash (T2.2)
+
+`nucleo/ruta.js` publica URLs compartibles y da sentido al botón atrás. Cada
+vista tiene una ruta y el router la aplica leyendo `location.hash`:
+
+| Ruta | Vista | Notas |
+| --- | --- | --- |
+| `#/` | landing de matrícula | con sesión redirige a `#/dashboard` |
+| `#/acceso` | landing con el formulario a la vista | destino cuando falta sesión |
+| `#/dashboard` | panel | requiere sesión |
+| `#/curso/<curso>` | vista de curso | `<curso>` es el id de `MODULES` (`mod1`…) |
+| `#/modulo/<curso>[/<módulo>]` | vista de módulo | `<módulo>` es el id de la API; sin él, el primero |
+| `#/leccion/<curso>/<índice>` | vista de lección | índice 0-based, como `state.currentLesson` |
+| `#/diagnostico` | simulacro del panel | abre el panel y conserva la ruta al recargar |
+| `#/admin/diagnostico` | editor de preguntas | solo rol `admin` |
+
+Reglas del contrato:
+
+- **Una sola fuente de verdad.** `openCourse`, `openModule` y `openLesson` fijan
+  el estado y llaman a `showView`; al final de `showView` el router escribe la
+  URL con `history.pushState`. Como `pushState` no dispara `hashchange`, no hay
+  doble render. `principal.js` llama a `iniciarRuta()` cuando `refreshSession()`
+  ya resolvió, así que un enlace profundo encuentra la sesión y el `courseMap`.
+- **Atrás/adelante.** `popstate` y `hashchange` aplican la ruta sin escribir en el
+  historial. Durante la aplicación se usa `replaceState`, así que los alias se
+  canonizan sin añadir entradas.
+- **Enlaces profundos protegidos.** Sin sesión, cualquier ruta protegida lleva a
+  `#/acceso`, muestra la landing con el formulario y abre el modal de sesión.
+- **Rutas inválidas.** Curso o lección inexistente cae al panel (con sesión) o al
+  inicio (sin sesión); nunca queda una vista vacía.
+- **Alias compartibles.** `#/modulo/<id API>` y `#/leccion/<id API>` resuelven el
+  curso con `state.courseMap` y se canonizan a la forma larga. Las rutas
+  canónicas llevan el curso porque el SPA también funciona en modo local, donde
+  los identificadores de la base de datos no existen.
+- **Sin reescrituras en el servidor.** El fragmento no viaja al servidor: Vercel
+  y Express siguen sirviendo `GET /` para todas las rutas.
+- **`?vista=panel`** se mantiene como compatibilidad: con sesión redirige a
+  `#/dashboard` antes de aplicar la ruta inicial.
+
 ## 5. Recetas
 
 **Añadir o cambiar contenido de una lección**
@@ -161,10 +202,13 @@ plantillas de `vistas/*.js`) → 0, con 15 acciones registradas.
 2. Añadir el bloque de marcado en `indexInicial.html` con los IDs necesarios.
 3. Registrar el `<script src="/js/vistas/<nombre>.js"></script>` después de los
    archivos de los que dependa y antes de `principal.js`.
-4. Añadir la vista a `showView` (`nucleo/ui.js`) y, si hay controles nuevos,
-   declarar su acción en `nucleo/acciones.js` y usarla como `data-action`. No
-   añadir `onclick`/`on*`: la CSP (`script-src-attr 'none'`) los bloquea.
-5. Cubrir el flujo con una prueba jsdom usando `tests/spa-dom.js`, provocando
+4. Añadir la vista a `showView` (`nucleo/ui.js`), su ruta en `nucleo/ruta.js` y,
+   si hay controles nuevos, declarar su acción en `nucleo/acciones.js` y usarla
+   como `data-action`. No añadir `onclick`/`on*`: la CSP (`script-src-attr
+   'none'`) los bloquea.
+5. Si la ruta lleva parámetros, sincronizarla en `sincronizarRutaDeVista` y
+   resolver el enlace en `navegarSegunRuta` con guarda de sesión.
+6. Cubrir el flujo con una prueba jsdom usando `tests/spa-dom.js`, provocando
    clics reales (`.click()`), no llamadas directas, para validar la delegación.
 
 **Añadir estilos**
@@ -195,9 +239,15 @@ aparecen por separado, con números de línea reales.
   `data-action` declarado existe en `ACCIONES`, verifica que `acciones.js` se carga
   antes de `principal.js` y provoca clics y envíos reales en jsdom (modal de
   sesión, panel → curso, quiz de lección, completar lección, índice de lecciones).
-- Suites jsdom: `spa-ui`, `spa-acciones`, `learning-experience`, `lesson-quiz-spa`,
-  `admin-pilot-diagnostic-ui` y `ui-design`.
-- Comando completo: `npm test` (22 suites, 153 pruebas) con `DATABASE_URL` y
+- `tests/spa-ruta.test.js` (T2.2) protege el router: comprueba el lugar de
+  `nucleo/ruta.js` en el pipeline, la normalización y construcción de rutas, las
+  redirecciones sin sesión (`#/dashboard` → `#/acceso` con modal abierto), el
+  `hashchange` manual, la navegación programática de curso/módulo/lección, el
+  botón atrás real (`history.back()`), los alias por id de la API y la ruta del
+  simulacro.
+- Suites jsdom: `spa-ui`, `spa-acciones`, `spa-ruta`, `learning-experience`,
+  `lesson-quiz-spa`, `admin-pilot-diagnostic-ui` y `ui-design`.
+- Comando completo: `npm test` (23 suites, 168 pruebas) con `DATABASE_URL` y
   `JWT_SECRET` definidos. Detalle del entorno en la sección 8.
 
 ## 7. Despliegue
@@ -210,6 +260,10 @@ aparecen por separado, con números de línea reales.
   `Cache-Control: public, max-age=0, must-revalidate`. Como los archivos no llevan
   hash en el nombre, esa cabecera evita servir una versión vieja tras un despliegue.
 - El resto de rutas sigue igual: `/api/(.*)` y `/health` a la función, `/` e `/indexInicial.html` al SPA, `/diagnostico-piloto` a `diagnosticoPiloto.html`.
+- **Rutas del SPA**: desde T2.2 son fragmentos (`#/curso/mod1`, `#/leccion/mod1/2`…).
+  El fragmento no llega al servidor, así que no hacen falta reescrituras
+  adicionales en `vercel.json` ni en Express: `GET /` sigue siendo la única
+  entrada y el router resuelve la vista en el navegador.
 - **CSP estricta**: `src/server.js` declara `script-src-attr 'none'` (valor por
   defecto de Helmet, ahora explícito como contrato) porque el marcado ya no tiene
   atributos `on*`. `script-src 'self'` se mantiene: tampoco hay `<script>` en
@@ -244,9 +298,10 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5433/merito_test_local" \
 JWT_SECRET="clave-local-solo-pruebas" npm test
 ```
 
-Resultado esperado tras T2.1: **22 suites, 153 pruebas, 0 fallos**. La suite
-`tests/spa-modular.test.js` aporta 8 pruebas y `tests/spa-acciones.test.js` 9
-(4 de contrato estático y 5 de comportamiento delegado en jsdom).
+Resultado esperado tras T2.2: **23 suites, 168 pruebas, 0 fallos**. La suite
+`tests/spa-modular.test.js` aporta 8 pruebas, `tests/spa-acciones.test.js` 9
+(4 de contrato estático y 5 de comportamiento delegado en jsdom) y
+`tests/spa-ruta.test.js` 15 (5 de contrato y 10 de navegación real en jsdom).
 
 ## 9. Límites conocidos y siguiente etapa
 
@@ -256,8 +311,12 @@ Pendiente (no bloquea nada de lo anterior):
   funciona solo porque la CSP declara `script-src-attr 'unsafe-inline'`~~.
   Resuelto en T2.1: 0 atributos `on*`, delegación única en `nucleo/acciones.js` y
   CSP en `'none'`. Ver la sección 4.1.
-- **Rutas del navegador**: no hay `hash`/`pushState`; recargar una vista pierde el
-  contexto. Etapa 2: router por hash con URLs compartibles (`#/curso/<id>/leccion/<n>`).
+- **Rutas del navegador**: ~~no hay `hash`/`pushState`; recargar una vista pierde
+  el contexto~~. Resuelto en T2.2: router por hash con URLs compartibles, botón
+  atrás y enlaces profundos; ver la sección 4.2. Queda como límite que
+  `#/leccion` use el índice de la lección en el curso (los alias por id de la API
+  cubren el enlace estable) y que el estado del simulacro en curso no se
+  reconstruya al recargar `#/diagnostico`: se vuelve a pedir el cuestionario.
 - **Frontends duplicados**: `index.html` + `app.js` (28 KB) siguen publicados como
   integración provisional; `diagnosticoPiloto.html` es una página aparte. Retirarlos
   y unificar el diagnóstico es una tarea propia, con prueba de regresión.
@@ -326,3 +385,31 @@ Pendiente (no bloquea nada de lo anterior):
   de la función Express, no en `/` ni en `/js/**`, que Vercel sirve desde su capa
   estática. El SPA ya no depende de esa cabecera para funcionar: no hay atributos
   `on*` que bloquear.
+
+### T2.2 · Router por hash (2026-11-02)
+
+- Archivo nuevo `public/js/nucleo/ruta.js` (431 líneas, 15.115 bytes): constantes
+  de ruta, normalización del hash, constructores de URL, resolución de curso,
+  módulo y lección, guardas de sesión, `aplicarRuta` y `iniciarRuta`. Se carga
+  entre `nucleo/acciones.js` y `principal.js`; el SPA pasa de 17 a 18 archivos.
+- `nucleo/ui.js`: al final de `showView` se llama a `sincronizarRutaDeVista`, que
+  deriva la URL del estado que fijaron `openCourse`, `openModule` y `openLesson`.
+  No se duplicó la lógica de navegación ni se añadió estado nuevo al router.
+- `principal.js`: `iniciarRuta()` se ejecuta cuando `refreshSession()` resolvió
+  (antes solo se pre-renderizaba el panel). `?vista=panel` sigue funcionando y
+  redirige a `#/dashboard`.
+- `vistas/quiz-diagnostico.js`: abrir el simulacro fija `#/diagnostico`; cerrarlo
+  vuelve a `#/dashboard`.
+- Pruebas: `tests/spa-ruta.test.js` con 15 pruebas (5 de contrato estático y 10 de
+  navegación real: redirección sin sesión, `hashchange` manual, curso/módulo/
+  lección, `history.back()` real, alias por id de la API y simulacro).
+  `tests/spa-modular.test.js` exige 18 scripts y el orden de `ruta.js`.
+- Validación ejecutada: `node --check` en `ruta.js`, `ui.js`, `principal.js`,
+  `quiz-diagnostico.js` y la suite nueva; `npm test` → **23/23 suites y 168/168
+  pruebas**; servidor real en el puerto 3107 → `/` 200 (30.148 bytes) con 18
+  `<script src>`, 1 referencia a `/js/nucleo/ruta.js`, **0** manejadores `on*` y
+  `script-src-attr 'none'`; `/js/nucleo/ruta.js` → 200 `application/javascript`
+  (15.115 bytes); `/styles/app.css` → 200 `text/css`.
+- Nota de entorno: el PostgreSQL de `127.0.0.1:5432` estaba en modo de
+  recuperación; la suite se ejecutó contra `merito_test_local` en
+  `127.0.0.1:5433`, sin tocar Supabase ni Production.

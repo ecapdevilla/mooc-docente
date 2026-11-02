@@ -40,6 +40,7 @@
           // Si no hay usuario, mostrar landing
           document.getElementById('view-landing').classList.remove('hidden');
           document.getElementById('registro').scrollIntoView({ behavior: 'smooth' });
+          sincronizarRutaDeVista('landing');
           return;
         }
         document.getElementById('view-dashboard').classList.remove('hidden');
@@ -69,6 +70,10 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       updateNavbar();
+
+      // T2.2 · La URL acompaña a la vista. Curso, módulo y lección llevan
+      // parámetros y se sincronizan desde el estado que fijan sus navegadores.
+      sincronizarRutaDeVista(view);
     }
 
     function updateNavbar() {
