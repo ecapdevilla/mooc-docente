@@ -247,7 +247,7 @@ aparecen por separado, con números de línea reales.
   simulacro.
 - Suites jsdom: `spa-ui`, `spa-acciones`, `spa-ruta`, `learning-experience`,
   `lesson-quiz-spa`, `admin-pilot-diagnostic-ui` y `ui-design`.
-- Comando completo: `npm test` (23 suites, 168 pruebas) con `DATABASE_URL` y
+- Comando completo: `npm test` (25 suites, 193 pruebas) con `DATABASE_URL` y
   `JWT_SECRET` definidos. Detalle del entorno en la sección 8.
 
 ## 7. Despliegue
@@ -323,9 +323,10 @@ Pendiente (no bloquea nada de lo anterior):
 - **Framework**: solo se evaluará por vista y con criterios escritos, cuando el
   router y el manejo de eventos ya estén resueltos. Migrar ahora no resuelve el
   cuello de botella real, que es contenido y evaluación final por curso.
-- **Evaluación final por curso**: el SPA no tiene examen final de curso; ese
-  contrato (`GET/POST /api/v1/courses/:id/assessment`) y el umbral de aprobación
-  quedan para la siguiente fase.
+- **Evaluación final por curso**: contrato de backend hecho en T2.4
+  (`GET/POST /api/v1/courses/:id/assessment`, umbral en
+  `COURSE_ASSESSMENT_PASSING_SCORE`); falta la vista del SPA y la decisión del
+  umbral definitivo. Ver la sección 11.
 
 ## 10. Evidencia de la Etapa 1 (2026-11-02)
 
@@ -420,3 +421,36 @@ Pendiente (no bloquea nada de lo anterior):
   `application/javascript`; `/styles/app.css` → 200 `text/css`; `/health` reporta
   `commit: fe7770c`. El HTML, `ruta.js` y `principal.js` servidos tienen el mismo
   SHA-256 que el repositorio al normalizar CRLF.
+
+## 11. Backend del examen final por curso (T2.4, 2026-11-02)
+
+Contrato completo en `docs/evaluacion-final-por-curso.md`. Resumen:
+
+- `src/services/courseAssessment.js`: lectura del banco del curso, agrupación de
+  preguntas con sus opciones, calificación contra `quiz_options.es_correcta`,
+  umbral configurable (`COURSE_ASSESSMENT_PASSING_SCORE`, 80 % por defecto),
+  requisito opcional de lecciones (`COURSE_ASSESSMENT_REQUIRES_LESSONS`),
+  desempeño por lección y áreas prioritarias.
+- `src/routes/courses.js`: `GET /:id/assessment` (preguntas sin clave, umbral,
+  requisitos e historial de los últimos cinco intentos) y
+  `POST /:id/assessment/attempts` (validación, calificación, persistencia y
+  respuesta con `results`, `porLeccion` y `areasPrioritarias`).
+- `database/migrations/20261102_course_assessment.sql`: añade a `quiz_attempts`
+  `curso_id`, `alcance` (`diagnostico` | `evaluacion_curso`) y `aprobado`, más
+  el índice parcial `idx_quiz_attempts_usuario_curso`. Es aditiva, idempotente y
+  reversible; `database/schema.sql` ya refleja el estado final.
+- El cliente solo envía `answers: [{ questionId, optionId }]`; `puntaje`,
+  `aprobado` o resultados enviados por el cliente se ignoran. Cada envío crea un
+  intento nuevo con snapshot de pregunta y opción (historial append-only).
+- Sin migración aplicada, ambos endpoints responden `503` con mensaje explícito
+  en lugar de `500`.
+- Pruebas nuevas: `tests/course-assessment.test.js` (20, base simulada) y
+  `tests/course-assessment-db.test.js` (5, PostgreSQL real: banco del curso,
+  persistencia de `curso_id`/`alcance`/`aprobado`, historial y envío
+  incompleto).
+- Validación ejecutada: `node --check` en el servicio y la ruta; migración
+  aplicada dos veces sobre `merito_test_local` (`127.0.0.1:5433`) sin errores;
+  `npm test` → **25/25 suites y 193/193 pruebas**. No se tocó Supabase ni
+  Production.
+- Pendiente: vista `#/evaluacion/<curso>` en el SPA, umbral definitivo, insignia
+  solo al aprobar el examen final y banco verificado del curso #1.
