@@ -77,12 +77,15 @@ npx vercel --prod    # primer despliegue de producción
 | `GET https://<dominio>/js/vistas/evaluacion.js` | 200 `application/javascript` |
 | Matrícula en el formulario | Usuario nuevo en la tabla `users` de Supabase |
 
-Verificación ejecutada el 2026-11-02 sobre `https://mooc-docente.vercel.app`:
-`/health` → `commit: 9da930d`; `/` → 200, `Last-Modified` del despliegue, 19
-`<script src>`, contenedor `view-assessment`; `/js/vistas/evaluacion.js` → 200
-`application/javascript` (24.015 bytes); `/styles/app.css` → 200 `text/css`
-(99.126 bytes); `/api/v1/courses` → 200 `application/json`. La CSP del HTML
-estático se añadió después (ver sección 7).
+Verificación ejecutada el 2026-11-02 sobre `https://mooc-docente.vercel.app`
+(commit `6d3b3da`): `/health` → `commit: 6d3b3da`; `/` → 200 con 19
+`<script src>`, `Content-Security-Policy`, `X-Content-Type-Options: nosniff` y
+`Referrer-Policy: no-referrer`; `/js/vistas/evaluacion.js` → 200
+`application/javascript` (24.015 bytes); `/styles/app.css` → 200 `text/css`;
+`/api/v1/courses` → 200 `application/json`;
+`/api/v1/courses/1/assessment` → 401 (ruta publicada y protegida);
+`/diagnostico-piloto` → `Cache-Control: no-store`. La CSP del HTML estático se
+detalla en la sección 7.
 
 Si el formulario responde *"No pudimos conectar con el servidor"*, el SPA degradó a modo local y el problema está en la API (ver abajo).
 

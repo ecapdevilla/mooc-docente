@@ -49,16 +49,18 @@ archivos borrados.
 
 | Comprobación | Resultado |
 | --- | --- |
-| `GET https://mooc-docente.vercel.app/health` | `{"status":"ok",...,"commit":"9da930d"}` |
-| `GET /` | 200, `Last-Modified` del despliegue, 19 `<script src>`, `#view-assessment` |
+| `GET https://mooc-docente.vercel.app/health` | `{"status":"ok",...,"commit":"6d3b3da"}` |
+| `GET /` | 200, 19 `<script src>`, `#view-assessment`, CSP + `nosniff` + `no-referrer` |
+| `GET /indexInicial.html` | 200 con la misma CSP (ruta catch-all) |
 | `GET /js/vistas/evaluacion.js` | 200 `application/javascript` (24.015 bytes) |
-| `GET /styles/app.css` | 200 `text/css` (99.126 bytes) |
+| `GET /styles/app.css` | 200 `text/css` |
 | `GET /api/v1/courses` | 200 `application/json` |
+| `GET /api/v1/courses/1/assessment` | 401 (ruta publicada y protegida) |
+| `GET /diagnostico-piloto` | `Cache-Control: no-store` |
 
-La CSP del HTML estático se añadió después de esa sonda: se comprueba con
-`curl -sI https://mooc-docente.vercel.app/` y debe aparecer
-`Content-Security-Policy` con `script-src-attr 'none'`. La cadena exacta y su
-paridad con Helmet están en `docs/deploy-vercel.md`, sección 7.
+La CSP del HTML estático se detalla en `docs/deploy-vercel.md`, sección 7. Ojo:
+con `builds` + `routes` el arreglo `headers` de nivel superior se ignora; las
+cabeceras van dentro de cada ruta.
 
 ## 3. Pendiente, en orden
 

@@ -97,9 +97,10 @@ git push origin v0.2.0
 ## 6. Estado de la migración a este modelo (2026-11-02)
 
 - Hasta hoy Vercel publicaba desde `recovery/integracion-20261031`. Los commits
-  `b775fc3`, `d86cbfe`, `be8b1c8`, `9da930d` y el de la T2.5 se publicaron así.
-- `main` se crea desde el commit verificado de la T2.5. Pasos que requieren la
-  cuenta del repositorio:
+  `be8b1c8`, `9da930d`, `5d6a811`, `db45957` y `6d3b3da` se publicaron así; el
+  último es el que sirve la T2.5 con CSP y está verificado (`/health`).
+- `main` se crea en `6d3b3da` con el tag `v0.2.0`. Pasos que requieren la cuenta
+  del repositorio:
   1. GitHub → *Settings → Branches* → cambiar la rama por defecto a `main`.
   2. GitHub → *Settings → Branches* → regla de protección para `main` (PR
      obligatorio, checks requeridos, sin force-push, sin borrar).
