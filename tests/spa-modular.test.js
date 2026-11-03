@@ -4,7 +4,10 @@
  * `indexInicial.html` ya no contiene estilos ni lógica en línea: enlaza
  * `public/styles/app.css` y carga en orden los archivos de `public/js/`.
  * Esta suite protege ese contrato para que el HTML no vuelva a convertirse en
- * aplicación, hoja de estilos y fuente de datos al mismo tiempo.
+ * aplicación, hoja de estilos y fuente de datos al mismo tiempo. Desde la T2.5
+ * también comprueba que no reaparezca el frontend duplicado (`index.html`,
+ * `app.js`, `public/api-client.js`, `public/auth.js`) y que la CSP que declara
+ * `vercel.json` sea la misma que sirve Express.
  */
 
 const fs = require('fs');
@@ -136,5 +139,39 @@ describe('Etapa 1 · SPA modularizado', () => {
 
     const cacheables = VERCEL.headers.filter((header) => /^\/(js|styles)\/\(\.\*\)$/.test(header.source));
     expect(cacheables).toHaveLength(2);
+  });
+
+  test('T2.5 · el frontend duplicado ya no existe ni se publica', () => {
+    ['index.html', 'app.js', 'public/api-client.js', 'public/auth.js'].forEach((relativo) => {
+      expect(fs.existsSync(path.join(RAIZ, relativo))).toBe(false);
+    });
+
+    const referencias = [
+      ...VERCEL.builds.map((build) => build.src),
+      ...VERCEL.routes.map((ruta) => `${ruta.src} ${ruta.dest}`),
+    ].join(' ');
+
+    expect(referencias).not.toMatch(/index\.html|app\.js|api-client|auth\.js/);
+  });
+
+  test('la CSP del HTML estático es la misma que sirve Express', async () => {
+    const cspDeVercel = (fuente) => {
+      const entrada = VERCEL.headers.find((header) => header.source === fuente);
+      const cabecera = (entrada ? entrada.headers : []).find(
+        (header) => header.key === 'Content-Security-Policy'
+      );
+
+      return cabecera && cabecera.value;
+    };
+
+    // Production sirve el HTML desde la capa estática de Vercel, que no pasa por
+    // Helmet. Sin esta cabecera, la CSP solo aplicaba a `npm run dev` y a la
+    // función serverless. Comparar con Express evita que ambas capas se separen.
+    const respuesta = await api.get('/');
+    const cspExpress = respuesta.headers['content-security-policy'];
+
+    expect(cspExpress).toContain("script-src-attr 'none'");
+    expect(cspDeVercel('/')).toBe(cspExpress);
+    expect(cspDeVercel('/indexInicial.html')).toBe(cspExpress);
   });
 });

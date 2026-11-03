@@ -34,8 +34,6 @@ Mooc-Docente/
 │   ├── utils/           # Validators, helpers
 │   └── server.js        # Entry point
 ├── public/              # Frontend assets
-│   ├── api-client.js
-│   ├── auth.js
 │   ├── styles/
 │   │   └── app.css      # Hoja de estilos del SPA (Etapa 1)
 │   └── js/              # SPA modular (Etapa 1): scripts clásicos en orden

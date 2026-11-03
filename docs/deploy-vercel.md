@@ -5,15 +5,19 @@ Guía operativa para publicar el frontend (`indexInicial.html`) y la API Express
 Arquitectura del despliegue:
 
 ```
-Vercel (estático)  ->  indexInicial.html, index.html, app.js, public/** (js/**, styles/app.css, api-client.js, auth.js)
+Vercel (estático)  ->  indexInicial.html, diagnosticoPiloto.html, public/** (js/**, styles/app.css, diagnosticoPiloto.js|css)
 Vercel (función)   ->  api/index.js  ->  src/server.js (Express)  ->  Supabase (PostgreSQL)
 ```
+
+`indexInicial.html` es la única entrada del frontend desde la T2.5 (2026-11-02):
+`index.html`, `app.js`, `public/api-client.js` y `public/auth.js` ya no existen ni
+se publican.
 
 ## 1. Antes de desplegar (local)
 
 ```bash
 npm install
-npm test          # 26 suites / 196 pruebas en verde (requiere DATABASE_URL y JWT_SECRET)
+npm test          # 26 suites / 198 pruebas en verde (requiere DATABASE_URL y JWT_SECRET)
 npm run db:preparar  # idempotente; esquema + migraciones si la base está vacía
 npm run seed
 npm run dev       # http://localhost:3000/
@@ -65,10 +69,20 @@ npx vercel --prod    # primer despliegue de producción
 | Comprobación | Resultado esperado |
 | --- | --- |
 | `GET https://<dominio>/` | SPA con navbar, hero y formulario de matrícula |
+| `GET https://<dominio>/health` | `{"status":"ok",...,"commit":"<sha>"}` con el SHA publicado |
 | `GET https://<dominio>/api/v1` | `{"status":"ok","api":"MéritoDocente","version":"v1"}` |
 | `GET https://<dominio>/api/v1/ping/health` | `{"status":"ok","db":"connected"}` |
 | `GET https://<dominio>/api/v1/courses` | 2 cursos |
+| Cabeceras de `GET /` | `Content-Security-Policy` con `script-src-attr 'none'` y `script-src 'self'` |
+| `GET https://<dominio>/js/vistas/evaluacion.js` | 200 `application/javascript` |
 | Matrícula en el formulario | Usuario nuevo en la tabla `users` de Supabase |
+
+Verificación ejecutada el 2026-11-02 sobre `https://mooc-docente.vercel.app`:
+`/health` → `commit: 9da930d`; `/` → 200, `Last-Modified` del despliegue, 19
+`<script src>`, contenedor `view-assessment`; `/js/vistas/evaluacion.js` → 200
+`application/javascript` (24.015 bytes); `/styles/app.css` → 200 `text/css`
+(99.126 bytes); `/api/v1/courses` → 200 `application/json`. La CSP del HTML
+estático se añadió después (ver sección 7).
 
 Si el formulario responde *"No pudimos conectar con el servidor"*, el SPA degradó a modo local y el problema está en la API (ver abajo).
 
@@ -84,4 +98,40 @@ Si el formulario responde *"No pudimos conectar con el servidor"*, el SPA degrad
 
 - El simulacro gratuito sin registro (Fase 2 del roadmap) todavía no existe en el SPA.
 - `docs/swagger.yaml` no existe, por lo que `/api-docs` no se monta.
-- `index.html` y `app.js` son la integración provisional que se retirará.
+- La migración `20261102_course_assessment.sql` no está aplicada en Supabase: en
+  producción, `GET /api/v1/courses/:id/assessment` responde `503`.
+- GitHub y Vercel siguen apuntando a `recovery/integracion-20261031` como rama
+  publicada; el cambio a `main` está descrito en `docs/estrategia-ramas.md`.
+
+## 7. CSP del HTML estático (T2.5, 2026-11-02)
+
+La SPA no la sirve Express en producción, sino la capa estática de Vercel, que no
+pasa por Helmet. Por eso la CSP se declara dos veces:
+
+| Capa | Dónde | Cuándo aplica |
+| --- | --- | --- |
+| Express (Helmet) | `src/server.js` | `npm run dev`, `npm start` y la función serverless |
+| Vercel (estático) | `vercel.json` → `headers` para `/` y `/indexInicial.html` | Production y Preview |
+
+Valor publicado (idéntico al que genera Helmet con la configuración actual):
+
+```text
+script-src-attr 'none';default-src 'self';base-uri 'self';font-src 'self' https: data:;
+form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';
+script-src 'self';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+```
+
+Junto con la CSP se envían `X-Content-Type-Options: nosniff` y
+`Referrer-Policy: no-referrer`. Las dos directivas que más limitan el código son:
+
+- `script-src 'self'`: no hay `<script>` en línea ni `eval`; todo el JS vive en
+  `public/js/**`. Los CDN de Font Awesome y Google Fonts entran por `style-src
+  https:` y `font-src https:`.
+- `script-src-attr 'none'`: ningún atributo `on*`; las acciones viajan como
+  `data-action` y las resuelve `public/js/nucleo/acciones.js`.
+
+`tests/spa-modular.test.js` compara la cabecera de `vercel.json` con la que
+responde Express en `GET /`: si Helmet cambia y `vercel.json` no, la suite falla
+antes de publicar. Si se define `window.MERITO_API_BASE` hacia otro origen, hay
+que añadir ese origen a `connect-src` en ambos lugares (hoy cae en
+`default-src 'self'`).

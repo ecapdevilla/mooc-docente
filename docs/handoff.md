@@ -1,8 +1,8 @@
 # Handoff — estado y siguientes pasos
 
 **Actualizado:** 2026-11-02
-**Rama:** `main` (repositorio `c:\Users\capde\mooc-docente-cursos-eval`)
-**Suites:** 26/26 suites y 196/196 pruebas en verde (`npx jest --maxWorkers=2`)
+**Rama de producción:** `main` (histórico publicado durante la reconstrucción: `recovery/integracion-20261031`)
+**Suites:** 26/26 suites y 198/198 pruebas en verde (`npx jest --maxWorkers=2`)
 **Base de desarrollo:** PostgreSQL local `meritodocente` (`127.0.0.1:5432`) preparada
 con `npm run db:preparar` + `npm run seed`. Supabase = producción, intacto.
 
@@ -29,33 +29,36 @@ Regla que no se debe romper: **el navegador nunca calcula puntaje ni aprobación
 Envía `{ answers: [{ questionId, optionId }] }` y muestra lo que responde el
 servidor. Detalle completo en `docs/evaluacion-final-por-curso.md`.
 
-## 2. Cambios sin commitear (primera acción)
+## 2. Qué está publicado (nada pendiente de commit)
 
-18 archivos en `cursos-eval` (14 modificados y 4 nuevos), verificados con
-`node --check`, `git diff --check` y la suite completa, pero **sin commit**:
+La T2.4 y la T2.5 están cerradas y publicadas; `git status` debe quedar limpio.
 
-```text
- M AGENTS.md
- M README.md
- M docs/arquitectura-frontend.md
- M docs/deploy-vercel.md
- M docs/evaluacion-final-por-curso.md
- M docs/roadmap.md
- M indexInicial.html
- M package.json
- M public/js/nucleo/acciones.js
- M public/js/nucleo/api.js
- M public/js/nucleo/ruta.js
- M public/js/nucleo/ui.js
- M public/js/vistas/curso.js
- M public/styles/app.css
-?? docs/handoff.md
-?? public/js/vistas/evaluacion.js
-?? scripts/preparar-base-local.js
-?? tests/course-assessment-spa.test.js
-```
+| Commit | Contenido |
+| --- | --- |
+| `be8b1c8` | T2.4: evaluación final por curso + `db:preparar` |
+| `9da930d` | `.env.example`: variables del examen final |
+| commit de T2.5 | Frontend único (`index.html`, `app.js`, `api-client.js`, `auth.js` retirados) + CSP en `vercel.json` + `docs/estrategia-ramas.md` |
 
-Mensaje sugerido: `feat(T2.4): evaluación final por curso en el SPA + db:preparar`.
+El commit de la T2.5 toca: `vercel.json`, `src/server.js`, `tests/spa-modular.test.js`,
+`tests/spa-dom.js`, `AGENTS.md`, `README.md`, `docs/arquitectura-frontend.md`,
+`docs/architecture.md`, `docs/deploy-vercel.md`, `docs/proyecto.md`,
+`docs/roadmap.md` y `docs/estrategia-ramas.md` (nuevo), además de los cuatro
+archivos borrados.
+
+## 2 bis. Despliegue verificado (2026-11-02)
+
+| Comprobación | Resultado |
+| --- | --- |
+| `GET https://mooc-docente.vercel.app/health` | `{"status":"ok",...,"commit":"9da930d"}` |
+| `GET /` | 200, `Last-Modified` del despliegue, 19 `<script src>`, `#view-assessment` |
+| `GET /js/vistas/evaluacion.js` | 200 `application/javascript` (24.015 bytes) |
+| `GET /styles/app.css` | 200 `text/css` (99.126 bytes) |
+| `GET /api/v1/courses` | 200 `application/json` |
+
+La CSP del HTML estático se añadió después de esa sonda: se comprueba con
+`curl -sI https://mooc-docente.vercel.app/` y debe aparecer
+`Content-Security-Policy` con `script-src-attr 'none'`. La cadena exacta y su
+paridad con Helmet están en `docs/deploy-vercel.md`, sección 7.
 
 ## 3. Pendiente, en orden
 
@@ -87,10 +90,14 @@ Mensaje sugerido: `feat(T2.4): evaluación final por curso en el SPA + db:prepar
 6. **Revisión visual en navegador** de la vista nueva a 1440 / 768 / 390 px
    (`npm run dev`, entrar a un curso → `Evaluación final`). Las pruebas jsdom
    validan contrato, no píxeles.
-7. **T2.5: frontend único.** Retirar `index.html` y `app.js`, dejando
-   `indexInicial.html` como única entrada (revisar `vercel.json` y `public/`).
-8. **CSP en `vercel.json`** para el HTML que sirve la capa estática (hoy la
-   directiva `script-src-attr 'none'` solo viaja en las respuestas de Express).
+7. ~~**T2.5: frontend único.** Retirar `index.html` y `app.js`, dejando
+   `indexInicial.html` como única entrada (revisar `vercel.json` y `public/`).~~
+   Hecho el 2026-11-02: también se retiraron `public/api-client.js` y
+   `public/auth.js`, con dos guardas en `tests/spa-modular.test.js`.
+8. ~~**CSP en `vercel.json`** para el HTML que sirve la capa estática (hoy la
+   directiva `script-src-attr 'none'` solo viaja en las respuestas de Express).~~
+   Hecho el 2026-11-02; se compara con la cabecera de Express en la suite. Detalle
+   en `docs/deploy-vercel.md`, sección 7.
 9. **Simulacro gratuito sin registro** y su calificación en backend
    (prioridad 4 de `AGENTS.md`).
 10. **Editor/importador de preguntas** desde Word para dejar de depender del seed
@@ -101,8 +108,11 @@ Mensaje sugerido: `feat(T2.4): evaluación final por curso en el SPA + db:prepar
 11. Aplicar `20261102_course_assessment.sql` en Supabase siguiendo
     `docs/carga-catalogo-production.md` (secciones 7.2 y 7.3, con respaldo y
     verificación de cascada). **No** se ha tocado producción.
-12. Verificar el despliegue en Vercel y la estrategia de ramas
-    (`docs/deploy-vercel.md`).
+12. ~~Verificar el despliegue en Vercel y la estrategia de ramas
+    (`docs/deploy-vercel.md`).~~ Verificado el 2026-11-02 (tabla §2 bis) y
+    estrategia definida en `docs/estrategia-ramas.md`. Quedan tres pasos de panel
+    que requieren la cuenta: rama por defecto `main` en GitHub, protección de
+    `main` y *Production Branch* de Vercel en `main`.
 
 ## 4. Lo que le toca a la persona (no al agente)
 
@@ -122,7 +132,7 @@ cd c:/Users/capde/mooc-docente-cursos-eval
 npm install
 npm run db:preparar     # idempotente; solo si la base está vacía o cambió una migración
 npm run seed            # idempotente
-npx jest --maxWorkers=2 # debe dar 26/26 suites y 196/196 pruebas
+npx jest --maxWorkers=2 # debe dar 26/26 suites y 198/198 pruebas
 ```
 
 Si la suite falla con `500` en las pruebas de UI o de API, la causa más probable
@@ -145,8 +155,8 @@ es que la base de `.env` esté vacía: repetir `db:preparar` y `seed`.
   `tests/admin-database-identity.test.js` apunta a un endpoint
   (`/api/v1/admin/database-identity`) que no existe aquí: no portarlo. Sus dos
   documentos de 2026-10-31 están superados por los de este repo: no copiarlos.
-- **`index.html` / `app.js`** siguen siendo la integración provisional; no añadir
-  funcionalidad nueva ahí, se retiran en T2.5.
+- **`index.html` / `app.js`**: retirados en la T2.5 (2026-11-02). Si reaparecen,
+  `tests/spa-modular.test.js` falla; no reintroducir una segunda integración.
 
 ## 7. Documentos por tema
 
@@ -157,6 +167,7 @@ es que la base de `.env` esté vacía: repetir `db:preparar` y `seed`.
 | Quiz de lección y calificación segura | `docs/calificacion-segura-cuestionarios.md` |
 | Catálogo, contenido y correspondencia SPA↔BD | `docs/inventario-academico-tres-cursos.md`, `docs/catalogo-contenido-auditoria.md` |
 | Despliegue y variables | `docs/deploy-vercel.md` |
+| Ramas, PR, tags, reversión y cambio a `main` | `docs/estrategia-ramas.md` |
 | Carga a producción | `docs/carga-catalogo-production.md` |
 | Hoja de ruta completa | `docs/roadmap.md` |
 

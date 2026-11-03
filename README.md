@@ -5,7 +5,13 @@ Plataforma MOOC para preparación de concursos de méritos docentes con cursos, 
 ## Estado y pendientes
 
 El estado vigente, lo que falta por prioridad y lo que requiere decisión humana
-están en `docs/handoff.md`; el contexto operativo para agentes, en `AGENTS.md`.
+están en `docs/handoff.md`; el contexto operativo para agentes, en `AGENTS.md`;
+el modelo de ramas y de publicación, en `docs/estrategia-ramas.md`.
+
+- Rama de producción: `main` (histórico de la reconstrucción:
+  `recovery/integracion-20261031`).
+- Producción: <https://mooc-docente.vercel.app> — despliegue verificado el
+  2026-11-02 (ver `docs/deploy-vercel.md`).
 
 ## Requisitos previos
 

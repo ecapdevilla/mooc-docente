@@ -328,9 +328,11 @@ Pendiente (no bloquea nada de lo anterior):
   `#/leccion` use el índice de la lección en el curso (los alias por id de la API
   cubren el enlace estable) y que el estado del simulacro en curso no se
   reconstruya al recargar `#/diagnostico`: se vuelve a pedir el cuestionario.
-- **Frontends duplicados**: `index.html` + `app.js` (28 KB) siguen publicados como
-  integración provisional; `diagnosticoPiloto.html` es una página aparte. Retirarlos
-  y unificar el diagnóstico es una tarea propia, con prueba de regresión.
+- **Frontends duplicados**: resuelto en la T2.5 (2026-11-02). `index.html`,
+  `app.js`, `public/api-client.js` y `public/auth.js` se retiraron, junto con sus
+  rutas de Express y `vercel.json`; `tests/spa-modular.test.js` impide
+  reintroducirlos. `diagnosticoPiloto.html` sigue siendo una página aparte del
+  piloto, documentada en su propio flujo.
 - **Framework**: solo se evaluará por vista y con criterios escritos, cuando el
   router y el manejo de eventos ya estén resueltos. Migrar ahora no resuelve el
   cuello de botella real, que es contenido y evaluación final por curso.
@@ -466,3 +468,28 @@ Contrato completo en `docs/evaluacion-final-por-curso.md`. Resumen:
   pruebas**. No se tocó Supabase ni Production.
 - Pendiente: umbral definitivo, insignia solo al aprobar el examen final y banco
   verificado del curso #1.
+
+## 12. T2.5 · frontend único y CSP estática (2026-11-02)
+
+Cierre de la etapa de consolidación: `indexInicial.html` es la única entrada.
+
+- **Retirados:** `index.html`, `app.js`, `public/api-client.js` y
+  `public/auth.js`. Con ellos se fueron las rutas `GET /index.html` y
+  `GET /app.js` de `src/server.js`, las entradas de `builds`/`routes` de
+  `vercel.json` y la mención en el cargador de `tests/spa-dom.js`. No había otro
+  consumidor: el SPA usa `public/js/nucleo/api.js` y `public/js/nucleo/sesion.js`.
+- **CSP en la capa estática:** `vercel.json` declara `Content-Security-Policy`
+  para `/` y `/indexInicial.html`, además de `X-Content-Type-Options: nosniff` y
+  `Referrer-Policy: no-referrer`. El valor es el mismo que genera Helmet en
+  `src/server.js`, de modo que `npm run dev` y Production aplican la misma
+  política. Detalle en `docs/deploy-vercel.md`, sección 7.
+- **Guardas nuevas** en `tests/spa-modular.test.js` (10 pruebas): los cuatro
+  archivos no existen ni aparecen en `vercel.json`, y la CSP de Vercel coincide
+  carácter a carácter con la de `GET /` en Express.
+- **Validación:** `node --check src/server.js` y `tests/*.js` tocados; `vercel.json`
+  parseado con `require()`; `npx jest tests/spa-modular.test.js` → 10/10;
+  suite completa → 26/26 suites y 198/198 pruebas.
+- **Despliegue verificado** en `https://mooc-docente.vercel.app`: `/health`
+  reportó el SHA publicado, `/` 200 con 19 `<script src>`, `/js/vistas/evaluacion.js`
+  200 `application/javascript`, `/styles/app.css` 200 `text/css` y
+  `/api/v1/courses` 200.

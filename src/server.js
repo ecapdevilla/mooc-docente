@@ -120,8 +120,9 @@ app.get('/health', (req, res) => {
 });
 
 // Frontend estático
-// La SPA principal es indexInicial.html (ver docs/roadmap.md).
-// public/ expone /api-client.js y /auth.js en la raíz para la integración provisional.
+// La SPA principal es indexInicial.html (ver docs/roadmap.md) y es la única
+// entrada. La integración provisional (index.html, app.js, public/api-client.js
+// y public/auth.js) se retiró en la T2.5 (2026-11-02).
 const publicDir = path.join(__dirname, '..', 'public');
 const rootDir = path.join(__dirname, '..');
 
@@ -138,15 +139,6 @@ app.get('/', (req, res) => {
 
 app.get('/indexInicial.html', (req, res) => {
   res.sendFile(path.join(rootDir, 'indexInicial.html'));
-});
-
-// Integración provisional: se retira cuando la SPA principal esté conectada a la API.
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(rootDir, 'index.html'));
-});
-
-app.get('/app.js', (req, res) => {
-  res.sendFile(path.join(rootDir, 'app.js'));
 });
 
 // API documentation (if swagger exists)

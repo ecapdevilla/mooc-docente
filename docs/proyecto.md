@@ -8,7 +8,7 @@ MéritoDocente es una plataforma MOOC (en línea) para la preparación de concur
 
 - **Backend**: Node.js 18+, Express 4, PostgreSQL (Supabase), JWT + bcryptjs.
 - **Base de datos**: Supabase PostgreSQL, pooler `aws-0-ca-central-1.pooler.supabase.com:6543` con `?sslmode=require&pgbouncer=true`.
-- **Frontend**: SPA vanilla HTML/CSS/JS en `indexInicial.html`, con `public/api-client.js` y `public/auth.js`.
+- **Frontend**: SPA vanilla HTML/CSS/JS en `indexInicial.html`, modularizada en `public/js/**` y `public/styles/app.css`. Desde la T2.5 (2026-11-02) no hay integración duplicada.
 - **Servidor**: `npm run dev` activo en `http://localhost:3000/`.
 - **Seed**: `npm run seed` ejecutado correctamente (`✅ Seed completed successfully`).
 - **API base**: `/api/v1`.

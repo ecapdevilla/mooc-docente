@@ -245,5 +245,5 @@ prioritarias y la retroalimentación devueltos por el servidor simulado.
   documento no contiene `es_correcta` ni explicaciones antes del envío y que el
   `POST` solo lleva `questionId`/`optionId`; el veredicto, las áreas
   prioritarias y la retroalimentación se toman de la respuesta del servidor.
-- Suite completa: **26/26 suites y 196/196 pruebas**.
+- Suite completa: **26/26 suites y 198/198 pruebas** (la T2.5 sumó dos guardas en `tests/spa-modular.test.js`).
 - No se tocó Supabase ni Production.

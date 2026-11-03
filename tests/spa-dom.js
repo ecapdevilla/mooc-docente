@@ -38,8 +38,7 @@ class CargadorLocal extends ResourceLoader {
     }
 
     const esPublico =
-      /^\/(js|styles)\//.test(ruta) ||
-      /^\/(api-client|auth|diagnosticoPiloto)\.(js|css)$/.test(ruta);
+      /^\/(js|styles)\//.test(ruta) || /^\/diagnosticoPiloto\.(js|css)$/.test(ruta);
 
     if (!esPublico) return null;
 
