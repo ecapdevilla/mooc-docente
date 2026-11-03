@@ -37,7 +37,14 @@ La T2.4 y la T2.5 están cerradas y publicadas; `git status` debe quedar limpio.
 | --- | --- |
 | `be8b1c8` | T2.4: evaluación final por curso + `db:preparar` |
 | `9da930d` | `.env.example`: variables del examen final |
-| commit de T2.5 | Frontend único (`index.html`, `app.js`, `api-client.js`, `auth.js` retirados) + CSP en `vercel.json` + `docs/estrategia-ramas.md` |
+| `5d6a811` | T2.5: frontend único + CSP + `docs/estrategia-ramas.md` |
+| `db45957` | CSP por ruta (el arreglo `headers` de nivel superior no se aplicaba) |
+| `6d3b3da` | Limpieza: cabeceras solo por ruta, sin arreglo ignorado |
+| `3e88b78`, `6195bcc` | Evidencia del despliegue y aclaración de ramas/tag |
+
+`main` y `recovery/integracion-20261031` apuntan al mismo commit (`6195bcc`), con
+el tag anotado `v0.2.0`. Vercel sigue publicando desde `recovery/...` hasta que se
+cambie la *Production Branch* (ver `docs/estrategia-ramas.md`, sección 6).
 
 El commit de la T2.5 toca: `vercel.json`, `src/server.js`, `tests/spa-modular.test.js`,
 `tests/spa-dom.js`, `AGENTS.md`, `README.md`, `docs/arquitectura-frontend.md`,
