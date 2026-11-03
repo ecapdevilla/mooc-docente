@@ -42,9 +42,10 @@ La T2.4 y la T2.5 están cerradas y publicadas; `git status` debe quedar limpio.
 | `6d3b3da` | Limpieza: cabeceras solo por ruta, sin arreglo ignorado |
 | `3e88b78`, `6195bcc` | Evidencia del despliegue y aclaración de ramas/tag |
 
-`main` y `recovery/integracion-20261031` apuntan al mismo commit (`6195bcc`), con
-el tag anotado `v0.2.0`. Vercel sigue publicando desde `recovery/...` hasta que se
-cambie la *Production Branch* (ver `docs/estrategia-ramas.md`, sección 6).
+`main` y `recovery/integracion-20261031` avanzan juntos; el tag anotado `v0.2.0`
+apunta al commit verificado `6195bcc`. Vercel sigue publicando desde
+`recovery/...` hasta que se cambie la *Production Branch* (ver
+`docs/estrategia-ramas.md`, sección 6).
 
 El commit de la T2.5 toca: `vercel.json`, `src/server.js`, `tests/spa-modular.test.js`,
 `tests/spa-dom.js`, `AGENTS.md`, `README.md`, `docs/arquitectura-frontend.md`,
