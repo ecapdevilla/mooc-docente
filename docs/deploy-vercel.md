@@ -111,7 +111,14 @@ pasa por Helmet. Por eso la CSP se declara dos veces:
 | Capa | Dónde | Cuándo aplica |
 | --- | --- | --- |
 | Express (Helmet) | `src/server.js` | `npm run dev`, `npm start` y la función serverless |
-| Vercel (estático) | `vercel.json` → `headers` para `/` y `/indexInicial.html` | Production y Preview |
+| Vercel (estático) | `vercel.json` → `routes` legacy, cabeceras por ruta (`/` y `/(.*)`) | Production y Preview |
+
+> **Trampa comprobada (2026-11-02):** con `builds` + `routes` (config legacy),
+> Vercel **ignora** el arreglo `headers` de nivel superior. Las cabeceras solo se
+> aplican si se declaran dentro de cada ruta (`"headers": { ... }`). Se verificó
+> en Production: el `Cache-Control: no-store` de `/diagnostico-piloto` tampoco
+> llegaba y empezó a funcionar al moverlo a la ruta. `tests/spa-modular.test.js`
+> falla si se reintroduce el arreglo `headers`.
 
 Valor publicado (idéntico al que genera Helmet con la configuración actual):
 

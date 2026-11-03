@@ -155,6 +155,11 @@ es que la base de `.env` esté vacía: repetir `db:preparar` y `seed`.
   `tests/admin-database-identity.test.js` apunta a un endpoint
   (`/api/v1/admin/database-identity`) que no existe aquí: no portarlo. Sus dos
   documentos de 2026-10-31 están superados por los de este repo: no copiarlos.
+- **`headers` de nivel superior en `vercel.json`.** Con `builds` + `routes`
+  (config legacy) Vercel lo ignora: la cabecera nunca aparece en Production.
+  Comprobado el 2026-11-02 con la CSP y con el `no-store` de
+  `/diagnostico-piloto`. Las cabeceras van dentro de cada ruta
+  (`"headers": { ... }`) y `tests/spa-modular.test.js` falla si vuelve el arreglo.
 - **`index.html` / `app.js`**: retirados en la T2.5 (2026-11-02). Si reaparecen,
   `tests/spa-modular.test.js` falla; no reintroducir una segunda integración.
 

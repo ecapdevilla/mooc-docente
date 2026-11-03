@@ -479,10 +479,12 @@ Cierre de la etapa de consolidación: `indexInicial.html` es la única entrada.
   `vercel.json` y la mención en el cargador de `tests/spa-dom.js`. No había otro
   consumidor: el SPA usa `public/js/nucleo/api.js` y `public/js/nucleo/sesion.js`.
 - **CSP en la capa estática:** `vercel.json` declara `Content-Security-Policy`
-  para `/` y `/indexInicial.html`, además de `X-Content-Type-Options: nosniff` y
-  `Referrer-Policy: no-referrer`. El valor es el mismo que genera Helmet en
-  `src/server.js`, de modo que `npm run dev` y Production aplican la misma
-  política. Detalle en `docs/deploy-vercel.md`, sección 7.
+  dentro de las rutas legacy `/` y `/(.*)`, además de
+  `X-Content-Type-Options: nosniff` y `Referrer-Policy: no-referrer`. El valor es
+  el mismo que genera Helmet en `src/server.js`, de modo que `npm run dev` y
+  Production aplican la misma política. Ojo: con `builds` + `routes` el arreglo
+  `headers` de nivel superior se ignora; las cabeceras van por ruta. Detalle en
+  `docs/deploy-vercel.md`, sección 7.
 - **Guardas nuevas** en `tests/spa-modular.test.js` (10 pruebas): los cuatro
   archivos no existen ni aparecen en `vercel.json`, y la CSP de Vercel coincide
   carácter a carácter con la de `GET /` en Express.

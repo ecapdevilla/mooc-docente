@@ -45,47 +45,5 @@
         "Referrer-Policy": "no-referrer"
       }
     }
-  ],
-  "headers": [
-    {
-      "source": "/diagnostico-piloto",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
-      ]
-    },
-    {
-      "source": "/js/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/styles/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "script-src-attr 'none';default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-        },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "no-referrer" }
-      ]
-    },
-    {
-      "source": "/indexInicial.html",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "script-src-attr 'none';default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-        },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "no-referrer" }
-      ]
-    }
   ]
 }

@@ -137,8 +137,11 @@ describe('Etapa 1 · SPA modularizado', () => {
       expect.arrayContaining(['public/js/$1', 'public/styles/$1'])
     );
 
-    const cacheables = VERCEL.headers.filter((header) => /^\/(js|styles)\/\(\.\*\)$/.test(header.source));
+    const cacheables = VERCEL.routes.filter((ruta) => /^\/(js|styles)\/\(\.\*\)$/.test(ruta.src));
     expect(cacheables).toHaveLength(2);
+    cacheables.forEach((ruta) => {
+      expect(ruta.headers['Cache-Control']).toBe('public, max-age=0, must-revalidate');
+    });
   });
 
   test('T2.5 · el frontend duplicado ya no existe ni se publica', () => {
@@ -155,23 +158,24 @@ describe('Etapa 1 · SPA modularizado', () => {
   });
 
   test('la CSP del HTML estático es la misma que sirve Express', async () => {
-    const cspDeVercel = (fuente) => {
-      const entrada = VERCEL.headers.find((header) => header.source === fuente);
-      const cabecera = (entrada ? entrada.headers : []).find(
-        (header) => header.key === 'Content-Security-Policy'
-      );
+    // Con `builds` + `routes` (config legacy), Vercel ignora el arreglo
+    // `headers` de nivel superior: las cabeceras se declaran en cada ruta. Está
+    // comprobado en Production (2026-11-02) y documentado en
+    // docs/deploy-vercel.md, sección 7.
+    const cspDeRuta = (src) => {
+      const ruta = VERCEL.routes.find((entrada) => entrada.src === src);
+      const cabeceras = (ruta && ruta.headers) || {};
 
-      return cabecera && cabecera.value;
+      return cabeceras['Content-Security-Policy'];
     };
 
-    // Production sirve el HTML desde la capa estática de Vercel, que no pasa por
-    // Helmet. Sin esta cabecera, la CSP solo aplicaba a `npm run dev` y a la
-    // función serverless. Comparar con Express evita que ambas capas se separen.
     const respuesta = await api.get('/');
     const cspExpress = respuesta.headers['content-security-policy'];
 
     expect(cspExpress).toContain("script-src-attr 'none'");
-    expect(cspDeVercel('/')).toBe(cspExpress);
-    expect(cspDeVercel('/indexInicial.html')).toBe(cspExpress);
+    expect(VERCEL.headers).toBeUndefined();
+    expect(cspDeRuta('/')).toBe(cspExpress);
+    // El catch-all sirve `/indexInicial.html` y cualquier enlace profundo.
+    expect(cspDeRuta('/(.*)')).toBe(cspExpress);
   });
 });
