@@ -108,6 +108,9 @@
               <button class="btn btn-primary" type="button" data-action="open-lesson" data-course-id="${course.idSpa}" data-lesson-index="${course.nextLessonIndex}">
                 ${ctaLabel} <i class="fas fa-arrow-right" aria-hidden="true"></i>
               </button>
+              <button class="btn btn-outline" type="button" data-action="open-course-assessment" data-course-id="${course.idSpa}">
+                <i class="fas fa-file-circle-check" aria-hidden="true"></i> Evaluación final
+              </button>
               <a class="btn btn-ghost" href="#coursePath">Ver la ruta</a>
             </div>
           </div>

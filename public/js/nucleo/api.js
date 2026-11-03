@@ -40,6 +40,9 @@
       if (!response.ok) {
         const error = new Error((data && data.error) || `HTTP ${response.status}`);
         error.status = response.status;
+        // El cuerpo del error viaja con la excepción para que las vistas puedan
+        // mostrar datos accionables (por ejemplo, los requisitos de un 403).
+        error.data = data;
         throw error;
       }
 

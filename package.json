@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js",
     "test": "jest --verbose",
     "seed": "node src/seed/seed.js",
+    "db:preparar": "node scripts/preparar-base-local.js",
     "diagnostico:catalogo": "node scripts/diagnostico-catalogo.js",
     "carga:catalogo": "node scripts/generar-carga-catalogo.js",
     "contenido:catalogo": "node scripts/auditar-contenido-catalogo.js"

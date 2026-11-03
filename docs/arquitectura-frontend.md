@@ -61,7 +61,8 @@ public/js/
 │   ├── curso-modelo.js      # modelo de presentación curso → módulo → lección
 │   ├── curso.js             # vista de curso (#view-course)
 │   ├── modulo.js            # vista de módulo (#view-module)
-│   └── leccion.js           # vista de lección, actividad y progreso (#view-lesson)
+│   ├── leccion.js           # vista de lección, actividad y progreso (#view-lesson)
+│   └── evaluacion.js        # examen final del curso (#view-assessment)
 └── principal.js             # init(): restaura sesión y arranca la interfaz
 ```
 
@@ -74,7 +75,8 @@ public/js/
 3. `admin/diagnostico-editor.js`, `admin/diagnostico-inicio.js`
 4. `nucleo/sesion.js`
 5. `vistas/quiz-diagnostico.js`, `vistas/acceso.js`, `vistas/dashboard.js`,
-   `vistas/curso-modelo.js`, `vistas/curso.js`, `vistas/modulo.js`, `vistas/leccion.js`
+   `vistas/curso-modelo.js`, `vistas/curso.js`, `vistas/modulo.js`, `vistas/leccion.js`,
+   `vistas/evaluacion.js`
 6. `nucleo/modales.js`, `nucleo/acciones.js`, `nucleo/ruta.js`
 7. `principal.js` (registra la delegación, ejecuta `init()` y arranca el router
    cuando la sesión ya está resuelta)
@@ -159,6 +161,7 @@ vista tiene una ruta y el router la aplica leyendo `location.hash`:
 | `#/curso/<curso>` | vista de curso | `<curso>` es el id de `MODULES` (`mod1`…) |
 | `#/modulo/<curso>[/<módulo>]` | vista de módulo | `<módulo>` es el id de la API; sin él, el primero |
 | `#/leccion/<curso>/<índice>` | vista de lección | índice 0-based, como `state.currentLesson` |
+| `#/evaluacion/<curso>` | evaluación final del curso | requiere sesión; el servidor califica y decide el veredicto |
 | `#/diagnostico` | simulacro del panel | abre el panel y conserva la ruta al recargar |
 | `#/admin/diagnostico` | editor de preguntas | solo rol `admin` |
 
@@ -245,9 +248,14 @@ aparecen por separado, con números de línea reales.
   `hashchange` manual, la navegación programática de curso/módulo/lección, el
   botón atrás real (`history.back()`), los alias por id de la API y la ruta del
   simulacro.
-- Suites jsdom: `spa-ui`, `spa-acciones`, `spa-ruta`, `learning-experience`,
-  `lesson-quiz-spa`, `admin-pilot-diagnostic-ui` y `ui-design`.
-- Comando completo: `npm test` (25 suites, 193 pruebas) con `DATABASE_URL` y
+- `tests/course-assessment-spa.test.js` (T2.4) protege la vista del examen final:
+  botón del curso → `#/evaluacion/<curso>`, preguntas sin `es_correcta` ni
+  explicaciones, `POST` con solo `questionId`/`optionId` y resultado pintado con
+  el veredicto del servidor.
+- Suites jsdom: `spa-ui`, `spa-acciones`, `spa-ruta`, `course-assessment-spa`,
+  `learning-experience`, `lesson-quiz-spa`, `admin-pilot-diagnostic-ui` y
+  `ui-design`.
+- Comando completo: `npm test` (26 suites, 196 pruebas) con `DATABASE_URL` y
   `JWT_SECRET` definidos. Detalle del entorno en la sección 8.
 
 ## 7. Despliegue
@@ -280,7 +288,9 @@ aparecen por separado, con números de línea reales.
 
 ## 8. Cómo reproducir la validación de la Etapa 1
 
-El checkout puede no tener `.env`. Con cualquier PostgreSQL 14+:
+El `.env` del checkout apunta a un PostgreSQL local (`meritodocente` en
+`127.0.0.1:5432`), que suele estar vacío tras un clon. Para una base aislada de
+pruebas, con cualquier PostgreSQL 14+:
 
 ```bash
 # 1. Base de pruebas aislada
@@ -288,9 +298,10 @@ docker run -d --name merito-test-db -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_USER=postgres -e POSTGRES_DB=merito_test_local -p 5433:5432 postgres:15
 
 # 2. Esquema, migraciones y seed
-psql "postgresql://postgres:postgres@localhost:5433/merito_test_local" -f database/schema.sql
-psql "postgresql://postgres:postgres@localhost:5433/merito_test_local" \
-  -f database/migrations/20261101_lesson_quiz_responses.sql
+#    `db:preparar` es idempotente: aplica database/schema.sql y las migraciones
+#    versionadas, y omite las del editor piloto (requieren tablas base que solo
+#    existen en Supabase) sin abortar.
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/merito_test_local" npm run db:preparar
 DATABASE_URL="postgresql://postgres:postgres@localhost:5433/merito_test_local" npm run seed
 
 # 3. Suite completa
@@ -444,13 +455,14 @@ Contrato completo en `docs/evaluacion-final-por-curso.md`. Resumen:
   intento nuevo con snapshot de pregunta y opción (historial append-only).
 - Sin migración aplicada, ambos endpoints responden `503` con mensaje explícito
   en lugar de `500`.
-- Pruebas nuevas: `tests/course-assessment.test.js` (20, base simulada) y
+- Pruebas nuevas: `tests/course-assessment.test.js` (20, base simulada),
   `tests/course-assessment-db.test.js` (5, PostgreSQL real: banco del curso,
   persistencia de `curso_id`/`alcance`/`aprobado`, historial y envío
-  incompleto).
-- Validación ejecutada: `node --check` en el servicio y la ruta; migración
-  aplicada dos veces sobre `merito_test_local` (`127.0.0.1:5433`) sin errores;
-  `npm test` → **25/25 suites y 193/193 pruebas**. No se tocó Supabase ni
-  Production.
-- Pendiente: vista `#/evaluacion/<curso>` en el SPA, umbral definitivo, insignia
-  solo al aprobar el examen final y banco verificado del curso #1.
+  incompleto) y `tests/course-assessment-spa.test.js` (3, jsdom: botón del
+  curso, ruta `#/evaluacion/<curso>`, preguntas sin clave y `POST` mínimo).
+- Validación ejecutada: `node --check` en el servicio, la ruta y los módulos del
+  SPA tocados; migración aplicada dos veces sobre `merito_test_local`
+  (`127.0.0.1:5433`) sin errores; `npm test` → **26/26 suites y 196/196
+  pruebas**. No se tocó Supabase ni Production.
+- Pendiente: umbral definitivo, insignia solo al aprobar el examen final y banco
+  verificado del curso #1.

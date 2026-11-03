@@ -46,6 +46,8 @@
       'open-course': (el) => openCourse(el.dataset.courseId),
       'open-module': (el) => openModule(el.dataset.courseId, accionNumero(el.dataset.moduleId)),
       'open-lesson': (el) => openLesson(el.dataset.courseId, accionNumero(el.dataset.lessonIndex)),
+      'open-course-assessment': (el) => window.openCourseAssessment(el.dataset.courseId),
+      'close-course-assessment': () => window.closeCourseAssessment(),
       'answer-quiz': (el) => answerQuiz(accionNumero(el.dataset.optionIndex)),
       'answer-api-quiz': (el) => answerApiQuiz(el.dataset.quizId, el.dataset.optionId),
       'complete-lesson': () => completeLessonFromFooter()

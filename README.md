@@ -2,6 +2,11 @@
 
 Plataforma MOOC para preparación de concursos de méritos docentes con cursos, evaluaciones tipo prueba y seguimiento de progreso.
 
+## Estado y pendientes
+
+El estado vigente, lo que falta por prioridad y lo que requiere decisión humana
+están en `docs/handoff.md`; el contexto operativo para agentes, en `AGENTS.md`.
+
 ## Requisitos previos
 
 - Node.js >= 18.x
@@ -21,9 +26,9 @@ npm install
 cp .env.example .env
 # Editar .env con tus credenciales de la base de datos
 
-# 4. Crear base de datos e importar schema
+# 4. Crear base de datos y aplicarle esquema + migraciones
 createdb meritodocente
-psql -d meritodocente -f database/schema.sql
+npm run db:preparar
 
 # 5. Poblar datos iniciales
 npm run seed

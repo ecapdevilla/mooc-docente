@@ -13,7 +13,9 @@ Vercel (función)   ->  api/index.js  ->  src/server.js (Express)  ->  Supabase 
 
 ```bash
 npm install
-npm test          # 25 suites / 193 pruebas en verde (requiere DATABASE_URL y JWT_SECRET)
+npm test          # 26 suites / 196 pruebas en verde (requiere DATABASE_URL y JWT_SECRET)
+npm run db:preparar  # idempotente; esquema + migraciones si la base está vacía
+npm run seed
 npm run dev       # http://localhost:3000/
 ```
 

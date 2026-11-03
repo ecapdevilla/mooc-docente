@@ -31,6 +31,8 @@
       document.getElementById('view-module').classList.add('hidden');
       document.getElementById('view-lesson').classList.add('hidden');
       document.getElementById('view-admin-diagnostic').classList.add('hidden');
+      const vistaEvaluacion = document.getElementById('view-assessment');
+      if (vistaEvaluacion) vistaEvaluacion.classList.add('hidden');
 
       if (view === 'landing') {
         document.getElementById('view-landing').classList.remove('hidden');
@@ -67,6 +69,16 @@
         loadAdminDiagnostic().catch((error) => {
           setAdminDiagnosticNotice(error.message || 'No se pudo cargar el módulo administrativo.');
         });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (view === 'assessment') {
+        // La evaluación final vive en su propia vista (T2.4): el contenedor se
+        // rellena con el estado que fijó openCourseAssessment.
+        if (!state.user) {
+          showView('dashboard');
+          return;
+        }
+        if (typeof renderAssessmentView === 'function') renderAssessmentView();
+        if (vistaEvaluacion) vistaEvaluacion.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       updateNavbar();

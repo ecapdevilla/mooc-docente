@@ -12,6 +12,7 @@
  *   #/curso/<curso>             vista de curso (curso = id de MODULES)
  *   #/modulo/<curso>[/<módulo>] vista de módulo (módulo = id de la API)
  *   #/leccion/<curso>/<índice>  vista de lección (índice 0-based, como en state)
+ *   #/evaluacion/<curso>        evaluación final del curso (T2.4)
  *   #/diagnostico               simulacro diagnóstico del panel
  *   #/admin/diagnostico         editor de preguntas (solo administradores)
  *
@@ -41,6 +42,7 @@
     const PREFIJO_CURSO = '#/curso/';
     const PREFIJO_MODULO = '#/modulo/';
     const PREFIJO_LECCION = '#/leccion/';
+    const PREFIJO_EVALUACION = '#/evaluacion/';
 
     /** Rutas de las vistas que no llevan parámetros. */
     const RUTAS_POR_VISTA = Object.freeze({
@@ -98,6 +100,11 @@
 
     function rutaDeLeccion(courseId, lessonIndex) {
       return `${PREFIJO_LECCION}${encodeURIComponent(courseId)}/${lessonIndex}`;
+    }
+
+    /** Evaluación final del curso (T2.4): `#/evaluacion/<curso>`. */
+    function rutaDeEvaluacion(courseId) {
+      return `${PREFIJO_EVALUACION}${encodeURIComponent(courseId)}`;
     }
 
     /* ------------------------------------------------------------
@@ -339,6 +346,17 @@
         return;
       }
 
+      if (seccion === 'evaluacion') {
+        if (!exigirSesion()) return;
+        const destino = primero && cursoValido(primero) ? primero : cursoDeRespaldo();
+        if (!destino) {
+          rutaSinDestino();
+          return;
+        }
+        window.openCourseAssessment(destino);
+        return;
+      }
+
       if (seccion === 'diagnostico') {
         if (!exigirSesion()) return;
         showView('dashboard');
@@ -402,6 +420,12 @@
           return;
         }
         sincronizarRuta(rutaDeLeccion(actual.moduleId, actual.lessonIndex));
+        return;
+      }
+
+      if (view === 'assessment') {
+        const curso = cursoDeRespaldo();
+        if (curso) sincronizarRuta(rutaDeEvaluacion(curso));
         return;
       }
 

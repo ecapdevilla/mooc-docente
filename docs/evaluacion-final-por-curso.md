@@ -1,7 +1,8 @@
 # Evaluación final por curso
 
-Estado: 2026-11-02. Contrato de backend implementado y probado en local; la
-migración **no** se ha ejecutado en Production ni se ha desplegado.
+Estado: 2026-11-02. Contrato de backend **y vista del SPA** implementados y
+probados en local; la migración **no** se ha ejecutado en Production ni se ha
+desplegado.
 
 ## 1. Problema y alcance
 
@@ -183,19 +184,54 @@ insignias.
 
 ## 7. Pendientes
 
-1. Vista del SPA para presentar el examen (`#/evaluacion/<curso>`), reutilizando
-   el patrón del simulacro: una pregunta por pantalla, envío único al final y
-   pantalla de resultados con `porLeccion` y `areasPrioritarias`.
-2. Aprobación del umbral definitivo y del requisito de lecciones.
-3. Insignia del curso **solo** al aprobar el examen final; hoy el backend no
+1. Aprobación del umbral definitivo y del requisito de lecciones.
+2. Insignia del curso **solo** al aprobar el examen final; hoy el backend no
    otorga insignias en este flujo.
-4. Cargar/verificar el banco del curso #1 antes de habilitar el examen en
+3. Cargar/verificar el banco del curso #1 antes de habilitar el examen en
    Production.
 
-## 8. Validación ejecutada (2026-11-02)
+## 8. Vista del SPA (`#/evaluacion/<curso>`)
 
-- `node --check` sin errores en `src/services/courseAssessment.js` y
-  `src/routes/courses.js`.
+Implementada el 2026-11-02 en `public/js/vistas/evaluacion.js`, con el mismo
+patrón que el simulacro: una pregunta por pantalla, indicador de avance,
+navegación anterior/siguiente y envío único al final.
+
+| Pieza | Archivo | Detalle |
+| --- | --- | --- |
+| Entrada | `public/js/vistas/curso.js` | Botón `Evaluación final` (`data-action="open-course-assessment"`) en el héroe del curso |
+| Estado | `public/js/vistas/evaluacion.js` | Objeto `assessment` con curso del SPA/API, preguntas, respuestas e índice |
+| Vista | `#view-assessment` en `indexInicial.html` | Contenedor `#assessmentView` con el mismo `lx-shell` de las demás vistas |
+| Ruta | `public/js/nucleo/ruta.js` | `#/evaluacion/<curso>`, con `rutaDeEvaluacion()` y sincronización al abrir/cerrar |
+| Acciones | `public/js/nucleo/acciones.js` | `open-course-assessment` y `close-course-assessment` |
+
+Reglas de la vista:
+
+- El navegador nunca calcula aciertos ni puntaje: envía
+  `{ answers: [{ questionId, optionId }] }` y muestra el veredicto del servidor.
+- No se muestra ninguna opción marcada como correcta antes del envío; la
+  explicación y el tema llegan en la respuesta del `POST`.
+- El resultado reutiliza las clases `diagnostic-*`: puntaje, umbral, desempeño
+  por tema (`porLeccion`), áreas prioritarias y retroalimentación por pregunta.
+- `403` con `requisitos` en el cuerpo: la vista pinta el avance real de
+  lecciones en lugar de un error genérico (por eso `apiFetch` adjunta
+  `error.data`).
+- Un curso local sin correspondencia en la API muestra un aviso y no llama al
+  endpoint.
+- Rutas de escape: `Reintentar` tras un error, `Repetir evaluación` al terminar
+  y `Volver al curso` en todos los estados.
+
+Prueba: `tests/course-assessment-spa.test.js` ejecuta el SPA real en jsdom,
+pulsa el botón del curso, verifica que la URL pasa a `#/evaluacion/<curso>`,
+que las preguntas se publican sin `es_correcta` ni explicaciones y que el `POST`
+solo lleva `questionId` y `optionId`; al final comprueba el veredicto, las áreas
+prioritarias y la retroalimentación devueltos por el servidor simulado.
+
+## 9. Validación ejecutada (2026-11-02)
+
+- `node --check` sin errores en `src/services/courseAssessment.js`,
+  `src/routes/courses.js` y los módulos del SPA tocados (`vistas/evaluacion.js`,
+  `vistas/curso.js`, `nucleo/api.js`, `nucleo/acciones.js`, `nucleo/ruta.js`,
+  `nucleo/ui.js`).
 - `tests/course-assessment.test.js` (20 pruebas, base simulada): contrato del
   `GET`, umbral configurable, `400/401/404/409/503`, calificación del servidor,
   rechazo de puntajes del cliente, snapshot y requisito de lecciones.
@@ -204,5 +240,10 @@ insignias.
   `alcance` y `aprobado`, historial y envío incompleto.
 - Migración aplicada dos veces sobre `merito_test_local`
   (`postgres:15`, `127.0.0.1:5433`) sin errores: es idempotente.
-- Suite completa: **25/25 suites y 193/193 pruebas**.
+- Prueba nueva de interfaz: `tests/course-assessment-spa.test.js` (3, jsdom)
+  pulsa el botón del curso, comprueba la ruta `#/evaluacion/<curso>`, que el
+  documento no contiene `es_correcta` ni explicaciones antes del envío y que el
+  `POST` solo lleva `questionId`/`optionId`; el veredicto, las áreas
+  prioritarias y la retroalimentación se toman de la respuesta del servidor.
+- Suite completa: **26/26 suites y 196/196 pruebas**.
 - No se tocó Supabase ni Production.

@@ -13,8 +13,8 @@ Este archivo es el contexto operativo mínimo para agentes de IA que trabajen en
 - API base: `/api/v1`.
 - Esquema de datos: `database/schema.sql`.
 - Datos iniciales: `src/seed/data.sql` y `src/seed/seed.js`, idempotentes. Las opciones de quiz se reconcilian al reejecutar el seed.
-- Base de datos de desarrollo: Supabase (pooler) mediante `DATABASE_URL` en `.env`.
-- Pruebas: `tests/` tiene 25 suites y 193 pruebas. Las de interfaz ejecutan el SPA real en jsdom con `tests/spa-dom.js` (resuelve `/js/**` y `/styles/**` desde disco); `tests/spa-modular.test.js` protege el contrato modular de la Etapa 1, `tests/spa-acciones.test.js` el de la delegación de eventos de la T2.1, `tests/spa-ruta.test.js` el del router por hash de la T2.2, `tests/course-assessment.test.js` el del examen final de curso de la T2.4 y `tests/learning-experience.test.js` corre sin base de datos con un doble de la API. `npm test` requiere `DATABASE_URL` y `JWT_SECRET`; este checkout no incluye `.env`, así que la suite se corre con el PostgreSQL local `merito_test_local` (ver `docs/arquitectura-frontend.md`, sección 8) o con la base de Supabase.
+- Base de datos de desarrollo: PostgreSQL local definido en `.env` (`meritodocente` en `127.0.0.1:5432`); Supabase (pooler) queda para producción y pruebas remotas. Tras un clon o una base vacía: `npm run db:preparar` y `npm run seed`.
+- Pruebas: `tests/` tiene 26 suites y 196 pruebas. Las de interfaz ejecutan el SPA real en jsdom con `tests/spa-dom.js` (resuelve `/js/**` y `/styles/**` desde disco); `tests/spa-modular.test.js` protege el contrato modular de la Etapa 1, `tests/spa-acciones.test.js` el de la delegación de eventos de la T2.1, `tests/spa-ruta.test.js` el del router por hash de la T2.2, `tests/course-assessment.test.js` y `tests/course-assessment-spa.test.js` el del examen final de curso de la T2.4 y `tests/learning-experience.test.js` corre sin base de datos con un doble de la API. `npm test` requiere `DATABASE_URL` y `JWT_SECRET`; si el checkout no trae `.env`, la suite se corre con el PostgreSQL local `merito_test_local` (ver `docs/arquitectura-frontend.md`, sección 8) o con la base de Supabase.
 - Servido local: `GET /` entrega `indexInicial.html`; `express.static(public)` sirve `/styles/app.css` y `/js/**`, y `public/` expone `/api-client.js` y `/auth.js` en la raíz.
 - Despliegue: `vercel.json` y `api/index.js` preparan frontend estático + API serverless. Aún no desplegado ni verificado en Vercel.
 - Git: repositorio inicializado, rama `main`, remoto `origin` apuntando a `https://github.com/ecapdevilla/mooc-docente.git`.
@@ -145,6 +145,11 @@ Evaluar Supabase Auth, Storage y Row Level Security únicamente después de esta
 
 ## Punto actual y siguiente acción
 
+> **Entrada rápida:** `docs/handoff.md` concentra el estado, lo que falta por
+> prioridad, lo que requiere decisión humana y las trampas conocidas. Las
+> entradas de estado que siguen son el registro cronológico; la vigente es la
+> última (T2.4).
+
 Estado (2026-09-16): Supabase conectado y operativo; seed canónico; bloqueos funcionales corregidos; 30 pruebas pasan; `indexInicial.html` registra e inicia sesión contra la API y guarda el progreso en PostgreSQL (con respaldo local si la API no responde); configuración de Vercel preparada pero sin desplegar. Las preguntas avanzadas están cargadas en Supabase mediante el seed. El dashboard ofrece el `Simulacro diagnóstico` como submódulo opcional; al abrirlo, se califica en backend y se guarda el intento.
 
 Estado (2026-11-01): se añadió el recorrido de aprendizaje curso → módulo → lección con el sistema `.lx-` en `indexInicial.html`; las tres vistas consumen módulos, lecciones y progreso reales de la API y declaran como "en preparación" lo que aún no tiene contenido. La suite `tests/learning-experience.test.js` (8 pruebas, sin base de datos) cubre estados, navegación y persistencia simulada. Pendiente de revisión visual en navegador a 1440/768/390 px y de decisión sobre la calificación del quiz de lección en backend.
@@ -155,9 +160,9 @@ Estado (2026-11-02, T2.1): la interfaz ya no usa manejadores en línea. Los 51 a
 
 Estado (2026-11-02, T2.2): el SPA tiene router por hash. `public/js/nucleo/ruta.js` es el 18.º archivo (431 líneas) y publica `#/`, `#/acceso`, `#/dashboard`, `#/curso/<curso>`, `#/modulo/<curso>[/<módulo>]`, `#/leccion/<curso>/<índice>`, `#/diagnostico` y `#/admin/diagnostico`. `showView` sincroniza la URL con `pushState` al final de cada render, y `hashchange`/`popstate` aplican atrás/adelante sin duplicar la vista. Los enlaces profundos protegidos sin sesión llevan a `#/acceso` con el modal abierto; las rutas inválidas caen al panel (con sesión) o al inicio. `iniciarRuta()` corre cuando `refreshSession()` ya resolvió, así que el enlace profundo encuentra la sesión y el `courseMap`. Suite completa: 23/23 suites y 168/168 pruebas (`tests/spa-ruta.test.js`, 15 pruebas, incluida `history.back()` real). Servidor real en 3107: `/` 200 con 18 scripts, 0 manejadores `on*` y `/js/nucleo/ruta.js` 200 `application/javascript`. Desplegado y verificado en Production (código en `fe7770c`; los commits posteriores solo tocan documentación): `/` sirve 18 scripts y 0 manejadores, `/js/nucleo/ruta.js` 200 `application/javascript` y el HTML, `ruta.js` y `principal.js` coinciden por SHA-256 al normalizar CRLF.
 
-Estado (2026-11-02, T2.4): el examen final de curso ya tiene contrato de backend. `GET /api/v1/courses/:id/assessment` publica las preguntas del curso sin clave, el umbral vigente, los requisitos de lecciones y los últimos cinco intentos; `POST /api/v1/courses/:id/assessment/attempts` califica en el servidor, aplica el umbral (`COURSE_ASSESSMENT_PASSING_SCORE`, 80 % por defecto), persiste el intento en `quiz_attempts` con `curso_id`, `alcance = 'evaluacion_curso'` y `aprobado`, y devuelve desempeño por lección y áreas prioritarias. La migración `20261102_course_assessment.sql` es aditiva e idempotente; mientras no esté aplicada, ambos endpoints responden `503`. Suite completa: 25/25 suites y 193/193 pruebas. No hay todavía vista en el SPA ni migración aplicada en Production.
+Estado (2026-11-02, T2.4): el examen final de curso tiene contrato de backend y vista en el SPA. `GET /api/v1/courses/:id/assessment` publica las preguntas del curso sin clave, el umbral vigente, los requisitos de lecciones y los últimos cinco intentos; `POST /api/v1/courses/:id/assessment/attempts` califica en el servidor, aplica el umbral (`COURSE_ASSESSMENT_PASSING_SCORE`, 80 % por defecto), persiste el intento en `quiz_attempts` con `curso_id`, `alcance = 'evaluacion_curso'` y `aprobado`, y devuelve desempeño por lección y áreas prioritarias. La migración `20261102_course_assessment.sql` es aditiva e idempotente; mientras no esté aplicada, ambos endpoints responden `503`. En el cliente, el botón `Evaluación final` del héroe del curso abre `#/evaluacion/<curso>` (`public/js/vistas/evaluacion.js`): una pregunta por pantalla, envío único de `{ questionId, optionId }`, resultado y retroalimentación tomados del servidor y `403` de requisitos pintado con el avance real. Suite completa: 26/26 suites y 196/196 pruebas. `tests/course-assessment-spa.test.js` cubre la vista; la migración no está aplicada en Production.
 
-Siguiente acción concreta: construir la vista `#/evaluacion/<curso>` del examen final y aprobar el umbral definitivo; después T2.5 (frontend único) y la CSP estática en `vercel.json`.
+Siguiente acción concreta: aprobar el umbral definitivo del examen final y cargar el banco verificado del curso #1; después T2.5 (frontend único) y la CSP estática en `vercel.json`.
 
 ## Comandos
 
@@ -166,10 +171,11 @@ npm install
 npm run dev       # nodemon src/server.js
 npm start         # node src/server.js
 npm run seed      # idempotente; requiere PostgreSQL y variables de entorno
-npm test          # 25 suites / 193 pruebas; requieren DATABASE_URL y JWT_SECRET (base local o Supabase)
+npm run db:preparar # idempotente; esquema + migraciones versionadas en la base de DATABASE_URL
+npm test          # 26 suites / 196 pruebas; requieren DATABASE_URL y JWT_SECRET (base local o Supabase)
 ```
 
-Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y `DATABASE_URL` + `JWT_SECRET` (en `.env` o como variables de entorno; el patrón está en `.env.example`). El servidor verifica la conexión a la base de datos antes de escuchar en el puerto. Con `npm run dev`, el SPA está en `http://localhost:3000/` y la API en `http://localhost:3000/api/v1`. Para reproducir el enrutado de Vercel en local: `npx vercel dev`. Este checkout no incluye `.env`: para correr la suite sin tocar Supabase, usar el PostgreSQL local `merito_test_local` documentado en `docs/arquitectura-frontend.md` (sección 8).
+Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y `DATABASE_URL` + `JWT_SECRET` (en `.env` o como variables de entorno; el patrón está en `.env.example`). El servidor verifica la conexión a la base de datos antes de escuchar en el puerto. Con `npm run dev`, el SPA está en `http://localhost:3000/` y la API en `http://localhost:3000/api/v1`. Para reproducir el enrutado de Vercel en local: `npx vercel dev`. Si la base de `.env` está vacía, `npm test` falla en las suites de API y UI: `npm run db:preparar` y `npm run seed` la dejan lista. Para correr la suite sin tocar Supabase, usar el PostgreSQL local `merito_test_local` documentado en `docs/arquitectura-frontend.md` (sección 8).
 
 ## Mapa rápido
 
@@ -183,12 +189,14 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y `DATABASE_URL` + `JW
 - `public/styles/app.css`: hoja de estilos única del SPA (tokens y componentes `.lx-`).
 - `public/js/datos/modulos.js`: `const MODULES`, fuente del catálogo, las lecciones y los quizzes del frontend.
 - `public/js/nucleo/`: estado, vista/navbar, cliente de API, sesión y progreso, modales, `acciones.js` (registro `data-action` + oyente delegado) y `ruta.js` (router por hash).
-- `public/js/vistas/`: una vista por archivo (acceso, dashboard, curso, módulo, lección, simulacro).
+- `public/js/vistas/`: una vista por archivo (acceso, dashboard, curso, módulo, lección, evaluación final, simulacro).
 - `public/js/admin/`: editor administrativo del diagnóstico piloto.
 - `public/js/principal.js`: `init()` del SPA; se carga al final.
 - `tests/spa-dom.js`: cargador jsdom del SPA modular (sirve `/js/**` y `/styles/**` desde disco).
 - `tests/spa-modular.test.js`: guardián del contrato de la Etapa 1.
 - `tests/spa-ruta.test.js`: guardián del router por hash (T2.2): rutas, redirecciones y navegación real en jsdom.
+- `tests/course-assessment-spa.test.js`: guardián de la vista del examen final (T2.4) en jsdom.
+- `docs/handoff.md`: estado actual, pendientes por prioridad, tareas humanas y trampas conocidas. Empezar por aquí al retomar.
 - `docs/arquitectura-frontend.md`: estructura, orden de carga, flujo de datos, recetas, pruebas y despliegue del frontend.
 - `docs/inventario-academico-tres-cursos.md`: inventario A/B/C, contrato de la API, correspondencia SPA↔BD y modelo de presentación de curso, módulo y lección.
 - `tests/learning-experience.test.js`: integración sin base de datos del recorrido curso → módulo → lección con un doble de la API.
@@ -210,7 +218,8 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y `DATABASE_URL` + `JW
 - Frontend modular (Etapa 1): no introducir `<style>` ni `<script>` con lógica en línea en `indexInicial.html`; los estilos van a `public/styles/app.css` y el código a `public/js/**` como scripts clásicos. El orden de carga importa y `principal.js` va al final. No usar `type="module"` (jsdom no ejecuta módulos ES) ni redeclarar nombres entre archivos (comparten ámbito global).
 - Contenido del catálogo: `MODULES` se edita en `public/js/datos/modulos.js`; después se ejecutan `npm run contenido:catalogo` y `npm run carga:catalogo` para auditar y regenerar `database/loads/`. `tests/spa-modular.test.js` debe pasar.
 - CSP: `src/server.js` sirve `script-src 'self'` y `script-src-attr 'none'`. El marcado no admite atributos `on*`: cada control declara `data-action` y su entrada en `public/js/nucleo/acciones.js`; el oyente delegado aplica `preventDefault()` y lee los parámetros de `data-*`. No añadir `<script>` en línea ni `eval`/`new Function` (las suites lo impiden).
-- Router por hash (T2.2): las URLs son `#/`, `#/acceso`, `#/dashboard`, `#/curso/<curso>`, `#/modulo/<curso>[/<módulo>]`, `#/leccion/<curso>/<índice>`, `#/diagnostico` y `#/admin/diagnostico`. `showView` es el único punto que sincroniza la URL (con `pushState`); `hashchange`/`popstate` aplican atrás/adelante con `replaceState` durante la aplicación. Los alias `#/modulo/<id API>` y `#/leccion/<id API>` se resuelven con `state.courseMap` y se canonizan. Una vista nueva debe declarar su ruta en `nucleo/ruta.js` y quedar cubierta por `tests/spa-ruta.test.js`.
+- Router por hash (T2.2): las URLs son `#/`, `#/acceso`, `#/dashboard`, `#/curso/<curso>`, `#/modulo/<curso>[/<módulo>]`, `#/leccion/<curso>/<índice>`, `#/evaluacion/<curso>`, `#/diagnostico` y `#/admin/diagnostico`. `showView` es el único punto que sincroniza la URL (con `pushState`); `hashchange`/`popstate` aplican atrás/adelante con `replaceState` durante la aplicación. Los alias `#/modulo/<id API>` y `#/leccion/<id API>` se resuelven con `state.courseMap` y se canonizan. Una vista nueva debe declarar su ruta en `nucleo/ruta.js` y quedar cubierta por `tests/spa-ruta.test.js`.
+- Evaluación final por curso (T2.4): `GET /api/v1/courses/:id/assessment` publica preguntas sin clave y `POST …/assessment/attempts` califica en el servidor. El cliente envía solo `{ answers: [{ questionId, optionId }] }` y nunca calcula puntaje ni aprobación; el `403` de requisitos trae `requisitos` en el cuerpo y se lee desde `error.data`. Detalle en `docs/evaluacion-final-por-curso.md`.
 - Mapeo SPA ↔ API: `public/js/datos/modulos.js` aporta los módulos del prototipo y `nucleo/sesion.js` (`loadCourseMap`) los empareja con cada curso por título, resuelve las lecciones por orden (`modulos[].lecciones[]`) y guarda cada lección completada con `POST /api/v1/progress/lesson/:id`. `GET /api/v1/progress` entrega, por módulo, `lessons` con `completada`.
 - Origen de la API en el SPA: `window.MERITO_API_BASE` si está definido; si no, `origen actual + /api/v1`; si no, `http://localhost:3000/api/v1` (apertura con `file://`). Si la API no responde, el SPA degrada a modo local y avisa al usuario.
 - Claves de `localStorage` compartidas: `auth_token` y `user`.
@@ -218,7 +227,7 @@ Requisitos de ejecución: Node.js >= 18, PostgreSQL >= 14 y `DATABASE_URL` + `JW
 
 ## Protocolo de trabajo para agentes
 
-1. Leer este archivo y el archivo directamente relacionado con la tarea.
+1. Leer `docs/handoff.md` (estado y pendientes) y este archivo, más el archivo directamente relacionado con la tarea.
 2. Formular una hipótesis local sobre la causa o el cambio requerido.
 3. Revisar solo un vecino: ruta, controlador, modelo, cliente o test relacionado.
 4. Hacer el cambio más pequeño que pruebe la hipótesis.
@@ -241,7 +250,7 @@ Bloqueos o decisiones pendientes:
 Siguiente acción concreta:
 ```
 
-El agente siguiente debe comenzar por `Siguiente acción concreta` y solo ampliar la exploración si la validación lo exige.
+El agente siguiente debe comenzar por `Siguiente acción concreta` y solo ampliar la exploración si la validación lo exige. Al cerrar una sesión, reflejar el resultado en `docs/handoff.md` (secciones 1 a 3) para que el relevo no dependa del historial de chat.
 
 ## Bloqueos 2026-11-01: catálogo y calificación segura
 
@@ -337,14 +346,14 @@ Estado (2026-11-01, local, sin commit ni despliegue):
 - Nada de esto se ejecutó en Production. Procedimiento definitivo, mapa de
   cascada y mitigaciones en `docs/carga-catalogo-production.md` (secciones 7.2
   y 7.3).
-- Nota de entorno: este checkout no tiene `.env`; las pruebas requieren
-  `DATABASE_URL` y `JWT_SECRET` en el entorno y una base con
-  `database/schema.sql`, el seed y
-  `database/migrations/20261101_lesson_quiz_responses.sql` y
-  `database/migrations/20261102_course_assessment.sql`. Con eso la suite
-  completa queda en 25/25 suites y 193/193 pruebas (`npx jest --maxWorkers=2`).
-  Validado el 2026-11-02 sobre `postgres:15` en Docker (puerto 5433) con una base
-  desechable; el procedimiento está en `docs/arquitectura-frontend.md` (sección 8).
+- Nota de entorno: la base de `.env` (`meritodocente` en `127.0.0.1:5432`) debe
+  tener `database/schema.sql`, las migraciones versionadas y el seed; en una base
+  vacía basta `npm run db:preparar` seguido de `npm run seed` (el script es
+  idempotente y omite las migraciones del editor piloto, cuyas tablas base solo
+  existen en Supabase). Con eso la suite completa queda en 26/26 suites y 196/196
+  pruebas (`npx jest --maxWorkers=2`). Validado el 2026-11-02 sobre `postgres:15`
+  en Docker (puerto 5433) con una base desechable; el procedimiento está en
+  `docs/arquitectura-frontend.md` (sección 8).
 
 ## Prioridades pendientes
 
@@ -353,6 +362,6 @@ Estado (2026-11-01, local, sin commit ni despliegue):
 3. ~~Crear Supabase y conectar PostgreSQL mediante `DATABASE_URL`.~~ Hecho.
 4. Implementar el simulacro gratuito sin registro y su calificación en backend.
 5. Crear editor, importar y publicar las primeras 50 preguntas desde Word.
-6. ~~Consolidar `indexInicial.html` como única SPA.~~ Etapa 1 hecha (2026-11-02): HTML solo con marcado, CSS en `public/styles/app.css`, lógica en `public/js/**` y guardián `tests/spa-modular.test.js`. T2.1 hecha: delegación de eventos (`data-action`) y CSP `script-src-attr 'none'`, con guardián `tests/spa-acciones.test.js`. T2.2 hecha: router por hash con URLs compartibles, botón atrás y enlaces profundos, con guardián `tests/spa-ruta.test.js`. T2.3 hecha: calificación del quiz de lección en backend (`POST /api/v1/quizzes/lessons/:lessonId/responses`). T2.4 hecha en backend: examen final por curso (`GET/POST /api/v1/courses/:id/assessment`) con umbral configurable y persistencia; falta su vista en el SPA. Pendiente T2.5 (retirar `index.html`/`app.js`).
+6. ~~Consolidar `indexInicial.html` como única SPA.~~ Etapa 1 hecha (2026-11-02): HTML solo con marcado, CSS en `public/styles/app.css`, lógica en `public/js/**` y guardián `tests/spa-modular.test.js`. T2.1 hecha: delegación de eventos (`data-action`) y CSP `script-src-attr 'none'`, con guardián `tests/spa-acciones.test.js`. T2.2 hecha: router por hash con URLs compartibles, botón atrás y enlaces profundos, con guardián `tests/spa-ruta.test.js`. T2.3 hecha: calificación del quiz de lección en backend (`POST /api/v1/quizzes/lessons/:lessonId/responses`). T2.4 hecha: examen final por curso (`GET/POST /api/v1/courses/:id/assessment`) con umbral configurable, persistencia y vista `#/evaluacion/<curso>` en el SPA. Pendiente T2.5 (retirar `index.html`/`app.js`).
 7. Verificar el despliegue en Vercel (`vercel.json` y `api/index.js` ya preparados, ahora con rutas `/js/**` y `/styles/**`) y definir la estrategia de ramas.
-8. ~~Construir la evaluación final por curso (`GET/POST /api/v1/courses/:id/assessment`) con umbral de aprobación y persistencia del intento.~~ Backend hecho (T2.4): umbral configurable (80 % por defecto), requisito opcional de lecciones y persistencia en `quiz_attempts` con `alcance`. Faltan la vista del SPA y el banco verificado del curso #1.
+8. ~~Construir la evaluación final por curso (`GET/POST /api/v1/courses/:id/assessment`) con umbral de aprobación y persistencia del intento.~~ Hecho (T2.4): umbral configurable (80 % por defecto), requisito opcional de lecciones, persistencia en `quiz_attempts` con `alcance` y vista `#/evaluacion/<curso>` cubierta por `tests/course-assessment-spa.test.js`. Falta el banco verificado del curso #1.
