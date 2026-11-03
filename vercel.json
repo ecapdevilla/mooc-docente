@@ -10,13 +10,41 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/health", "dest": "/api/index.js" },
-    { "src": "/diagnostico-piloto", "dest": "diagnosticoPiloto.html" },
+    {
+      "src": "/diagnostico-piloto",
+      "dest": "diagnosticoPiloto.html",
+      "headers": { "Cache-Control": "no-store" }
+    },
     { "src": "/diagnosticoPiloto.js", "dest": "public/diagnosticoPiloto.js" },
     { "src": "/diagnosticoPiloto.css", "dest": "public/diagnosticoPiloto.css" },
-    { "src": "/styles/(.*)", "dest": "public/styles/$1" },
-    { "src": "/js/(.*)", "dest": "public/js/$1" },
-    { "src": "/", "dest": "indexInicial.html" },
-    { "src": "/(.*)", "dest": "indexInicial.html" }
+    {
+      "src": "/styles/(.*)",
+      "dest": "public/styles/$1",
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "public/js/$1",
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }
+    },
+    {
+      "src": "/",
+      "dest": "indexInicial.html",
+      "headers": {
+        "Content-Security-Policy": "script-src-attr 'none';default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "indexInicial.html",
+      "headers": {
+        "Content-Security-Policy": "script-src-attr 'none';default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer"
+      }
+    }
   ],
   "headers": [
     {
