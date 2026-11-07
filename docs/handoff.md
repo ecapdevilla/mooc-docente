@@ -20,15 +20,18 @@ título es 11/11 (detalle en §2 ter). Lo único pendiente de commit es este
 documento y la entrada de estado de `AGENTS.md`.
 
 **Verificación 2026-11-06 (sin cambios de código):** `main` local =
-`origin/main` = `4525786` (origin/recovery apunta al mismo commit); Production
-sirve ese SHA y `/api/v1/courses` devuelve los 3 cursos; suite local 26/26
+`origin/main` = `4837402` (origin/recovery quedó en `4525786`); Production
+sirve `4837402` tras el despliegue manual de hoy (`vercel --prod`), con
+`/api/v1/courses` → 3 cursos, HTML con CSP, 19 scripts y
+`/js/vistas/evaluacion.js` como `application/javascript`; suite local 26/26
 suites y 198/198 pruebas. Conteos reales medidos sobre el proyecto: 19
 `<script src>` ↔ 19 archivos JS en `public/js/**` (3.927 líneas, 193 KB),
 `indexInicial.html` de 532 líneas y `app.css` de 2.905 líneas (102 KB). El
 archivo `nulul` ya no existe (eliminado en `5e0c2e0`). La tarea #1 quedó
 cerrada: migración `20261106_lessons_descripcion.sql` creada y registrada en
-`scripts/preparar-base-local.js`. Todos los cambios quedan sin commit por
-decisión de la persona.
+`scripts/preparar-base-local.js`; la tarea de panel quedó con rama por defecto
+`main` (hecho), protección mínima de `main` (hecha) y `main` publicado en
+Production.
 
 ### Orden propuesto para la próxima sesión
 
