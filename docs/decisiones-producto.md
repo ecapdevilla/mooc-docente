@@ -42,7 +42,7 @@ La vista de evaluación final muestra ahora la insignia otorgada por el servidor
 
 | # | Tema | Estado | Acción |
 | --- | --- | --- | --- |
-| 4 | Banco del curso #1 (Fundamentos) | **Bloqueado por material del autor** | No se inventan preguntas: la fuente debe ser el material del autor (PDF/normas). Formato de captura en `docs/handoff.md` §0. |
+| 4 | Banco del curso #1 (Fundamentos) | **Bloqueado por material del autor** | Plantilla lista en `docs/fuentes/plantilla-banco-fundamentos.md` con las 3 lecciones exactas y 9 bloques (3 por lección). No se inventan preguntas: la fuente debe ser el material del autor (PDF/normas). Formato de captura en `docs/handoff.md` §0. |
 | 5 | Reconciliar SPA ↔ BD | Pendiente, sin bloqueo | Afecta a `porLeccion` y a las áreas prioritarias del resultado; se aborda al cargar el banco real. |
 
 ### Regla de contenido

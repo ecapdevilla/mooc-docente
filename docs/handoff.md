@@ -55,7 +55,8 @@ No empezar por 4 ni 5 sin cerrar 1 y 2: son minutos y desbloquean al resto.
 ### Qué conviene que prepares tú (ahorra tokens y contexto)
 
 El PDF grande del curso no hace falta que lo lea ni que lo pegues en el chat: con
-un bloque estructurado se carga directo. Por cada pregunta, estos campos:
+un bloque estructurado se carga directo. La plantilla lista está en
+`docs/fuentes/plantilla-banco-fundamentos.md`; por cada pregunta, estos campos:
 
 ```text
 LECCION: <título exacto de una lección que ya exista, o "NUEVA: <título>">
