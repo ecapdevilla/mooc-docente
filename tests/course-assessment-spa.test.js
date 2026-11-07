@@ -141,6 +141,7 @@ async function crearDom() {
 
           const aciertos = results.filter((item) => item.correct).length;
           const puntaje = Math.round((aciertos / results.length) * 10000) / 100;
+          const aprobado = puntaje >= 80;
           estado = 201;
           datos = {
             attempt: {
@@ -149,7 +150,7 @@ async function crearDom() {
               puntaje,
               aciertos,
               totalPreguntas: results.length,
-              aprobado: puntaje >= 80,
+              aprobado,
               umbralAprobacion: 80,
             },
             results,
@@ -157,9 +158,19 @@ async function crearDom() {
               { leccion: 'Lección A', aciertos: results[0] && results[0].correct ? 1 : 0, total: 1, porcentaje: results[0] && results[0].correct ? 100 : 0 },
               { leccion: 'Lección B', aciertos: results[1] && results[1].correct ? 1 : 0, total: 1, porcentaje: results[1] && results[1].correct ? 100 : 0 },
             ],
-            areasPrioritarias: puntaje >= 80
+            areasPrioritarias: aprobado
               ? []
               : [{ area: 'Evaluación Educativa', aciertos, total: results.length, porcentaje: puntaje }],
+            badge: aprobado
+              ? {
+                  badgeId: 101,
+                  nombre: 'Curso aprobado: Fundamentos de Pedagogía y Didáctica',
+                  descripcion: 'Insignia obtenida al aprobar el examen final del curso.',
+                  icono: 'fa-solid fa-certificate',
+                  color: '#0D9488',
+                  nueva: true,
+                }
+              : null,
           };
         } else if (ruta === '/quizzes/post-login') {
           datos = { quiz: { preguntas: [] } };
@@ -280,5 +291,31 @@ describe('Evaluación final por curso (T2.4)', () => {
     expect(anuncio).not.toBeNull();
     expect(anuncio.getAttribute('role')).toBe('status');
     expect(texto(anuncio)).toContain('sin aprobar');
+  });
+
+  test('muestra la insignia de curso cuando el servidor la otorga al aprobar', async () => {
+    const botonesAccion = doc.querySelectorAll('#assessmentResult .assessment-actions .btn');
+    botonesAccion[0].click();
+    await esperar(200);
+
+    const opciones = () => doc.querySelectorAll('#assessmentPanel .quiz-option');
+    opciones()[0].click();
+    doc.getElementById('assessmentNext').click();
+    opciones()[1].click();
+    doc.getElementById('assessmentSubmit').click();
+    await esperar(300);
+
+    const resultado = doc.getElementById('assessmentResult');
+    expect(resultado).not.toBeNull();
+    expect(texto(resultado.querySelector('.assessment-verdict'))).toBe('Aprobado');
+    expect(texto(resultado.querySelector('.assessment-title'))).toBe('Evaluación aprobada');
+
+    const badge = resultado.querySelector('.assessment-badge');
+    expect(badge).not.toBeNull();
+    expect(badge.classList.contains('is-new')).toBe(true);
+    expect(badge.getAttribute('aria-label')).toBe('Insignia de curso otorgada');
+    expect(texto(badge.querySelector('.assessment-badge__title'))).toBe('¡Nueva insignia desbloqueada!');
+    expect(texto(badge.querySelector('.assessment-badge__name'))).toContain('Curso aprobado:');
+    expect(texto(badge.querySelector('.assessment-badge__desc'))).toContain('examen final del curso');
   });
 });

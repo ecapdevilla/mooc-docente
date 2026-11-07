@@ -27,9 +27,16 @@ Cerrada en el Sprint A (`docs/sprints-paralelos.md`):
   desaprobar.
 - Pruebas en `tests/course-assessment-badge.test.js`.
 
-Pendiente (frontend, opcional): mostrar la insignia en el resultado de
-`vistas/evaluacion.js` y refrescar el dashboard cuando `badge.nueva` sea `true`.
-Hoy el backend la expone; la vista no la pinta todavía.
+### Frontend (Sprint 2, 2026-11-07)
+
+La vista de evaluación final muestra ahora la insignia otorgada por el servidor:
+
+- `public/js/vistas/evaluacion.js` renderiza un bloque `.assessment-badge` con
+  el nombre, la descripción y el icono que devuelven `badge`/`badge.nueva`.
+- `public/styles/app.css` añade el estilo del bloque dentro de `.assessment-*`.
+- `tests/course-assessment-spa.test.js` cubre el caso aprobado con insignia
+  nueva, manteniendo la regla de que el navegador no calcula puntaje ni
+  veredicto.
 
 ## P2 — Contenido
 

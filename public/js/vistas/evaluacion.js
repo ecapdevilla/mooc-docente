@@ -481,6 +481,11 @@
       panel.id = 'assessmentResult';
       panel.appendChild(construirVeredicto(intento, aciertos, total, puntaje, aprobado));
 
+      const badge = resultado.badge;
+      if (badge) {
+        panel.appendChild(construirInsigniaCurso(badge));
+      }
+
       const porLeccion = resultado.porLeccion || [];
       if (porLeccion.length) {
         const reporte = evNodo('div', 'diagnostic-report');
@@ -534,7 +539,32 @@
       return panel;
     }
 
-    function construirVeredicto(intento, aciertos, total, puntaje, aprobado) {
+    function construirInsigniaCurso(badge) {
+     const caja = evNodo(
+       'section',
+       `assessment-badge${badge.nueva ? ' is-new' : ''}`
+     );
+     caja.setAttribute('aria-label', 'Insignia de curso otorgada');
+
+     const icono = evNodo('span', 'assessment-badge__icon');
+     icono.appendChild(evIcono(badge.icono || 'fas fa-medal'));
+     caja.appendChild(icono);
+
+     const contenido = evNodo('div', 'assessment-badge__content');
+     contenido.appendChild(evNodo(
+       'span',
+       'assessment-badge__title',
+       badge.nueva ? '¡Nueva insignia desbloqueada!' : 'Insignia de curso desbloqueada'
+     ));
+     contenido.appendChild(evNodo('strong', 'assessment-badge__name', badge.nombre || 'Insignia de curso'));
+     if (badge.descripcion) {
+       contenido.appendChild(evNodo('p', 'assessment-badge__desc', badge.descripcion));
+     }
+     caja.appendChild(contenido);
+     return caja;
+   }
+
+   function construirVeredicto(intento, aciertos, total, puntaje, aprobado) {
       const cabecera = evNodo('header', 'assessment-head');
       cabecera.appendChild(evNodo('span', 'lx-eyebrow', 'Resultado de la evaluación final'));
       cabecera.appendChild(evNodo(

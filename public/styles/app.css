@@ -1420,8 +1420,17 @@
 
       .assessment-detail__answer i { color: var(--accent); }
 
+      .assessment-badge { display: flex; align-items: flex-start; gap: 0.85rem; margin: 0.8rem 0 1rem; padding: 0.9rem 1rem; border: 1px solid #86E0CE; border-radius: 0.85rem; background: linear-gradient(180deg, #F0FDFA, #FFFFFF); box-shadow: 0 5px 16px rgba(20, 40, 75, 0.05); }
+      .assessment-badge__icon { display: grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-dark); font-size: 1.1rem; }
+      .assessment-badge__content { display: grid; gap: 0.2rem; min-width: 0; }
+      .assessment-badge__title { color: var(--primary-dark); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+      .assessment-badge__name { color: var(--dark); font-size: 0.98rem; line-height: 1.35; }
+      .assessment-badge__desc { margin: 0; color: var(--text-soft); font-size: 0.84rem; line-height: 1.55; }
+      .assessment-badge.is-new { border-color: #5EEAD4; }
+
       @media (max-width: 600px) {
         .assessment-actions .btn { width: 100%; justify-content: center; }
+        .assessment-badge { align-items: center; }
       }
 
 
