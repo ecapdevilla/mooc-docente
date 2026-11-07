@@ -3206,3 +3206,49 @@
         transition-duration: .01ms !important;
       }
     }
+
+    /* ============================================================
+       PULIDO PROFESIONAL (2026-11-06)
+       Refinamientos de acabado: selección, tacto, tipografía y
+       scroll. No altera la identidad visual ni los contratos de
+       las pruebas. Documentado en docs/diseno-visual.md.
+    ============================================================ */
+    ::selection {
+      background: rgba(13, 148, 136, 0.18);
+      color: #0B3B38;
+    }
+
+    body { text-rendering: optimizeLegibility; }
+
+    img { max-width: 100%; height: auto; }
+
+    /* Equilibra las líneas de los títulos (ignorado en navegadores viejos) */
+    .hero h1,
+    .section-header h2,
+    .welcome-banner h2,
+    .lx-hero h1,
+    .lx-lesson-head h1,
+    .lx-module-head h1 {
+      text-wrap: balance;
+    }
+
+    /* Feedback táctil sutil en acciones primarias */
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+      transition-duration: 0.06s;
+    }
+    .btn-primary:active { box-shadow: 0 3px 8px rgba(37, 99, 235, 0.14); }
+    .cta-box .btn:active { box-shadow: 0 3px 8px rgba(20, 40, 75, 0.16); }
+
+    /* Barra de desplazamiento sutil, acorde a la paleta */
+    @supports (scrollbar-width: thin) {
+      html { scrollbar-width: thin; scrollbar-color: #B6C4DA #F1F5FA; }
+    }
+    ::-webkit-scrollbar { width: 11px; height: 11px; }
+    ::-webkit-scrollbar-track { background: #F1F5FA; }
+    ::-webkit-scrollbar-thumb {
+      background: #B6C4DA;
+      border-radius: 999px;
+      border: 2px solid #F1F5FA;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #9DB0CC; }

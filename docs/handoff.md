@@ -31,7 +31,10 @@ archivo `nulul` ya no existe (eliminado en `5e0c2e0`). La tarea #1 quedó
 cerrada: migración `20261106_lessons_descripcion.sql` creada y registrada en
 `scripts/preparar-base-local.js`; la tarea de panel quedó con rama por defecto
 `main` (hecho), protección mínima de `main` (hecha) y `main` publicado en
-Production.
+Production. En la misma sesión se aplicó un pulido de apariencia (selección,
+feedback táctil en botones, `text-wrap: balance`, scrollbar sutil) documentado
+en `docs/diseno-visual.md`, y se registraron las decisiones P1/P2 en
+`docs/decisiones-producto.md`; la suite completa sigue en 26/26 y 198/198.
 
 ### Orden propuesto para la próxima sesión
 
@@ -368,6 +371,8 @@ es que la base de `.env` esté vacía: repetir `db:preparar` y `seed`.
 | Despliegue y variables | `docs/deploy-vercel.md` |
 | Ramas, PR, tags, reversión y cambio a `main` | `docs/estrategia-ramas.md` |
 | Carga a producción | `docs/carga-catalogo-production.md` |
+| Diseño, apariencia e identidad visual | `docs/diseno-visual.md` |
+| Decisiones de producto (umbral, insignia, banco) | `docs/decisiones-producto.md` |
 | Hoja de ruta completa | `docs/roadmap.md` |
 
 Al cerrar una sesión, actualizar **este archivo** (secciones 1–3) y la línea
