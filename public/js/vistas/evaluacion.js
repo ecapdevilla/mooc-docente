@@ -250,12 +250,16 @@
       progreso.appendChild(barra);
       bloque.appendChild(progreso);
 
-      bloque.appendChild(evNodo('h2', 'quiz-question', pregunta.pregunta));
+      const tituloPregunta = evNodo('h2', 'quiz-question', pregunta.pregunta);
+      tituloPregunta.id = 'assessmentQuestionText';
+      bloque.appendChild(tituloPregunta);
 
       const meta = [pregunta.area, pregunta.leccion].filter(Boolean).join(' · ');
       if (meta) bloque.appendChild(evNodo('p', 'assessment-question__meta', meta));
 
       const opciones = evNodo('div', 'quiz-options');
+      opciones.setAttribute('role', 'group');
+      opciones.setAttribute('aria-labelledby', 'assessmentQuestionText');
       const elegida = assessment.respuestas[pregunta.id];
       (pregunta.opciones || []).forEach((opcion, posicion) => {
         const boton = evBoton('', 'quiz-option', () => seleccionarOpcionEvaluacion(pregunta.id, opcion.id));
@@ -543,6 +547,23 @@
         'assessment-meta',
         `${aciertos} de ${lxPlural(total, 'respuesta correcta', 'respuestas correctas')} · ${puntaje}% · umbral ${intento.umbralAprobacion}%`
       ));
+
+      // Cifra destacada: jerarquiza el puntaje frente al resto del resultado.
+      const resumen = evNodo('div', `assessment-score ${aprobado ? 'is-pass' : 'is-fail'}`);
+      resumen.appendChild(evNodo('span', 'assessment-score__value', `${puntaje}%`));
+      resumen.appendChild(evNodo('span', 'assessment-score__label', 'Puntaje obtenido'));
+      cabecera.appendChild(resumen);
+
+      // Anuncio solo para lectores de pantalla: resume el veredicto sin
+      // repetir visualmente el texto que ya está en pantalla.
+      const anuncio = evNodo(
+        'p',
+        'assessment-sr-only',
+        `Resultado: ${aprobado ? 'aprobado' : 'sin aprobar'}. ${aciertos} de ${total} respuestas correctas, ${puntaje} por ciento.`
+      );
+      anuncio.setAttribute('role', 'status');
+      cabecera.appendChild(anuncio);
+
       cabecera.appendChild(evNodo(
         'span',
         `assessment-verdict ${aprobado ? 'is-pass' : 'is-fail'}`,
@@ -572,6 +593,19 @@
         const meta = [respuesta.area, respuesta.topic].filter(Boolean).join(' · ');
         if (meta) bloque.appendChild(evNodo('span', 'assessment-detail__meta', meta));
         bloque.appendChild(evNodo('p', 'assessment-detail__explanation', respuesta.explanation || ''));
+
+        const opcionCorrecta = pregunta && (pregunta.opciones || [])
+          .find((opcion) => opcion.id === respuesta.correctOptionId);
+        if (opcionCorrecta) {
+          const correcta = evNodo('span', 'assessment-detail__answer');
+          correcta.appendChild(evIcono('fas fa-circle-check'));
+          correcta.appendChild(evNodo(
+            'span',
+            '',
+            `Respuesta correcta: ${opcionCorrecta.texto || opcionCorrecta.opcion || ''}`
+          ));
+          bloque.appendChild(correcta);
+        }
         detalles.appendChild(bloque);
       });
 

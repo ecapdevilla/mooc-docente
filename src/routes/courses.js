@@ -10,6 +10,7 @@ const {
   construirPreguntas,
   estadoRequisitos,
   evaluacionDisponible,
+  otorgarInsigniaCurso,
   preguntasPublicas,
   umbralAprobacion,
 } = require('../services/courseAssessment');
@@ -283,6 +284,11 @@ router.post('/:id/assessment/attempts', authenticate, async (req, res) => {
       );
     }
 
+    let badge = null;
+    if (resultado.aprobado) {
+      badge = await otorgarInsigniaCurso(client, req.user.id, cursoId, curso.titulo);
+    }
+
     await client.query('COMMIT');
 
     return res.status(201).json({
@@ -307,6 +313,7 @@ router.post('/:id/assessment/attempts', authenticate, async (req, res) => {
       })),
       porLeccion: resultado.porLeccion,
       areasPrioritarias: resultado.areasPrioritarias,
+      badge,
     });
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});

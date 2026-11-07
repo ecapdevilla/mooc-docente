@@ -213,6 +213,17 @@ describe('Evaluación final por curso (T2.4)', () => {
     expect(panel.innerHTML).not.toContain('Explicación del servidor');
   });
 
+  test('marca el grupo de opciones con su pregunta para lectores de pantalla', () => {
+    const panel = doc.getElementById('assessmentPanel');
+    const opciones = panel.querySelector('.quiz-options');
+
+    expect(opciones).not.toBeNull();
+    expect(opciones.getAttribute('role')).toBe('group');
+    expect(opciones.getAttribute('aria-labelledby')).toBe('assessmentQuestionText');
+    expect(doc.getElementById('assessmentQuestionText')).not.toBeNull();
+    expect(texto(doc.getElementById('assessmentQuestionText'))).toContain('Pregunta uno');
+  });
+
   test('solo envía identificadores y muestra el veredicto del servidor', async () => {
     const opciones = () => doc.querySelectorAll('#assessmentPanel .quiz-option');
 
@@ -250,5 +261,24 @@ describe('Evaluación final por curso (T2.4)', () => {
     expect(texto(detalles[0])).toContain('Correcta');
     expect(texto(detalles[1])).toContain('revisa la lección antes de repetir');
     expect(doc.getElementById('view-assessment').classList.contains('hidden')).toBe(false);
+  });
+
+  test('jerarquiza el puntaje y muestra la respuesta correcta en la retroalimentación', () => {
+    const resultado = doc.getElementById('assessmentResult');
+
+    const score = resultado.querySelector('.assessment-score');
+    expect(score).not.toBeNull();
+    expect(score.classList.contains('is-fail')).toBe(true);
+    expect(texto(score.querySelector('.assessment-score__value'))).toBe('50%');
+    expect(texto(score.querySelector('.assessment-score__label'))).toBe('Puntaje obtenido');
+
+    const detalles = resultado.querySelectorAll('.diagnostic-detail');
+    expect(texto(detalles[0].querySelector('.assessment-detail__answer'))).toContain('Acompaña el proceso y retroalimenta.');
+    expect(texto(detalles[1].querySelector('.assessment-detail__answer'))).toContain('Ajustar apoyos sin renunciar al propósito.');
+
+    const anuncio = resultado.querySelector('.assessment-sr-only');
+    expect(anuncio).not.toBeNull();
+    expect(anuncio.getAttribute('role')).toBe('status');
+    expect(texto(anuncio)).toContain('sin aprobar');
   });
 });

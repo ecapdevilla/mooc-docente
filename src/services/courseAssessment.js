@@ -289,6 +289,56 @@ async function estadoRequisitos(queryable, usuarioId, cursoId) {
   };
 }
 
+/**
+ * Otorga (idempotente) la insignia de "curso aprobado" a la persona.
+ *
+ * Los badges de curso conviven con los de módulo: usan `badges.curso_id` en
+ * lugar de `modulo_id`. La insignia se crea una sola vez por curso y la
+ * relación en `user_badges` es única por `(usuario_id, badge_id)`, de modo que
+ * repetir el intento no duplica ni la insignia ni el otorgamiento.
+ */
+async function otorgarInsigniaCurso(queryable, usuarioId, cursoId, tituloCurso) {
+  const nombre = `Curso aprobado: ${tituloCurso}`;
+  const descripcion = 'Insignia obtenida al aprobar el examen final del curso.';
+  const icono = 'fa-solid fa-certificate';
+  const color = '#0D9488';
+
+  const { rows: existentes } = await queryable.query(
+    `SELECT id FROM badges WHERE curso_id = $1 AND nombre = $2`,
+    [cursoId, nombre]
+  );
+
+  let badgeId;
+  if (existentes.length > 0) {
+    badgeId = existentes[0].id;
+  } else {
+    const { rows: creados } = await queryable.query(
+      `INSERT INTO badges (curso_id, nombre, descripcion, icono, color)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
+      [cursoId, nombre, descripcion, icono, color]
+    );
+    badgeId = creados[0].id;
+  }
+
+  const { rows: otorgadas } = await queryable.query(
+    `INSERT INTO user_badges (usuario_id, badge_id)
+     VALUES ($1, $2)
+     ON CONFLICT (usuario_id, badge_id) DO NOTHING
+     RETURNING id`,
+    [usuarioId, badgeId]
+  );
+
+  return {
+    badgeId,
+    nombre,
+    descripcion,
+    icono,
+    color,
+    nueva: otorgadas.length > 0,
+  };
+}
+
 module.exports = {
   ALCANCE_EVALUACION,
   ErrorEvaluacion,
@@ -301,6 +351,7 @@ module.exports = {
   estadoRequisitos,
   evaluacionDisponible,
   exigeLecciones,
+  otorgarInsigniaCurso,
   preguntasPublicas,
   umbralAprobacion,
 };

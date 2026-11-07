@@ -157,6 +157,12 @@ function prepararCliente({
         }],
       };
     }
+    if (sql.includes('INSERT INTO badges')) {
+      return { rows: [{ id: 999 }] };
+    }
+    if (sql.includes('INSERT INTO user_badges')) {
+      return { rows: [{ id: 888 }] };
+    }
     return { rows: [] };
   });
 }

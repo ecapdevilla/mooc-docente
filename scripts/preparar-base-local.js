@@ -30,6 +30,7 @@ const ARCHIVOS = [
   ['database/migrations/20261101_lesson_quiz_responses.sql', true],
   ['database/migrations/20261102_course_assessment.sql', true],
   ['database/migrations/20261106_lessons_descripcion.sql', true],
+  ['database/migrations/20261107_course_badges.sql', true],
 ];
 
 // Códigos de "el objeto ya existe": repetir la preparación no es un error.

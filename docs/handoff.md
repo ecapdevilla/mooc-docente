@@ -2,7 +2,7 @@
 
 **Actualizado:** 2026-11-06 (verificación de puesta al día: repo, docs y producción sin desfases; suite 26/26 y 198/198 en verde)
 **Rama de producción:** `main` (histórico publicado durante la reconstrucción: `recovery/integracion-20261031`)
-**Suites:** 26/26 suites y 198/198 pruebas en verde (`npx jest --maxWorkers=2`)
+**Suites:** 27/27 suites y 202/202 pruebas en verde (`npx jest --maxWorkers=2`)
 **Base de desarrollo:** PostgreSQL local `meritodocente` (`127.0.0.1:5432`) preparada
 con `npm run db:preparar` + `npm run seed`. Supabase = producción, con el catálogo
 de 3 cursos cargado el 2026-11-03 (§2 ter).
@@ -34,7 +34,11 @@ cerrada: migración `20261106_lessons_descripcion.sql` creada y registrada en
 Production. En la misma sesión se aplicó un pulido de apariencia (selección,
 feedback táctil en botones, `text-wrap: balance`, scrollbar sutil) documentado
 en `docs/diseno-visual.md`, y se registraron las decisiones P1/P2 en
-`docs/decisiones-producto.md`; la suite completa sigue en 26/26 y 198/198.
+`docs/decisiones-producto.md`; la suite completa queda en 27/27 y 202/202.
+En paralelo se ejecutaron dos sprints con fronteras de archivos disjuntas (ver
+`docs/sprints-paralelos.md`): la insignia de curso al aprobar (backend, Sprint
+A) y el pulido visual/accesibilidad de la vista de evaluación final (frontend,
+Sprint B).
 
 ### Orden propuesto para la próxima sesión
 

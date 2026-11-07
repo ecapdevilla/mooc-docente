@@ -1361,6 +1361,65 @@
 
       .assessment-detail__explanation { margin: 0.4rem 0 0; }
 
+      /* ---- Pulido visual y accesibilidad de la evaluación final ---- */
+      .assessment-sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .assessment-head { width: 100%; }
+
+      .assessment-score {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.4rem;
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--r-sm);
+        background: var(--gray-100);
+      }
+
+      .assessment-score__value {
+        font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        color: var(--dark);
+      }
+
+      .assessment-score.is-pass { border-color: #86E0CE; background: var(--accent-soft); }
+      .assessment-score.is-pass .assessment-score__value { color: var(--accent-dark); }
+      .assessment-score.is-fail { border-color: #F5B5AE; background: var(--danger-soft); }
+      .assessment-score.is-fail .assessment-score__value { color: #991B1B; }
+
+      .assessment-score__label {
+        max-width: 10rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        line-height: 1.25;
+        color: var(--text-soft);
+      }
+
+      .assessment-detail__answer {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-top: 0.45rem;
+        color: var(--accent-dark);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .assessment-detail__answer i { color: var(--accent); }
+
       @media (max-width: 600px) {
         .assessment-actions .btn { width: 100%; justify-content: center; }
       }
