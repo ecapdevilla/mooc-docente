@@ -101,10 +101,14 @@ Si el formulario responde *"No pudimos conectar con el servidor"*, el SPA degrad
 
 - El simulacro gratuito sin registro (Fase 2 del roadmap) todavía no existe en el SPA.
 - `docs/swagger.yaml` no existe, por lo que `/api-docs` no se monta.
-- La migración `20261102_course_assessment.sql` no está aplicada en Supabase: en
-  producción, `GET /api/v1/courses/:id/assessment` responde `503`.
-- GitHub y Vercel siguen apuntando a `recovery/integracion-20261031` como rama
-  publicada; el cambio a `main` está descrito en `docs/estrategia-ramas.md`.
+- La migración `20261102_course_assessment.sql` ya está aplicada en Supabase
+  (2026-11-03): en producción `GET /api/v1/courses/:id/assessment` ya no responde
+  `503`.
+- GitHub ya tiene `default_branch = main` y protección mínima en `main` (sin
+  force-push ni borrado, 2026-11-06). El proyecto Vercel es `sourceless`
+  (despliegue manual con `vercel --prod`, sin auto-deploy de Git); su
+  `productionBranch` vinculado apunta a `recovery/integracion-20261031` pero no
+  gobierna despliegues. Detalle en `docs/estrategia-ramas.md`, sección 6.
 
 ## 7. CSP del HTML estático (T2.5, 2026-11-02)
 

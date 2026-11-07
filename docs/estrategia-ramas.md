@@ -94,19 +94,36 @@ git push origin v0.2.0
   aplicar una en Supabase, seguir `docs/carga-catalogo-production.md`
   (respaldo, verificación de cascada y marcha atrás).
 
-## 6. Estado de la migración a este modelo (2026-11-02)
+## 6. Estado de la migración a este modelo (2026-11-06)
 
-- Hasta hoy Vercel publicaba desde `recovery/integracion-20261031`. Los commits
-  `be8b1c8`, `9da930d`, `5d6a811`, `db45957` y `6d3b3da` se publicaron así; el
-  último es el que sirve la T2.5 con CSP y está verificado (`/health`).
-- `main` y el tag `v0.2.0` se crean en el commit verificado al cierre de la T2.5
-  (`/health` es la fuente de verdad del SHA publicado). Pasos que requieren la
-  cuenta del repositorio:
-  1. GitHub → *Settings → Branches* → cambiar la rama por defecto a `main`.
-  2. GitHub → *Settings → Branches* → regla de protección para `main` (PR
-     obligatorio, checks requeridos, sin force-push, sin borrar).
-  3. Vercel → *Settings → Git → Production Branch* = `main`; Preview = resto.
-- Mientras esos tres pasos no estén hechos, la rama desplegada sigue siendo
-  `recovery/integracion-20261031` y cualquier push allí publica en Production.
+### Hallazgo de despliegue (verificado por API)
+
+El proyecto `mooc-docente` de Vercel es **`sourceless`**: se despliega
+manualmente (`vercel --prod` desde un checkout local), **no** por auto-deploy de
+Git. La CLI adjunta el SHA del commit local al subir, por eso `/health` lo
+reporta. El campo `productionBranch` del `link` sigue apuntando a
+`recovery/integracion-20261031`, pero en un proyecto sourceless **no gobierna
+ningún despliegue**: es cosmético mientras no se reconecte Git.
+
+### Pasos de panel
+
+1. ~~GitHub → *Settings → Branches* → cambiar la rama por defecto a `main`.~~
+   **Hecho**: verificado por API (`default_branch = main`).
+2. ~~GitHub → *Settings → Branches* → regla de protección para `main`.~~
+   **Hecho el 2026-11-06, protección mínima**: `allow_force_pushes = false` y
+   `allow_deletions = false`. La variante completa (PR obligatorio + checks
+   requeridos) queda pendiente de un CI que hoy no existe (no hay
+   `.github/workflows`).
+3. Vercel → *Settings → Git → Production Branch* = `main`. **Pendiente, en el
+   panel web**: la API v9 rechaza `productionBranch`/`link` en el PATCH de
+   proyectos y la CLI solo expone `vercel git connect|disconnect`. Es cosmético
+   mientras el proyecto sea sourceless; lo que importa es desplegar `main`.
+
+### Cómo se publica hoy
+
+`vercel --prod` desde un checkout en `main`. No hay auto-deploy: un push a
+`main` **no** publica hasta que se ejecute `vercel --prod`. Para publicar el
+HEAD vigente de `main` basta desplegar desde ese checkout.
+
 - Los agentes no crean commits ni ramas sin pedido explícito; cuando lo hacen,
   registran el SHA y la evidencia de despliegue en `docs/handoff.md`.

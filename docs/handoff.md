@@ -110,8 +110,8 @@ salvo este documento cuando se está cerrando una sesión.
 | `3e88b78`, `6195bcc` | Evidencia del despliegue y aclaración de ramas/tag |
 
 `main` y `recovery/integracion-20261031` avanzan juntos; el tag anotado `v0.2.0`
-apunta al commit verificado `6195bcc`. Vercel sigue publicando desde
-`recovery/...` hasta que se cambie la *Production Branch* (ver
+apunta al commit verificado `6195bcc`. El despliegue de Vercel es **manual**
+(`vercel --prod`, proyecto `sourceless`), no por auto-deploy desde una rama (ver
 `docs/estrategia-ramas.md`, sección 6).
 
 El commit de la T2.5 toca: `vercel.json`, `src/server.js`, `tests/spa-modular.test.js`,
@@ -286,9 +286,11 @@ en el catálogo destino.
     (`20261106_lessons_descripcion.sql`).
 12. ~~Verificar el despliegue en Vercel y la estrategia de ramas
     (`docs/deploy-vercel.md`).~~ Verificado el 2026-11-02 (tabla §2 bis) y
-    estrategia definida en `docs/estrategia-ramas.md`. Quedan tres pasos de panel
-    que requieren la cuenta: rama por defecto `main` en GitHub, protección de
-    `main` y *Production Branch* de Vercel en `main`.
+    estrategia definida en `docs/estrategia-ramas.md`. Estado de los tres pasos de
+    panel (2026-11-06): rama por defecto `main` en GitHub **hecho**, protección
+    mínima de `main` **hecha** (sin force-push ni borrado) y *Production Branch*
+    de Vercel en `main` **pendiente** (cosmético: el proyecto es `sourceless`,
+    despliegue manual).
 
 ## 4. Lo que le toca a la persona (no al agente)
 
