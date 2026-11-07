@@ -20,8 +20,8 @@ título es 11/11 (detalle en §2 ter). Lo único pendiente de commit es este
 documento y la entrada de estado de `AGENTS.md`.
 
 **Verificación 2026-11-06 (sin cambios de código):** `main` local =
-`origin/main` = `4837402` (origin/recovery quedó en `4525786`); Production
-sirve `4837402` tras el despliegue manual de hoy (`vercel --prod`), con
+`origin/main` = `6afd474` (origin/recovery quedó en `4525786`); Production
+sirve `6afd474` tras el despliegue manual de hoy (`vercel --prod`), con
 `/api/v1/courses` → 3 cursos, HTML con CSP, 19 scripts y
 `/js/vistas/evaluacion.js` como `application/javascript`; suite local 26/26
 suites y 198/198 pruebas. Conteos reales medidos sobre el proyecto: 19
