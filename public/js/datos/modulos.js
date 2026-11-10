@@ -96,6 +96,110 @@
               feedbackOk: '¡Muy bien! El ABP parte de problemas reales y desarrolla competencias en los estudiantes.',
               feedbackKo: 'El ABP se centra en resolver problemas reales, no en memorizar.'
             }
+          },
+          {
+            title: 'L4. Didáctica activa y aprendizaje significativo',
+            content: `
+              <p><strong>Caso:</strong> Laura enseña sexto grado. Nota que sus estudiantes memorizan definiciones para la prueba, pero no saben aplicar los conceptos en situaciones reales de su comunidad.</p>
+              <h4>🗺️ Mapa conceptual: de la teoría a la práctica</h4>
+              <div class="info-box">
+                <strong>Objetivo de aprendizaje</strong> → <strong>Estrategia didáctica</strong> → <strong>Actitud de aula</strong> → <strong>Evidencia de aprendizaje</strong>
+              </div>
+              <h4>Clase tradicional vs. Clase activa</h4>
+              <table style="width:100%; border-collapse: collapse; margin: 12px 0;">
+                <tr style="background:#f4f6f8;">
+                  <th style="text-align:left; border:1px solid #ccc; padding:8px;">Elemento</th>
+                  <th style="text-align:left; border:1px solid #ccc; padding:8px;">Tradicional</th>
+                  <th style="text-align:left; border:1px solid #ccc; padding:8px;">Activa (significativa)</th>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:8px;"><strong>Rol del docente</strong></td>
+                  <td style="border:1px solid #ccc; padding:8px;">Explica y transmite conocimiento.</td>
+                  <td style="border:1px solid #ccc; padding:8px;">Diseña situaciones y guía la construcción del estudiante.</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:8px;"><strong>Rol del estudiante</strong></td>
+                  <td style="border:1px solid #ccc; padding:8px;">Escucha y repite.</td>
+                  <td style="border:1px solid #ccc; padding:8px;">Investiga, resuelve problemas y crea.</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:8px;"><strong>Evaluación</strong></td>
+                  <td style="border:1px solid #ccc; padding:8px;">Prueba escrita al final.</td>
+                  <td style="border:1px solid #ccc; padding:8px;">Rúbricas, portafolios y desempeño en tareas reales.</td>
+                </tr>
+              </table>
+              <div class="info-box"><strong>Dato clave del concurso:</strong> el aprendizaje significativo (Ausubel) ocurre cuando lo nuevo se conecta con los saberes previos del estudiante. No es "entretenimiento", es intención pedagógica.</div>
+            `,
+            quiz: {
+              question: 'Laura diseña una clase de ciencias sobre el ciclo del agua. En lugar de solo explicar, lleva a los estudiantes a observar charcos, medir temperatura y dibujar el proceso en su entorno. ¿Qué principio didáctico aplica principalmente?',
+              options: [
+                'Memorización repetitiva para asegurar la respuesta correcta en la prueba.',
+                'Conexión del nuevo conocimiento con los saberes previos y el contexto real de los estudiantes.',
+                'Evaluación únicamente con pruebas escritas al final de la unidad.',
+                'El docente explica todo el contenido y los estudiantes toman notas.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Es aprendizaje significativo: ancla lo nuevo en lo que el estudiante ya sabe y vive.',
+              feedbackKo: 'A, C y D son enfoques tradicionales que no garantizan comprensión ni transferencia a la vida real.'
+            }
+          },
+          {
+            title: 'L5. Evaluación formativa y retroalimentación',
+            content: `
+              <p><strong>Caso:</strong> Carlos aplica una evaluación y el 60 % del grupo no alcanza el desempeño esperado. La familia pregunta por la nota final y Carlos no sabe si avanzar o reforzar.</p>
+              <h4>🗺️ Mapa conceptual: tipos de evaluación</h4>
+              <div class="info-box">
+                <strong>Diagnóstico</strong> (inicio) → <strong>Formativo</strong> (durante) → <strong>Sumativo</strong> (cierre)
+              </div>
+              <h4>3 preguntas para retroalimentar bien</h4>
+              <ul>
+                <li>¿Qué logró el estudiante?</li>
+                <li>¿Qué le falta por mejorar y por qué?</li>
+                <li>¿Qué hará la próxima vez para avanzar?</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Decreto 1290 de 2009 señala que la evaluación institucional es permanente y formativa; debe reorientar procesos, no solo calificar. [VERIFICAR arts. 3 y 4]</div>
+            `,
+            quiz: {
+              question: 'Carlos quiere usar la evaluación formativa para mejorar los aprendizajes, no solo para calificar. ¿Qué acción es más coherente con este enfoque?',
+              options: [
+                'Anunciar la nota final sin explicar los errores, para que el estudiante asuma responsabilidad.',
+                'Entregar una rúbrica con fortalezas, dificultades específicas y una actividad de mejora concreta antes de la próxima valoración.',
+                'Suspender la materia al grupo entero hasta que todos aprueben una prueba de recuperación.',
+                'Ignorar los resultados bajos y continuar con el siguiente tema según el cronograma.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. La retroalimentación debe ser formativa: identificar fortalezas, dificultades y pasos concretos de mejora.',
+              feedbackKo: 'A, C y D convierten la evaluación en castigo o trámite administrativo, sin función pedagógica de apoyo.'
+            }
+          },
+          {
+            title: 'L6. Gestión del aula y convivencia desde la didáctica',
+            content: `
+              <p><strong>Caso:</strong> En el recreo, dos estudiantes de quinto tienen un conflicto físico. La docente debe decidir si aplica solo la sanción del manual o diseña una estrategia pedagógica de reparación.</p>
+              <h4>🗺️ Mapa conceptual: convivencia en el aula</h4>
+              <div class="info-box">
+                <strong>Reglas claras</strong> → <strong>Rutinas positivas</strong> → <strong>Relaciones de confianza</strong> → <strong>Reparación del daño</strong>
+              </div>
+              <h4>Lo que NO es una estrategia didáctica de convivencia</h4>
+              <ul>
+                <li>Castigar públicamente para dar ejemplo.</li>
+                <li>Ignorar el conflicto para que "se les pase".</li>
+                <li>Sancionar sin escuchar las versiones de los involucrados.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Ley 1620 de 2013 establece la Ruta de Atención Integral con componentes de promoción, prevención, atención y seguimiento. [VERIFICAR arts. 29 y 30]</div>
+            `,
+            quiz: {
+              question: 'Ante un conflicto físico entre estudiantes en el recreo, ¿cuál actuación es más pertinente desde una gestión didáctica del aula?',
+              options: [
+                'Aplicar la sanción máxima del manual inmediatamente para cerrar el caso rápido.',
+                'Escuchar las versiones, activar la ruta de convivencia del manual, definir medidas de reparación y hacer seguimiento con las familias.',
+                'Ignorar el hecho porque ocurrió en el recreo y no es competencia del docente de aula.',
+                'Publicar los nombres de los involucrados en el grupo de padres para transparencia.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Escuchar, activar ruta institucional, reparar y hacer seguimiento protege derechos y cumple con debido proceso.',
+              feedbackKo: 'A es castigo sin proceso, C omite el deber de cuidado, y D vulnera la confidencialidad y el debido proceso.'
+            }
           }
         ]
       },
@@ -160,6 +264,172 @@
               correct: 1,
               feedbackOk: '¡Excelente! El Decreto 1278 regula la carrera docente y el concurso de méritos.',
               feedbackKo: 'El Decreto 1278 es el Estatuto Docente: regula la carrera y el concurso de méritos.'
+            }
+          },
+          {
+            title: 'L1. Ruta de atención y convivencia escolar (Ley 1620 de 2013)',
+            content: `
+              <p><strong>Caso:</strong> estudiantes reportan que, desde hace semanas, un compañero recibe mensajes ofensivos en el grupo de WhatsApp del curso y hoy fue ridiculizado frente a otros. El estudiante afectado pide que “no se arme un problema grande”.</p>
+              <h4>Qué hacer</h4>
+              <ul>
+                <li><strong>Proteger</strong> al estudiante afectado sin exponerlo ni revictimizarlo.</li>
+                <li><strong>Registrar</strong> los hechos, versiones y evidencias con trazabilidad.</li>
+                <li><strong>Activar</strong> la Ruta de Atención Integral y el protocolo del manual de convivencia.</li>
+                <li>Informar a las familias dentro del debido proceso y hacer <strong>seguimiento</strong>.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Ley 1620 de 2013 crea la Ruta de Atención Integral (promoción, prevención, atención y seguimiento). El Comité Escolar de Convivencia interviene en el marco del manual de convivencia. [VERIFICAR arts. 13, 29–31]</div>
+            `,
+            quiz: {
+              question: 'Docente de 8°. Reportan mensajes ofensivos reiterados en WhatsApp del curso y ridiculización de un compañero. El afectado pide discreción. ¿Cuál actuación es más pertinente para iniciar el abordaje?',
+              options: [
+                'Citar a los involucrados con coordinación para escuchar versiones y compromisos, informando al grupo que el tema se maneja para evitar rumores.',
+                'Acordar con el afectado una disculpa mediada y, si la acepta, dejar constancia informal para no activar un trámite mayor.',
+                'Acoger el reporte con reserva, documentar lo conocido, orientar medidas inmediatas de protección y activar el protocolo/ruta según el manual institucional.',
+                'Orientar al estudiante y su familia para recopilar capturas y denunciar ante autoridad externa, mientras el colegio observa si hay nuevos hechos.'
+              ],
+              correct: 2,
+              feedbackOk: 'Correcto. La ruta se activa con reserva, protección del afectado y registro institucional; no se cierra con disculpas informales ni se deja solo al afectado.',
+              feedbackKo: 'Opciones A, B y D fallan: expón al grupo (A), informalidad que ignora la ruta (B) o trasladas la carga al exterior sin activar el protocolo interno (D).'
+            }
+          },
+          {
+            title: 'L2. Evaluación formativa, SIEE y promoción (Decreto 1290 de 2009)',
+            content: `
+              <p><strong>Caso:</strong> al cierre de periodo, un estudiante obtiene bajo desempeño en ciencias y ha tenido inasistencias por situación familiar conocida. La familia pregunta si “ya perdió la materia”.</p>
+              <h4>Qué hacer</h4>
+              <ul>
+                <li>Sustentar la valoración con <strong>evidencias y criterios del SIEE</strong>, no con una nota aislada.</li>
+                <li><strong>Retroalimentar</strong> oportunamente y definir apoyos y seguimiento.</li>
+                <li>Comunicar con claridad a la familia y al estudiante.</li>
+                <li>Usar las instancias de reclamación si persiste el desacuerdo; decidir promoción según el SIEE.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Decreto 1290 de 2009 reglamenta la evaluación del aprendizaje y promoción. La evaluación institucional es permanente, objetiva y formativa; el SIEE define criterios de evaluación, promoción, apoyos e instancias de reclamación. [VERIFICAR arts. 3, 4, 6]</div>
+            `,
+            quiz: {
+              question: '9°. Cierre de periodo: bajo desempeño en ciencias e inasistencias por situación familiar conocida. La familia pregunta si el estudiante “ya perdió”. ¿Cuál actuación es más pertinente?',
+              options: [
+                'Confirmar que el bajo desempeño del periodo define la pérdida, para que la familia tome medidas desde ya.',
+                'Socializar evidencias y criterios del SIEE, explicar el estado del proceso, definir apoyos y seguimiento, y acordar compromisos, indicando cómo se valora según el sistema institucional.',
+                'Ajustar la valoración a desempeño básico para evitar desmotivación, dejando los apoyos como opcionales.',
+                'Suspender la valoración del periodo hasta normalizar la situación familiar, sin registro de evidencias ni plan de apoyo.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Hace transparente la evaluación, la vincula al SIEE y activa apoyo/seguimiento sin adelantar conclusiones improcedentes.',
+              feedbackKo: 'Opciones A, C y D fallan: cierre prematuro (A), sacrificio de criterios y evidencias (C), o suspensión sin registro ni plan que debilita objetividad (D).'
+            }
+          },
+          {
+            title: 'L3. Educación inclusiva, ajustes razonables y PIAR (Decreto 1421 de 2017)',
+            content: `
+              <p><strong>Caso:</strong> ingresa a 5° un estudiante con discapacidad auditiva que usa apoyos comunicativos. La próxima unidad incluye videos, debate y evaluación escrita. ¿Bajar el nivel, exonerarlo o atenderlo aparte?</p>
+              <h4>Qué hacer</h4>
+              <ul>
+                <li>Identificar <strong>barreras del entorno</strong>, no “deficit” del estudiante como excusa de exclusión.</li>
+                <li>Planear con <strong>DUA</strong>: múltiples formas de presentar información, participar y evidenciar aprendizaje.</li>
+                <li>Concertar y documentar <strong>ajustes razonables</strong> en el PIAR, sin reducir expectativas de aprendizaje.</li>
+                <li>Articular con familia, apoyos y equipo institucional; mantener seguimiento.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Decreto 1421 de 2017 reglamenta la atención educativa en educación inclusiva. Define Ajustes Razonables, DUA y PIAR como herramienta para garantizar aprendizaje, participación, permanencia y promoción. [VERIFICAR definiciones en extracto]</div>
+            `,
+            quiz: {
+              question: '5°. Estudiante con discapacidad auditiva usa apoyos comunicativos. La unidad incluye videos, debate y evaluación escrita. ¿Cuál actuación es más pertinente?',
+              options: [
+                'Mantener las actividades previstas para todos y ofrecer explicación adicional al final de cada clase.',
+                'Diseñar con DUA y acordar en el PIAR ajustes razonables para acceso, participación y formas de evidenciar el aprendizaje.',
+                'Asignar actividades alternativas sobre contenidos previos mientras el grupo desarrolla la unidad.',
+                'Sustituir toda evaluación por observación informal, sin criterios registrados.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Elimina barreras desde el diseño y documenta ajustes individualizados sin excluir al estudiante.',
+              feedbackKo: 'Opciones A, C y D fallan: refuerzo sin eliminar barreras (A), riesgo de separación curricular (C), o flexibilidad sin criterios/registro que debilita validez (D).'
+            }
+          },
+          {
+            title: 'L4. Protocolo de acoso escolar: pasos de actuación (Ley 1620)',
+            content: `
+              <p><strong>Caso:</strong> Un docente recibe un reporte de que un estudiante de séptimo es excluido y señalado en grupos de WhatsApp del curso. La familia pide "que se castigue ya".</p>
+              <h4>🗺️ Mapa conceptual: actuación ante acoso escolar</h4>
+              <div class="info-box">
+                <strong>Acoger el reporte con reserva</strong> → <strong>Registrar hechos y evidencias</strong> → <strong>Activar ruta/comité de convivencia</strong> → <strong>Protección y seguimiento</strong>
+              </div>
+              <h4>Lo que NO se debe hacer</h4>
+              <ul>
+                <li>Sancionar sin investigación ni debido proceso.</li>
+                <li>Exponer públicamente al estudiante agresor o a la víctima.</li>
+                <li>Cerrar el caso con una disculpa informal sin seguimiento institucional.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Ley 1620 de 2013, Ruta de Atención Integral y protocolos del Comité Escolar de Convivencia. [VERIFICAR arts. 29–31]</div>
+            `,
+            quiz: {
+              question: 'Ante un reporte de acoso escolar en grupos de WhatsApp del curso, ¿cuál es el primer paso más pertinente del docente?',
+              options: [
+                'Sancionar inmediatamente a los presuntos agresores para enviar mensaje contundente.',
+                'Acoger el reporte con reserva, documentar lo conocido y activar la ruta de atención/comité según el manual de convivencia.',
+                'Pedir a los estudiantes que resuelvan el conflicto solos entre ellos.',
+                'Esperar a que la familia interponga una denuncia formal antes de actuar.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. El primer paso es acoger, documentar y activar la ruta institucional con reserva.',
+              feedbackKo: 'A, C y D omiten el debido proceso, la protección inmediata o la activación oportuna de la ruta.'
+            }
+          },
+          {
+            title: 'L5. Reclamaciones de evaluación y derechos de la familia (Decreto 1290)',
+            content: `
+              <p><strong>Caso:</strong> Una familia no está de acuerdo con la valoración final de su hijo y solicita "cambiar la nota" directamente al docente.</p>
+              <h4>🗺️ Mapa conceptual: reclamo de evaluación</h4>
+              <div class="info-box">
+                <strong>Revisar evidencias y criterios del SIEE</strong> → <strong>Informar de forma clara y oportuna</strong> → <strong>Orientar sobre instancias de reclamación formal</strong>
+              </div>
+              <h4>Qué hacer ante el reclamo</h4>
+              <ul>
+                <li>Mostrar los criterios y evidencias que fundamentan la valoración.</li>
+                <li>Explicar la escala de valoración institucional.</li>
+                <li>Orientar sobre el procedimiento y tiempos de reclamación previstos en el SIEE.</li>
+                <li>Dejar registro de la atención a la familia.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Decreto 1290 de 2009, art. 4 (instancias, procedimientos y mecanismos de atención y resolución de reclamaciones sobre evaluación y promoción). [VERIFICAR literal]</div>
+            `,
+            quiz: {
+              question: 'Una familia solicita cambiar la valoración final de su hijo. ¿Cuál es la actuación más pertinente del docente?',
+              options: [
+                'Cambiar la nota de inmediato para evitar conflicto con la familia.',
+                'Revisar evidencias y criterios del SIEE, informar claramente y orientar sobre el procedimiento formal de reclamación si persiste el desacuerdo.',
+                'Negar toda explicación porque la decisión del docente es final e inapelable.',
+                'Someter la nota a votación de los demás estudiantes para decidir.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Combina transparencia pedagógica con respeto por la vía institucional de reclamación.',
+              feedbackKo: 'A, C y D vulneran criterios de equidad, desconocen instancias de reclamación o reducen la evaluación a trámites informales.'
+            }
+          },
+          {
+            title: 'L6. Ajustes razonables y PIAR en la práctica docente (Decreto 1421)',
+            content: `
+              <p><strong>Caso:</strong> Un estudiante con discapacidad motriz necesita usar computadora para escribir en clases y exámenes. El docente duda si "bajar el nivel" o cómo ajustar.</p>
+              <h4>🗺️ Mapa conceptual: ajustes razonables</h4>
+              <div class="info-box">
+                <strong>Identificar barrera</strong> → <strong>Valorar pedagógica y socialmente</strong> → <strong>Acordar ajustes en el PIAR</strong> → <strong>Implementar con seguimiento</strong>
+              </div>
+              <h4>Ajustes razonables NO son</h4>
+              <ul>
+                <li>Bajar automáticamente el objetivo de aprendizaje.</li>
+                <li>Exonerar al estudiante de toda evaluación sin criterio.</li>
+                <li>Hacer un plan diferente y aislado sin articulación con el grupo.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Decreto 1421 de 2017, PIAR y ajustes razonables para garantizar acceso, participación, permanencia y promoción. [VERIFICAR definiciones de PIAR y DUA]</div>
+            `,
+            quiz: {
+              question: 'Un estudiante con discapacidad motriz requiere computadora para escribir en clases y exámenes. ¿Cuál es la actuación más pertinente?',
+              options: [
+                'Bajar el objetivo de aprendizaje para que apruebe sin esfuerzo.',
+                'Exonerarlo de toda evaluación escrita durante el periodo.',
+                'Acordar en el PIAR el uso de computadora como ajuste razonable, manteniendo el propósito de aprendizaje con criterios claros.',
+                'Dejar que el estudiante decida si escribe o no, sin registro institucional.'
+              ],
+              correct: 2,
+              feedbackOk: 'Correcto. El ajuste razonable elimina barreras de acceso/expresión sin bajar el propósito de aprendizaje.',
+              feedbackKo: 'A, B y D reducen expectativas, eliminan evidencias o carecen de trazabilidad institucional.'
             }
           }
         ]
@@ -359,6 +629,111 @@
               correct: 1,
               feedbackOk: '¡Muy bien! Lo esencial es la reflexión pedagógica y ética, no la complejidad tecnológica. Un proyecto simple pero bien fundamentado es más valioso.',
               feedbackKo: 'El proyecto integrador se evalúa por coherencia pedagógica, manejo ético de datos y reflexión sobre el impacto real en los aprendizajes, no por la cantidad de herramientas.'
+            }
+          },
+          {
+            title: 'L7. IA en la planificación didáctica: de la idea a la secuencia de clase',
+            content: `
+              <p><strong>Caso:</strong> María debe planear una semana de ciencias para quinto grado y no sabe por dónde empezar. Usa una IA para generar la planeación completa sin revisar los estándares curriculares ni el contexto de sus estudiantes.</p>
+              <h4>🗺️ Mapa conceptual: planificación con IA responsable</h4>
+              <div class="info-box">
+                <strong>Reto del aula</strong> → <strong>Estándar curricular</strong> → <strong>Prompt con rol, tarea, contexto y formato</strong> → <strong>Revisión y ajuste docente</strong> → <strong>Secuencia de clase</strong>
+              </div>
+              <h4>Lo que hace el docente vs. lo que hace la IA</h4>
+              <table style="width:100%; border-collapse: collapse; margin: 12px 0;">
+                <tr style="background:#f4f6f8;">
+                  <th style="text-align:left; border:1px solid #ccc; padding:8px;">Momento</th>
+                  <th style="text-align:left; border:1px solid #ccc; padding:8px;">Solo IA (riesgo)</th>
+                  <th style="text-align:left; border:1px solid #ccc; padding:8px;">Docente con IA (acertado)</th>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:8px;"><strong>Definir objetivo</strong></td>
+                  <td style="border:1px solid #ccc; padding:8px;">Acepta cualquier objetivo que sugiera la IA.</td>
+                  <td style="border:1px solid #ccc; padding:8px;">Valida que esté alineado a los estándares curriculares y al nivel.</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:8px;"><strong>Diseñar actividades</strong></td>
+                  <td style="border:1px solid #ccc; padding:8px;">Copia y pega lo que genere la IA sin adaptar.</td>
+                  <td style="border:1px solid #ccc; padding:8px;">Adapta al contexto, recursos y tiempos reales de su aula.</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #ccc; padding:8px;"><strong>Evaluar</strong></td>
+                  <td style="border:1px solid #ccc; padding:8px;">Usa la rúbrica de la IA sin revisar criterios.</td>
+                  <td style="border:1px solid #ccc; padding:8px;">Valida y ajusta la rúbrica con su juicio pedagógico.</td>
+                </tr>
+              </table>
+              <div class="info-box"><strong>Principio clave:</strong> la IA genera propuestas; el docente decide, valida y es responsable pedagógicamente del resultado final.</div>
+            `,
+            quiz: {
+              question: 'María usa una IA para generar su planeación semanal sin revisar estándares curriculares ni adaptar al contexto de sus estudiantes. ¿Cuál es el principal riesgo pedagógico?',
+              options: [
+                'La IA no permite exportar la planeación a Word o PDF.',
+                'La secuencia puede no alinearse con los estándares ni con las necesidades reales del grupo.',
+                'La IA tarda demasiado en generar los contenidos.',
+                'La planeación queda almacenada en la nube de la plataforma de IA.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Sin revisión del docente, la IA puede producir contenidos genéricos, desalineados con el currículo o inadecuados para el contexto.',
+              feedbackKo: 'A, C y D son problemas técnicos o secundarios; el riesgo central es la falta de validación pedagógica y curricular.'
+            }
+          },
+          {
+            title: 'L8. Sesgos, alucinaciones y verificación de IA generativa',
+            content: `
+              <p><strong>Caso:</strong> Un docente le pide a una IA que redacte una carta a padres sobre un proyecto de lectura. La IA inventa un decreto inexistente y cita un artículo del Código de la Infancia que no dice lo que afirma.</p>
+              <h4>🗺️ Mapa conceptual: verificación crítica</h4>
+              <div class="info-box">
+                <strong>Resultado de IA</strong> → <strong>Identificar posible alucinación</strong> → <strong>Contrastar con fuente primaria</strong> → <strong>Corregir o descartar</strong>
+              </div>
+              <h4>Señales de alerta en contenido generado por IA</h4>
+              <ul>
+                <li>Citas de normas, leyes o autores sin número de artículo ni fuente verificable.</li>
+                <li>Datos estadísticos o estudios que no se pueden rastrear.</li>
+                <li>Respuestas muy seguras sobre temas específicos pero con imprecisiones técnicas.</li>
+                <li>Referencias a páginas web que no existen o no abren.</li>
+              </ul>
+              <div class="info-box"><strong>Dato clave del concurso:</strong> la IA puede "alucinar" (inventar información presentándola como real). El docente debe contrastar con fuentes primarias antes de usar cualquier contenido con estudiantes o familias.</div>
+            `,
+            quiz: {
+              question: 'Una IA generativa redacta un documento para familias y cita un artículo de una ley que parece plausible pero el docente no lo encuentra en el texto legal. ¿Qué debe hacer el docente?',
+              options: [
+                'Usar el texto igual porque la IA suena convincente y segura.',
+                'Descartar la cita y contrastar la información con la fuente primaria (texto oficial de la ley) antes de incluirla.',
+                'Preguntar a otro sistema de IA para confirmar si el artículo existe.',
+                'Enviar el documento tal cual y pedir a las familias que verifiquen.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Nunca usar contenido generado por IA con citas legales sin contrastar con la fuente primaria oficial.',
+              feedbackKo: 'A asume que la IA es infalible; C solo traslada el problema a otra IA posible; D transfiere la responsabilidad a las familias.'
+            }
+          },
+          {
+            title: 'L9. Protección de datos de menores y consentimiento con IA (Ley 1581 y 1098)',
+            content: `
+              <p><strong>Caso:</strong> Un docente quiere subir fotos y nombres de sus estudiantes de primaria a una plataforma de IA para generar avatares personalizados y materiales didácticos, sin consultar a las familias ni revisar la política de privacidad de la plataforma.</p>
+              <h4>🗺️ Mapa conceptual: uso ético de datos con IA</h4>
+              <div class="info-box">
+                <strong>Identificar datos personales</strong> → <strong>Solicitar consentimiento informado a acudientes</strong> → <strong>Revisar política de privacidad de la plataforma</strong> → <strong>Minimizar datos compartidos</strong>
+              </div>
+              <h4>Qué NO hacer con datos de menores en plataformas de IA</h4>
+              <ul>
+                <li>Subir nombres completos, fotos o datos de salud sin consentimiento informado.</li>
+                <li>Usar plataformas gratuitas sin revisar si almacenan o entrenan con esos datos.</li>
+                <li>Suponer que "porque es educativo" ya está permitido.</li>
+              </ul>
+              <div class="info-box"><strong>Norma clave:</strong> Ley 1581 de 2012 (Protección de Datos Personales) y Ley 1098 de 2006 (Código de Infancia y Adolescencia). [VERIFICAR alcance para menores en contextos educativos]</div>
+            `,
+            quiz: {
+              question: 'Un docente quiere subir fotos y nombres de estudiantes de primaria a una IA para generar avatares, sin consultar a las familias ni revisar la política de privacidad. ¿Cuál es la actuación más pertinente?',
+              options: [
+                'Proceder porque es material educativo y no se vende nada.',
+                'Solicitar consentimiento informado a los acudientes, revisar la política de privacidad de la plataforma y minimizar los datos personales compartidos.',
+                'Usar solo nombres de pila sin apellidos para "proteger la identidad" sin consentimiento.',
+                'Pedir permiso después de subir las imágenes, si alguna familia se queja.'
+              ],
+              correct: 1,
+              feedbackOk: 'Correcto. Se requiere consentimiento informado, revisión de la política de privacidad y minimización de datos antes de compartir información de menores.',
+              feedbackKo: 'A, C y D vulneran la protección de datos personales de menores: no basta con fines educativos, omitir apellidos no elimina el dato personal, y pedir perdón después no sustituye al consentimiento previo.'
             }
           }
         ]
