@@ -1,17 +1,27 @@
 # Handoff — estado y siguientes pasos
 
-**Actualizado:** 2026-11-06 (verificación de puesta al día: repo, docs y producción sin desfases; suite 26/26 y 198/198 en verde)
+**Actualizado:** 2026-11-10 (piloto situacional publicado en producción, commit `4502261`; calificación segura deshabilitada en prod hasta aplicar `20261101_lesson_quiz_responses.sql` — ver §2 quater y §3 P0)
 **Rama de producción:** `main` (histórico publicado durante la reconstrucción: `recovery/integracion-20261031`)
-**Suites:** 27/27 suites y 202/202 pruebas en verde (`npx jest --maxWorkers=2`)
+**Suites:** 27/27 y 202/202 en verde en la verificación de 2026-11-06. En la sesión del 2026-11-10 la base local de esta máquina no autenticó (`localhost:5432` para el usuario `postgres`) ni Docker Desktop estaba operativo: las únicas suites ejecutadas fueron las 4 suites simuladas de seguridad (20/20) y `spa-modular` (10/10). `npm test` completo queda pendiente en la máquina de trabajo
 **Base de desarrollo:** PostgreSQL local `meritodocente` (`127.0.0.1:5432`) preparada
-con `npm run db:preparar` + `npm run seed`. Supabase = producción, con el catálogo
-de 3 cursos cargado el 2026-11-03 (§2 ter).
+con `npm run db:preparar` + `npm run seed` **si la contraseña de `.env` es correcta** (esta máquina falló la autenticación; alternativa documentada en `docs/arquitectura-frontend.md` §8: Docker `postgres:15` + `merito_test_local` en `127.0.0.1:5433`). Supabase = producción, con el catálogo de 3 cursos cargado el 2026-11-03 (§2 ter) y el piloto situacional el 2026-11-10 (§2 quater).
 
 Este documento es el punto de entrada para retomar el trabajo, sea la misma
 persona o un agente distinto. `AGENTS.md` sigue siendo el contexto operativo
 (contratos, comandos, protocolo); aquí está **qué falta y en qué orden**.
 
 ## 0. Empezar aquí (estado al 2026-11-03)
+
+> **Actualización 2026-11-10:** el piloto situacional ya está **publicado** en
+> producción (commit `4502261`, deploy `dpl_2wCiWyRN1Bu2nLWqD1mL9CY3EZhU`,
+> alias `mooc-docente.vercel.app`): 12 lecciones situacionales nuevas
+> (Pedagogía L4–L6, Legislación L1–L6, IA L7–L9) con sus 12 quizzes en
+> `estado_revision = 'publicado'`. **La calificación segura sigue
+> deshabilitada en producción**: responder cualquier actividad de lección
+> devuelve `503 "La calificación segura aún no está habilitada en este
+> entorno."` hasta aplicar `database/migrations/20261101_lesson_quiz_responses.sql`
+> (tabla `lesson_quiz_responses` inexistente, verificado con `to_regclass` el
+> 2026-11-10). Ver §2 quater y el P0 de §3.
 
 **Producción ya funciona con contenido real.** `https://mooc-docente.vercel.app`
 sirve 3 cursos desde Supabase (`GET /api/v1/courses` → `totalCursos: 3`), los 11
@@ -244,7 +254,76 @@ La carga crea `catalog_load_items` para auditar el lote y revertirlo sin tocar
 datos previos; su preflight aborta sin escribir si hubiera títulos duplicados
 en el catálogo destino.
 
+## 2 quater. Piloto situacional desplegado (2026-11-09/10)
+
+**Resultado: hecho, salvo la calificación segura.** El piloto de casos
+situacionales tipo concurso está en producción, de punta a punta (API, 12
+lecciones y deploy). Lo único que falta para que el piloto se pueda usar
+según el diseño seguro es **una migración** (§3 P0).
+
+### Qué se publicó
+
+| Capa | Detalle |
+| --- | --- |
+| Contenido SPA | `public/js/datos/modulos.js` (+375 líneas): 12 lecciones situacionales — Pedagogía L4–L6, Legislación L1–L6, IA L7–L9 — con pregunta, 4 opciones, retroalimentación y `es_correcta` solo en el seed del catálogo, nunca en el DOM |
+| BD producción | 4 cargas idempotentes/transaccionales aplicadas con `ON_ERROR_STOP=1`: `20261109_piloto_legislacion_situacional.sql`, `20261109_legislacion_situacional_adicional.sql` (dependía del anterior), `20261109_piloto_pedagogia_situacional.sql`, `20261109_piloto_ia_situacional.sql` |
+| Datos creados | Módulos piloto (`orden = 99`): Pedagogía 3 lecciones, Legislación 6, IA 3; 12 quizzes `publicado` × 4 opciones; autoverificación `quizzes_sin_una_correcta = 0` en los 4 archivos y conteos globales idénticos (Pedagogía 3/3/12, Legislación 6/6/24, IA 3/3/12) |
+| API | `GET /api/v1/courses` → Pedagogía `lesson_count 6` (antes 3), Legislación `8` (antes 2), IA `9` (antes 6); `totalCursos: 3` |
+| Git | `4502261` *feat: piloto situacional Legislación, Pedagogía e IA con preguntas tipo concurso* (5 archivos; `.env*` fuera del commit) y `git push origin main` (`cddedeb..4502261`) |
+| Deploy | `vercel --prod` → READY, deployment `dpl_2wCiWyRN1Bu2nLWqD1mL9CY3EZhU`, alias `mooc-docente.vercel.app` |
+| Verificación | `/health` → `"commit":"4502261"`; `/` → 200, CSP con `script-src-attr 'none'`, 19 `<script src>`, 0 manejadores `on*`; `/js/datos/modulos.js` → `application/javascript` con L1–L9; navegador (sesión real, 2026-11-10): dashboard con los 3 cursos, módulo piloto visible en cada curso (`#/modulo/mod2/12`, `#/modulo/mod1/13`, `#/modulo/mod3/14`), lección L1 Legislación renderiza el caso + quiz de la API **sin exponer la correcta**, 0 errores de consola |
+
+### Lo que NO está habilitado en producción (bloqueo actual)
+
+`POST /api/v1/quizzes/lessons/:lessonId/responses` responde
+**`503 "La calificación segura aún no está habilitada en este entorno."`**
+porque `public.lesson_quiz_responses` no existe (verificado con `to_regclass`
+el 2026-11-10 → NULL). Consecuencias mientras dure:
+
+- El feedback del servidor para las actividades de piloto no llega; el SPA
+  quedará mostrando el estado de "calificación no disponible" o sin puntaje.
+- `POST /progress/lesson/:id` sigue funcionando pero sin derivar puntaje con
+  `lesson_quiz_responses`: la lección se completa sin nota (`puntaje = NULL`)
+  y el dominio no puede exigirse.
+- El examen final de curso **sí** funciona (usa `quiz_attempts`, migración
+  `20261102` ya aplicada).
+
+El arreglo es una sola migración **aditiva e idempotente**, registrada en
+`scripts/preparar-base-local.js` y documentada en
+`docs/calificacion-segura-cuestionarios.md` (§7: migrar primero, luego
+publicar y verificar). No requiere redeploy: el código (`respuestasDisponibles`)
+lee el estado de la tabla en cada request.
+
+### Observaciones y deudas menores detectadas hoy
+
+- En módulos piloto (`orden = 99`) la etiqueta de cabecera muestra valores
+  como `Lección 4 de 3 de este módulo` o `Lección 7 de 3 de este módulo`:
+  la interpolación de posición/total no entiende que el módulo piloto se
+  añadió al final; revisar la vista de lección si se corrige.
+- En la página del módulo de piloto quedó añadido un botón oculto (`display`
+  de facto `none`, área cero) con `data-action="open-lesson"` y
+  `courseId="mod3"`: no es interactivo/visible, pero conviene retirarlo al
+  tocar esa vista.
+- `db:preparar` contra esta máquina falla la autenticación de `.env`
+  (`localhost:5432`, usuario `postgres`); la ruta soportada es el Docker
+  `merito_test_local` (`docs/arquitectura-frontend.md` §8) con Docker
+  Desktop encendido.
+- Detalle del comportamiento del 503: la respuesta está pensada para pasar
+  de sombra (503) a habilitada (201) en caliente, sin tocar código ni
+  Vercel.
+
 ## 3. Pendiente, en orden
+
+### P0 — Desbloquear la calificación segura del piloto (mañana, primer punto)
+
+- **Aplicar `database/migrations/20261101_lesson_quiz_responses.sql` en
+  producción** (`psql "$DATABASE_URL_PRODUCCION"`, con `.env.produccion`;
+  `ON_ERROR_STOP=1`). Orden sugerido:
+  1. (Opcional, staging) Encender Docker Desktop; `DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/merito_test_local npm run db:preparar` y luego las 4 suites de seguridad (`npx jest tests/lesson-quiz-security.test.js tests/progress-security.test.js tests/lesson-quiz-spa.test.js tests/catalog-diagnostics.test.js`). Deben pasar 20/20.
+  2. Aplicar la migración en Supabase. Verificar: `psql "$u" -c "SELECT to_regclass('public.lesson_quiz_responses');"` → devuelve el nombre de la tabla (no NULL).
+  3. Verificar en navegador con sesión real: abrir la lección L1 Legislación (`#/leccion/mod2/2`) → responder un ítem → el feedback debe ser el del servidor (sin `503`) y la lección debe poder completarse con puntaje derivado.
+  4. No hace falta `vercel --prod` ni cambiar código tras la migración: el gate (`respuestasDisponibles`) se lee en cada request.
+- **No activar todavía `LESSON_COMPLETION_REQUIRES_QUIZ=true`**: requiere que todas las actividades visibles usen la API; hoy conviven ambos caminos.
 
 ### P1 — Necesita decisión de producto (no de código)
 
@@ -310,6 +389,8 @@ en el catálogo destino.
 | Revisar y firmar el diff | Cambia contrato de UI y añade un script | `git status` / `git diff` |
 | Commit y push | No se hacen commits automáticos | Rama `main` |
 | **Rotar la contraseña de Supabase** | La cadena se pegó en el chat el 2026-11-03 | Panel de Supabase → Database → Reset password, luego actualizar `.env.produccion` y la variable de Vercel |
+| **Dar luz verde para la migración `20261101_lesson_quiz_responses.sql`** | Es DDL en producción: solo tras tu OK (staging → Supabase, §3 P0) | `.env.produccion` / §3 P0 |
+| **Corregir el acceso local** (`localhost:5432` rechaza el password del `.env`) | Bloquea `npm test` completo y `db:preparar`/`seed` de esta máquina | Actualizar `.env` o usar Docker `merito_test_local` (`docs/arquitectura-frontend.md` §8) |
 | Decidir umbral, requisito e insignia | Es criterio académico y comercial | P1 arriba |
 | Validar el banco del curso #1 | Requiere criterio docente | P2 arriba |
 | **Preparar las preguntas del PDF** | Es contenido académico, no código | Plantilla en §0 |

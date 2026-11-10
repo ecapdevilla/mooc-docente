@@ -1,6 +1,14 @@
 # Calificación segura de cuestionarios de lección
 
-Estado: 2026-11-01. Implementación local, sin migración ejecutada en Production.
+Estado: 2026-11-10. El **código está desplegado y verificado** en producción
+(commit `4502261`): el SPA y el endpoint califican solo con identificadores y
+la API devuelve `503 "La calificación segura aún no está habilitada en este
+entorno."` porque `public.lesson_quiz_responses` **no existe en Supabase**
+(verificado con `to_regclass` el 2026-11-10 → NULL). Falta únicamente aplicar
+`database/migrations/20261101_lesson_quiz_responses.sql` en producción (ver
+`docs/handoff.md` §2 quater y §3 P0); en cuanto exista la tabla, la
+calificación pasa a habilitada en caliente, sin redeploy. Suites simuladas:
+20/20 en verde.
 
 ## 1. Problema corregido
 
