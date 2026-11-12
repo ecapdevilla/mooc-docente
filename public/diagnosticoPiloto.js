@@ -8,7 +8,6 @@ const state = {
   token: null,
   questions: [],
   answers: {},
-  marked: {},
   position: 0,
   expiresAt: null,
 };
@@ -35,7 +34,6 @@ const request = async (path, body) => {
 
 const questionIds = () => new Set(state.questions.map((question) => question.id));
 const answeredCount = () => Object.keys(state.answers).filter((id) => questionIds().has(id)).length;
-const markedCount = () => Object.values(state.marked).filter(Boolean).length;
 
 const saveAttempt = () => {
   try {
@@ -60,9 +58,6 @@ const restoreAttempt = () => {
         const question = parsed.questions.find((item) => item.id === id);
         return ids.has(id) && question.opciones.some((option) => option.id === optionId);
       });
-    const validMarks = parsed.marked === undefined ||
-      (parsed.marked && typeof parsed.marked === 'object' && !Array.isArray(parsed.marked) &&
-        Object.entries(parsed.marked).every(([id, marked]) => ids.has(id) && marked === true));
     const expiry = parsed.expiresAt ? Date.parse(parsed.expiresAt) : null;
 
     if (
@@ -70,7 +65,6 @@ const restoreAttempt = () => {
       !/^[0-9a-f]{64}$/.test(parsed.token) ||
       !validQuestions ||
       !validAnswers ||
-      !validMarks ||
       !Number.isInteger(parsed.position) ||
       parsed.position < 0 ||
       parsed.position >= EXPECTED_QUESTIONS ||
@@ -81,7 +75,7 @@ const restoreAttempt = () => {
       return false;
     }
 
-    Object.assign(state, parsed, { marked: parsed.marked || {} });
+    Object.assign(state, parsed);
     return true;
   } catch (error) {
     try {
@@ -103,11 +97,6 @@ const appendText = (parent, tag, content, className) => {
   return node;
 };
 
-const setButtonState = (button, pressed) => {
-  button.setAttribute('aria-pressed', String(pressed));
-  button.textContent = pressed ? 'Quitar marca de revisión' : 'Marcar para revisar';
-};
-
 const renderQuestionNav = () => {
   const navigation = element('questionNav');
   navigation.replaceChildren();
@@ -115,21 +104,16 @@ const renderQuestionNav = () => {
 
   state.questions.forEach((question, index) => {
     const answered = Object.prototype.hasOwnProperty.call(state.answers, question.id);
-    const flagged = Boolean(state.marked[question.id]);
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `question-jump${answered ? ' answered' : ''}${flagged ? ' flagged' : ''}`;
+    button.className = `question-jump${answered ? ' answered' : ''}`;
     button.textContent = String(index + 1);
-    button.setAttribute('aria-label',
-      `Pregunta ${index + 1}, ${answered ? 'respondida' : 'pendiente'}${flagged ? ', marcada para revisar' : ''}`);
+    button.setAttribute('aria-label', `Pregunta ${index + 1}, ${answered ? 'respondida' : 'pendiente'}`);
     if (index === state.position) button.setAttribute('aria-current', 'step');
     button.addEventListener('click', () => moveToQuestion(index));
     navigation.append(button);
   });
 
-  element('reviewCount').textContent = markedCount()
-    ? `${markedCount()} para revisar`
-    : '';
   element('answerSummary').textContent =
     `${answeredCount()} respondidas · ${EXPECTED_QUESTIONS - answeredCount()} pendientes`;
   element('progressBar').setAttribute('aria-valuenow', String(answeredCount()));
@@ -181,7 +165,6 @@ const renderQuestion = () => {
   element('prev').disabled = state.position === 0;
   element('next').hidden = state.position === state.questions.length - 1;
   element('submit').hidden = state.position !== state.questions.length - 1;
-  setButtonState(element('markReview'), Boolean(state.marked[question.id]));
   renderQuestionNav();
 };
 
@@ -235,7 +218,6 @@ const startAttempt = async () => {
       token: payload.token,
       questions: payload.preguntas,
       answers: {},
-      marked: {},
       position: 0,
       expiresAt: payload.expira_en || null,
     });
@@ -495,17 +477,6 @@ const initialize = async () => {
   element('next').addEventListener('click', () => moveToQuestion(state.position + 1));
   element('submit').addEventListener('click', submitAttempt);
   element('sendFeedback').addEventListener('click', submitFeedback);
-  element('markReview').addEventListener('click', () => {
-    const question = state.questions[state.position];
-    if (!question) return;
-    state.marked[question.id] = !state.marked[question.id];
-    if (!state.marked[question.id]) delete state.marked[question.id];
-    if (saveAttempt()) {
-      setButtonState(element('markReview'), Boolean(state.marked[question.id]));
-      renderQuestionNav();
-      element('markReview').focus({ preventScroll: true });
-    }
-  });
   element('backPanel').addEventListener('click', (event) => {
     if (!element('exam').hidden) {
       event.preventDefault();
